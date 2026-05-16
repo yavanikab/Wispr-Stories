@@ -1,6 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 const PALS = [
   '#7c3aed',
