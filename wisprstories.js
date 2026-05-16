@@ -11,10 +11,30 @@ const PALS = [
   "#4f46e5",
 ];
 const PAL_NAMES = ['violet', 'amber', 'crimson', 'emerald', 'ocean', 'rose', 'orange', 'teal', 'fuchsia', 'indigo'];
+const CARD_RATIOS = ['2x2', '3x4', '4x5', '9x16'];
+const CARD_CORNERS = ['rounded', 'sharp'];
+function cardBgUrl(ratio, corners, palName) {
+  return `assets/card-bgs/${ratio}_${corners}_${palName}.webp`;
+}
 function getCardBgImage() {
   const ratio = (document.getElementById('card')?.dataset.ratio || '4/5').replace('/', 'x');
   const corners = useRounded ? 'rounded' : 'sharp';
-  return `assets/card-bgs/${ratio}_${corners}_${PAL_NAMES[curP]}.webp`;
+  return cardBgUrl(ratio, corners, PAL_NAMES[curP]);
+}
+// Cache for already-preloaded URLs so we don't re-fire Image() requests.
+const _cardBgPreloaded = new Set();
+function preloadCardBgVariant(ratio, corners) {
+  PAL_NAMES.forEach((name) => {
+    const src = cardBgUrl(ratio, corners, name);
+    if (_cardBgPreloaded.has(src)) return;
+    _cardBgPreloaded.add(src);
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+  });
+}
+function preloadAllCardBgs() {
+  CARD_RATIOS.forEach((r) => CARD_CORNERS.forEach((c) => preloadCardBgVariant(r, c)));
 }
 function isLightColor(hex) {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -150,9 +170,15 @@ function applyPal(idx) {
   if (isNaN(idx) || idx < 0 || idx >= PALS.length) return;
   curP = idx;
   const bg = document.getElementById("cardBg");
+  const col = PALS[idx];
+  // Solid color fallback first — prevents page-bg flash while the WebP loads.
+  bg.style.backgroundColor = col;
   bg.style.backgroundImage = `url(${getCardBgImage()})`;
   bg.style.backgroundSize = '100% 100%';
-  const col = PALS[idx];
+  // Warm the cache for the rest of the palettes in this ratio+corner combo so
+  // subsequent palette clicks are instant.
+  const ratio = (document.getElementById('card')?.dataset.ratio || '4/5').replace('/', 'x');
+  preloadCardBgVariant(ratio, useRounded ? 'rounded' : 'sharp');
   document.querySelectorAll(".pd").forEach((d) => d.classList.remove("on"));
   document.querySelector('.pd[data-p="' + idx + '"]').classList.add("on");
   wave(document.getElementById("sta").value);
@@ -766,6 +792,17 @@ if (!restored) {
   }
 }
 updateSupporterBadge();
+// Warm the full card-bg WebP cache during idle time so ratio/corner switches
+// later in the session are instant. Falls back to setTimeout where requestIdleCallback
+// isn't supported (e.g. older Safari).
+(function schedulePreloadAll() {
+  var run = function() { preloadAllCardBgs(); };
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 2500 });
+  } else {
+    setTimeout(run, 1500);
+  }
+})();
 try {
   var draft = JSON.parse(sessionStorage.getItem("wisprDraft") || "null");
   if (draft && draft.text && draft.text.trim()) {

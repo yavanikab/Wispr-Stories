@@ -83,9 +83,13 @@
     position: relative;
     bottom: auto;
     right: auto;
-    width: 100px;
+    width: auto;
     display: block !important;
     margin: 0 auto 30px;
+  }
+  .bg-ghost-img {
+    height: 250px;
+    width: auto;
   }
 
   .footer {
@@ -286,7 +290,7 @@
   .bg-ghost-decoration,
   .shell.has-card .bg-ghost-decoration {
     display: block !important;
-    width: 200px;
+    width: auto;
     margin: 10px auto 40px;
   }
   .share-modal-content,

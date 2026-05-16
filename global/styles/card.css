@@ -49,9 +49,6 @@
 .card-empty .card-bg {
   display: none;
 }
-.card-empty .card-ghost {
-  display: block;
-}
 .card-empty .card-panel {
   display: none;
 }
@@ -104,18 +101,7 @@
   background-repeat: no-repeat;
 }
 .card-ghost {
-  position: absolute;
-  right: -10px;
-  top: -10px;
-  font-family: "Font Awesome 6 Free";
-  font-size: 100px;
-  font-weight: 900;
-  line-height: 1;
-  color: rgba(255, 255, 255, 0.12);
-  user-select: none;
-  pointer-events: none;
-  z-index: 2;
-  transition: color 0.4s;
+  display: none;
 }
 .card-content {
   position: relative;
