@@ -110,7 +110,7 @@ function loadDraft() {
     if (!raw) return false;
     const draft = JSON.parse(raw);
     if (draft.text) document.getElementById("sta").value = draft.text;
-    if (draft.name) document.getElementById("nin").value = draft.name;
+    if (draft.name) document.getElementById("nin").value = String(draft.name).replace(/[^\p{L}]/gu, "").slice(0, 10);
     inputSource = draft.inputSource === "voice" ? "voice" : "story";
     if (draft.tone) applyTone(draft.tone);
     if (draft.palette != null) applyPal(draft.palette);
@@ -274,10 +274,8 @@ function canCreateCard() {
 function applyTone(tone) {
   curTone = tone;
   const t = TONES[tone] || TONES.original;
-  if (hasCardContent()) {
-    document.getElementById("cardGhost").innerHTML =
-      '<i class="' + t.g + '"></i>';
-  }
+  document.getElementById("cardGhost").innerHTML =
+    '<i class="' + t.g + '"></i>';
   const toneBtns = document.querySelectorAll(".tc");
   toneBtns.forEach((c) => c.classList.toggle("on", c.dataset.tone === tone));
   const tx = document.getElementById("cardText");
@@ -733,7 +731,16 @@ document.getElementById("sta").addEventListener("input", () => {
   clearTimeout(_dc);
   _dc = setTimeout(function() { updateCard(); saveDraft(); }, 100);
 });
-document.getElementById("nin").addEventListener("input", function() { updateCard(); saveDraft(); });
+document.getElementById("nin").addEventListener("input", function() {
+  const cleaned = this.value.replace(/[^\p{L}]/gu, "").slice(0, 10);
+  if (cleaned !== this.value) {
+    const pos = this.selectionStart;
+    this.value = cleaned;
+    try { this.setSelectionRange(pos - 1, pos - 1); } catch (e) {}
+  }
+  updateCard();
+  saveDraft();
+});
 document.getElementById("resetBtn").addEventListener("click", () => {
   if (isRec) {
     recog.stop();
@@ -779,7 +786,7 @@ if (location.hash && location.hash.length > 1) {
   var hP = params.get("p");
   inputSource = "story";
   if (hText) document.getElementById("sta").value = hText;
-  if (hName) document.getElementById("nin").value = hName;
+  if (hName) document.getElementById("nin").value = hName.replace(/[^\p{L}]/gu, "").slice(0, 10);
   if (hTone) applyTone(hTone);
   if (hP != null) applyPal(parseInt(hP));
   if (hText) { updateCard(); cardReady = true; document.getElementById("btnS").disabled = false; document.getElementById("wcta").classList.add("show"); document.getElementById("dlBtn").style.display = "block"; restored = true; }
@@ -979,7 +986,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   if (!c) return;
   inputSource = "story";
   document.getElementById("sta").value = (c.dataset.text || "").slice(0, 150);
-  document.getElementById("nin").value = (c.dataset.name || "").slice(0, 40);
+  document.getElementById("nin").value = (c.dataset.name || "").replace(/[^\p{L}]/gu, "").slice(0, 10);
   if (c.dataset.tone) {
     const tone = c.dataset.tone;
     if (tone !== "original" && !isSupporter() && getCardsLeft() === 0) {
@@ -1039,7 +1046,12 @@ document.getElementById("btnC").addEventListener("click", () => {
   cardReady = true;
   document.getElementById("btnS").disabled = false;
   document.getElementById("wcta").classList.add("show");
-  document.getElementById("dlBtn").style.display = "";
+  const dl = document.getElementById("dlBtn");
+  dl.style.display = "";
+  setTimeout(() => {
+    const target = window.innerWidth <= 720 ? dl : card;
+    target.scrollIntoView({ behavior: "smooth", block: window.innerWidth <= 720 ? "start" : "center" });
+  }, 120);
   showToast("Card ready \u2014 tap Share to download");
 });
 
@@ -1109,7 +1121,7 @@ document.getElementById("shareDownload").addEventListener("click", function () {
 });
 document.getElementById("shareCopyLink").addEventListener("click", function () {
   var text = encodeURIComponent((document.getElementById("sta").value || "").slice(0, 150));
-  var name = encodeURIComponent((document.getElementById("nin").value || "").slice(0, 40));
+  var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 10));
   var tone = curTone || "original";
   var p = curP != null ? curP : 0;
   var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p;

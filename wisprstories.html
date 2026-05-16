@@ -325,8 +325,11 @@
             class="nin"
             id="nin"
             aria-label="Your name"
-            placeholder="e.g. Nani, Dad, Priya, Margaret R."
-            maxlength="40"
+            placeholder="e.g. Nani"
+            maxlength="10"
+            inputmode="text"
+            autocomplete="off"
+            spellcheck="false"
           />
         </div>
 
@@ -645,6 +648,9 @@
           <button id="upgradeBtn" class="tone-upgrade-link">Upgrade</button>
         </div>
         <div class="card-wrap">
+          <button class="dl-btn" id="dlBtn" style="display: none">
+            <i class="fas fa-download"></i> Download card
+          </button>
           <div class="card card-empty" id="card">
             <div class="card-bg" id="cardBg"></div>
             <div class="card-ghost" id="cardGhost">“</div>
@@ -678,9 +684,6 @@
               </div>
             </div>
           </div>
-          <button class="dl-btn" id="dlBtn" style="display: none">
-            <i class="fas fa-download"></i> Download card
-          </button>
         </div>
         <div class="wcta" id="wcta">
           <p>
