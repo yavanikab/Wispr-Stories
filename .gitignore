@@ -1,4 +1,5 @@
 .env
+.env.example
 SHAREABLE_PLATFORMS.md
 AGENTS.md
 .claude/
