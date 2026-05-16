@@ -1,0 +1,345 @@
+/* PREVIEW LABEL */
+.pvw-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 16px;
+}
+
+/* CARD WRAP */
+.card-wrap {
+  width: 100%;
+  max-width: 320px;
+  position: relative;
+  padding-block-end: 60px;
+}
+
+/* THE CARD */
+.card {
+  width: 100%;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
+  border-radius: 32px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.18),
+    0 6px 20px rgba(0, 0, 0, 0.1);
+  transition:
+    box-shadow 0.3s,
+    transform 0.22s,
+    opacity 0.45s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Empty-state typewriter demo: gentle fade between cycles. The text writes
+   itself in character-by-character; no caret is drawn. */
+.card-demo-fading {
+  opacity: 0;
+}
+
+.card-empty {
+  border: 2px dashed rgba(0, 0, 0, 0.12);
+  background: transparent !important;
+  box-shadow: none;
+}
+.card-empty .card-bg {
+  display: none;
+}
+.card-empty .card-ghost {
+  display: block;
+}
+.card-empty .card-panel {
+  display: none;
+}
+.card-empty .card-voice-label {
+  display: none;
+}
+.card-empty .card-wv {
+  display: none;
+}
+.card-empty .card-label,
+.card-empty .card-foot {
+  display: none;
+}
+
+.card-empty-state {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  pointer-events: none;
+}
+.card-empty .card-empty-state {
+  display: flex;
+}
+.card-empty-state span {
+  font-family: var(--serif);
+  font-size: clamp(16px, 2.2vw, 22px);
+  font-style: italic;
+  color: var(--ink2);
+  text-align: center;
+  line-height: 1.6;
+  max-width: 260px;
+}
+
+
+.card-wrap:has(> .card[data-ratio="2/2"]) {
+  max-width: 360px !important;
+}
+.card[data-ratio="2/2"] {
+  min-height: 240px;
+}
+
+.card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.card-ghost {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  font-family: "Font Awesome 6 Free";
+  font-size: 100px;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.12);
+  user-select: none;
+  pointer-events: none;
+  z-index: 2;
+  transition: color 0.4s;
+}
+.card-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  gap: 6px;
+}
+.card-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  min-height: 16px;
+  flex-shrink: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.card-panel {
+  position: relative;
+  background: var(--card-panel-bg, #fff);
+  border-radius: 10px;
+  padding-inline: 14px;
+  padding-block-start: 20px;
+  padding-block-end: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.card-panel[dir="rtl"] .card-panel-text,
+.card-panel-text {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  margin-block-end: 8px;
+  line-height: 1.5;
+  color: var(--ink);
+  word-break: break-word;
+  white-space: pre-wrap;
+  transition:
+    font-family 0.2s,
+    font-weight 0.2s,
+    font-style 0.2s,
+    letter-spacing 0.2s;
+}
+.card-panel-text.mt {
+  color: #aaa;
+  font-style: italic;
+}
+.card-wv {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 22px;
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+.wb {
+  flex: 1;
+  border-radius: 1px;
+  min-height: 2px;
+  background: rgba(26, 26, 26, 0.12);
+  transition: all 0.2s ease;
+}
+.card-voice-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: rgba(26, 26, 26, 0.45);
+  margin-top: 4px;
+  text-align: left !important;
+  direction: ltr;
+}
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.card-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.card-logo-img {
+  height: 26px;
+  display: block;
+}
+.card-logo-text {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: rgba(255, 255, 255, 0.8);
+}
+.card-domain {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.01em;
+}
+
+/* WISPR CTA — conversion surface shown after a card is created.
+   Visual weight bumped via size, weight, and a soft elevation. Stays neutral
+   (ink/cream) so it never competes with the amber "Create card" primary
+   action in the left column when both are on screen. Fully reversible: revert
+   this block to restore the previous compact styling. */
+.wcta {
+  width: 100%;
+  max-width: 320px;
+  margin-top: 14px;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: center;
+  display: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.wcta.show {
+  display: block;
+}
+.wcta p {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.55;
+  margin-bottom: 11px;
+}
+.wcta a {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: 0.005em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s;
+}
+.wcta a:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+.wcta a:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14);
+}
+
+/* GHOST BACKGROUND IMAGE */
+.bg-ghost-decoration {
+  position: fixed;
+  bottom: 50px;
+  right: 40px;
+  width: clamp(120px, 20vw, 260px);
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shell.has-card .bg-ghost-decoration {
+  display: none;
+}
+
+.bg-ghost-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* DOWNLOAD BUTTON OVERLAY */
+.dl-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    opacity 0.3s,
+    background 0.2s;
+  pointer-events: auto;
+}
+.dl-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+.dl-btn .fa-download {
+  animation: dl-bounce 1s ease infinite;
+}
+@keyframes dl-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+.dl-btn .fa-spinner {
+  animation: fa-spin 0.8s linear infinite;
+}
+.dl-btn.done .fa-download {
+  animation: none;
+}
+.btn-s .fa-spinner {
+  animation: fa-spin 0.8s linear infinite;
+}
+

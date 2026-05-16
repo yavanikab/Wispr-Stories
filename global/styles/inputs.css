@@ -1,0 +1,438 @@
+/* RECORD */
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.rec-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  touch-action: manipulation;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.rec-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  opacity: 0.92;
+}
+.rec-btn:active {
+  transform: scale(0.88);
+}
+.rec-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s;
+}
+.rec-btn.on svg {
+  transform: scale(1.12);
+}
+.rec-btn.on {
+  background: #dc2626;
+  animation: rp 1.2s ease infinite;
+}
+@keyframes rp {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(220, 38, 38, 0);
+  }
+}
+.rec-st {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.rec-sub {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-top: 2px;
+}
+.rec-sub.live {
+  color: #dc2626;
+}
+.live-box {
+  margin-top: 10px;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-size: 14px;
+  color: var(--ink2);
+  line-height: 1.65;
+  min-height: 40px;
+  display: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: all 0.3s ease;
+}
+.live-box.show {
+  display: block;
+  background: #fef3f2;
+  border-color: #dc2626;
+  border-width: 1.5px;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+@keyframes pulse-border {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.15);
+  }
+}
+
+/* OR */
+.or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.orl {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.ort {
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* TEXTAREA */
+.sta {
+  width: 100%;
+  min-height: 100px;
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink);
+  resize: none;
+  outline: none;
+  transition: all 0.2s;
+}
+.sta::placeholder {
+  color: var(--ink3);
+  font-style: italic;
+}
+.sta:focus {
+  border-color: var(--focus-border);
+  outline: none;
+}
+.char-r {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+.char-c {
+  font-size: 12px;
+  color: var(--ink3);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.char-c.warn {
+  color: #dc2626;
+  font-weight: 600;
+}
+.char-c.warn::before {
+  content: "⚠️";
+  display: inline-block;
+  font-size: 11px;
+}
+.reset-btn {
+  font-size: 12px;
+  color: var(--ink3);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 4px 10px;
+  transition: all 0.18s;
+  cursor: pointer;
+  font-weight: 500;
+}
+.reset-btn:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+.reset-btn:active {
+  transform: scale(0.95);
+}
+:root.dark .reset-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.55);
+}
+
+/* NAME */
+.nin {
+  width: 100%;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 13px;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: all 0.2s;
+}
+.nin::placeholder {
+  color: var(--ink3);
+}
+.nin:focus {
+  border-color: var(--focus-border);
+  outline: none;
+}
+
+/* TONE */
+.tone-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tc {
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--ink2);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.tc:hover {
+  border-color: var(--ink3);
+  color: var(--ink);
+}
+.tc.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+  font-weight: 500;
+}
+.tc:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Blank state: tone / colour / size / roundness rows are inert until the
+   card has content. JS already early-returns clicks; this is the matching
+   visual affordance so users see they can't interact yet. */
+.shell:not(.has-card) #toneRow .tc,
+.shell:not(.has-card) #palRow .pd,
+.shell:not(.has-card) #sizeRow .sz,
+.shell:not(.has-card) #roundnessRow .sz {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tone-pill-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tone-pill {
+  font-size: 11px;
+  color: var(--ink2);
+  background: rgba(26, 26, 26, 0.06);
+  padding: 4px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:root.dark .tone-pill {
+  background: rgba(255, 255, 235, 0.08);
+  color: var(--ink3);
+}
+.tone-pill.exhausted {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  font-weight: 500;
+  animation: exhausted-pulse 2s ease-in-out infinite;
+}
+:root.dark .tone-pill.exhausted {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+@keyframes exhausted-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.tone-pill.supporter {
+  background: #febbf1;
+  color: #1a1a1a;
+}
+:root.dark .tone-pill.supporter {
+  background: rgba(255, 215, 0, 0.12);
+  color: #fbbf24;
+}
+.tone-upgrade-link {
+  font-size: 11px;
+  color: var(--ink2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+.tone-upgrade-link:hover {
+  color: var(--ink);
+}
+
+/* PALETTE */
+.pal-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.pd {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  transition: transform 0.18s;
+  flex-shrink: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pd:hover {
+  transform: scale(1.18);
+}
+.pd.on {
+  border-color: var(--ink);
+}
+
+/* SIZE BUTTONS */
+.sz-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.sz {
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 6px 11px;
+  font-size: 11px;
+  color: var(--ink2);
+  transition: all 0.18s;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.sz:hover {
+  border-color: var(--ink3);
+  color: var(--ink);
+}
+.sz.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+  font-weight: 500;
+}
+
+/* CUSTOMIZE ACCORDION (steps 5-8) — native <details> with custom chevron.
+   Collapsed by default to lighten the primary flow; user expands for finer
+   styling. Removing the <details>/<summary> wrapper restores the linear
+   form with zero side effects. */
+.customize {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 4px 0;
+}
+.customize > summary.customize-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 2px;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--sans);
+  color: var(--ink2);
+  transition: color 0.18s;
+}
+.customize > summary.customize-summary::-webkit-details-marker {
+  display: none;
+}
+.customize > summary.customize-summary:hover,
+.customize > summary.customize-summary:focus-visible {
+  color: var(--ink);
+}
+.customize-summary-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.customize-summary-hint {
+  flex: 1;
+  font-size: 11px;
+  color: var(--ink3);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.customize-chevron {
+  font-size: 10px;
+  color: var(--ink3);
+  transition: transform 0.2s ease;
+}
+.customize[open] > summary.customize-summary .customize-chevron {
+  transform: rotate(90deg);
+}
+/* Vertical spacing between wrapped steps. `.left`'s `gap: 24px` only reaches
+   direct children, and these step divs are grandchildren now — restore the
+   same rhythm explicitly. The 18px top on the first step pulls it closer to
+   the summary header for grouping; subsequent steps get the full 24px.
+   Bottom padding on the open accordion gives step 8 (Corner style) room to
+   breathe before the bottom border line. */
+.customize[open] > div {
+  margin-top: 24px;
+}
+.customize[open] > div:first-of-type {
+  margin-top: 18px;
+}
+.customize[open] {
+  padding-bottom: 18px;
+}
+.customize[open] > summary.customize-summary {
+  margin-bottom: 0;
+}
+/* Hide non-summary children when collapsed. The browser UA stylesheet usually
+   does this automatically, but the .left flex container's spacing rules and
+   inherited displays can leak through — make it explicit. */
+.customize:not([open]) > *:not(summary.customize-summary) {
+  display: none !important;
+}

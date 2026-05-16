@@ -1,0 +1,107 @@
+/* NAV */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: 52px;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--nav-bg);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.theme-toggle {
+  background: transparent;
+  border: none;
+  color: var(--ink3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  transform: scale(1.18);
+  color: var(--ink);
+  background: var(--cream2);
+}
+.theme-toggle:active {
+  transform: scale(0.88);
+}
+.theme-toggle:focus-visible {
+  outline: 1px solid var(--ink3);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+.nav-brand {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.nav-logo {
+  height: 22px;
+  display: block;
+}
+.nav-brand-text {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--ink);
+}
+.nav-tag {
+  font-size: 12px;
+  color: var(--ink3);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: inline-flex;
+}
+.nav-tag:focus-visible,
+.footer-wave:focus-visible {
+  outline: 1px solid var(--ink3);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.pro-badge {
+  font-size: 11px;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: #febbf1;
+  border: none;
+  transition: background 0.35s ease, color 0.35s ease;
+  padding: 2px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: default;
+  font-weight: 700;
+}
+.pro-badge i {
+  font-size: 10px;
+  margin-right: 2px;
+}
+:root.dark .pro-badge {
+  color: #fbbf24;
+  background: rgba(255, 215, 0, 0.12);
+}

@@ -1,0 +1,27 @@
+.card-occasion {
+  position: absolute;
+  bottom: 0;
+  right: 2px;
+  width: 60px;
+  height: 60px;
+  display: none;
+  z-index: 0;
+  pointer-events: none;
+}
+.card-occasion.show {
+  display: block;
+}
+.card-occasion img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* .card-panel.occasion .card-panel-text {
+  padding-bottom: 10px;
+} */
+.card-panel.occasion .card-wv {
+  padding-right: 55px;
+}

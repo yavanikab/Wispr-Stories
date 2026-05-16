@@ -1,0 +1,169 @@
+/* SHELL: sticky 2-col */
+.shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  height: calc(100vh - 52px);
+  height: calc(100dvh - 52px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* LEFT */
+.left {
+  grid-column: 1;
+  grid-row: 1;
+  border-right: 1px solid var(--rule);
+  padding: 40px 32px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  overflow-x: visible;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+/* RIGHT */
+.right {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 28px;
+  background: var(--cream);
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.right::-webkit-scrollbar {
+  display: none;
+}
+.right::before,
+.right::after {
+  content: '';
+  flex: 1;
+  min-height: 0;
+  pointer-events: none;
+}
+
+/* Stack the card preview and CTA above the fixed ghost decoration so the
+   ghost reads as a background flourish and never obscures interactive
+   content. Each gets its own stacking context via position + z-index. The
+   right column itself stays exactly where it is — no shifting when the CTA
+   appears or when the user switches card size. */
+.card-wrap,
+.wcta {
+  position: relative;
+  z-index: 2;
+}
+
+/* FOOTER */
+.footer {
+  grid-column: 1/-1;
+  grid-row: 2;
+  border-top: 1px solid var(--rule);
+  padding: 14px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--cream);
+  width: 100vw;
+  margin-left: calc((100vw - 100%) / -2);
+}
+.footer p,
+.footer span {
+  font-size: 12px;
+  color: var(--ink3);
+}
+.footer a {
+  color: var(--ink2);
+  text-decoration: none;
+}
+.footer a:hover {
+  color: var(--ink);
+}
+.footer-wave {
+  display: inline-flex;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* FOOTER MENU (footer-menu.js) — overrides only, never edit the script.
+   Sized down to match the 12px footer scale, low opacity at rest so it
+   doesn't compete with the copyright. Hover/focus restores full opacity. */
+.footer-copyright {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-sep {
+  color: var(--ink3);
+  opacity: 0.4;
+}
+.footer .fmenu-root {
+  font-size: 11px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  vertical-align: middle;
+}
+.footer .fmenu-root:hover,
+.footer .fmenu-root:focus-within {
+  opacity: 1;
+}
+/* Restore script-intended colors over the .footer a / .footer a:hover rules. */
+.footer .fmenu-toggle {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  /* color: var(--fmenu-secondary); */
+}
+.footer .fmenu-toggle:hover {
+  color: oklch(from var(--fmenu-primary) calc(l + 0.1) c h);
+}
+.footer .fmenu-panel {
+  min-width: 180px;
+  font-size: 12px;
+}
+.footer .fmenu-link {
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  color: oklch(from var(--fmenu-primary) calc(l + 0.1) calc(c - 0.16) h);
+}
+.footer .fmenu-link:hover {
+  color: var(--fmenu-secondary);
+}
+
+/* Light-mode palette — soften the purple/yellow to suit the cream surface. */
+:root:not(.dark) .footer .fmenu-root {
+  --fmenu-bg-shade-2: #f5f1e6;
+  --fmenu-bg-shade-3: rgba(26, 26, 26, 0.12);
+  --fmenu-purple: #777;
+  --fmenu-yellow: #1a1a1a;
+}
+/* Dark-mode palette — keep the menu's native dark colors but match Wispr's
+   surface tone so it blends with the footer instead of looking like an
+   embedded widget. */
+:root.dark .footer .fmenu-root {
+  --fmenu-bg-shade-2: #2a2a2a;
+  --fmenu-bg-shade-3: rgba(255, 255, 235, 0.12);
+}
+
+/* Show on mobile (the script hides itself at <=768px). On mobile the menu
+   uses full opacity. */
+@media (max-width: 768px) {
+  .footer .fmenu-root {
+    display: inline-block !important;
+    opacity: 1;
+  }
+}
+
+

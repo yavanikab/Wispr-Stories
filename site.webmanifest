@@ -1,0 +1,23 @@
+{
+  "name": "Wispr Stories",
+  "short_name": "Wispr Stories",
+  "description": "Turn your voice into beautiful, shareable cards",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffeb",
+  "theme_color": "#ffffeb",
+  "icons": [
+    {
+      "src": "assets/ws-logo-blwbg.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/ws-logo-blwbg.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

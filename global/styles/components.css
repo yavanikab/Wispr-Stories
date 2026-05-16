@@ -1,0 +1,59 @@
+/* WISPR STORIES - COMPONENT STYLES */
+/* Typography, form elements, cards, modals, and UI components */
+
+.nav-tag:focus-visible,
+.footer-wave:focus-visible {
+  outline: 1px solid var(--ink3);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* FIREFOX NOTICE */
+.ff-notice {
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.55;
+  display: none;
+}
+.ff-notice.show {
+  display: block;
+}
+
+/* DARK MODE OVERRIDES */
+:root.dark .card-panel-text {
+  color: #1a1a1a;
+}
+:root.dark .card-empty {
+  border-color: rgba(255, 255, 235, 0.15);
+}
+:root.dark .ec:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* PAGE-LOAD ANIMATIONS */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.shell > .left {
+  animation: fade-up 0.45s ease-out both;
+}
+.pvw-lbl {
+  animation: fade-up 0.45s ease-out both;
+  animation-delay: 0.04s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell > .left,
+  .pvw-lbl {
+    animation: none;
+  }
+}

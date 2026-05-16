@@ -1,0 +1,20 @@
+SHAREABLE_PLATFORMS.md
+AGENTS.md
+.claude/
+serve.js
+mobile.ps1
+start-mobile.ps1
+.bak/
+legacy/
+docs/
+Birthday cake-pana.svg
+server.log
+*.log
+.DS_Store
+node_modules/
+.edge-headless-profile/
+backups/
+backup/
+footer-menu.js
+prototype-waveform-play.html
+prototype-voice-cards.html

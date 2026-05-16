@@ -1,0 +1,360 @@
+/* SHARE MODAL */
+.share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.share-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.share-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+.share-modal-content {
+  position: relative;
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 380px;
+  width: 90vw;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+.share-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--ink3);
+  cursor: pointer;
+  line-height: 1;
+  padding: 10px;
+  touch-action: manipulation;
+}
+.share-modal-close:hover {
+  color: var(--ink);
+}
+.share-modal-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.share-modal-preview {
+  width: 100%;
+  aspect-ratio: 4/5;
+  border-radius: 12px;
+  overflow: hidden;
+  /* background: var(--cream2); */
+  margin-bottom: 20px;
+}
+.share-modal-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.share-modal-preview .loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--ink3);
+  font-size: 13px;
+}
+.share-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.share-modal-sub {
+  font-size: 12px;
+  color: var(--ink3);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.share-modal-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  background: var(--cream2);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.18s;
+  touch-action: manipulation;
+}
+.share-modal-btn:hover {
+  background: var(--cream3);
+}
+.share-modal-btn:first-child {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--cream);
+}
+.share-modal-btn:first-child:hover {
+  opacity: 0.85;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+  z-index: 9999;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* EXPORT PROGRESS */
+.export-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 999999;
+  display: none;
+  pointer-events: none;
+}
+.export-progress.show {
+  display: block;
+}
+.export-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--ink);
+  animation: export-fill 1.8s ease-in-out infinite;
+}
+@keyframes export-fill {
+  0% {
+    width: 0%;
+  }
+  40% {
+    width: 65%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+.export-progress-text {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--ink3);
+  background: var(--cream);
+  padding: 4px 14px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.export-progress.show .export-progress-text {
+  opacity: 1;
+}
+
+/* UPGRADE MODAL */
+.upgrade-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.upgrade-modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.upgrade-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+.upgrade-modal-content {
+  position: relative;
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 380px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+}
+/* When a modal is open, hide the mobile rewrite-bar so its buttons don't
+   bleed through the modal backdrop and look like they're floating out. */
+body.modal-open .rewrite-bar {
+  display: none !important;
+}
+.upgrade-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--ink3);
+  cursor: pointer;
+  line-height: 1;
+  padding: 10px;
+  touch-action: manipulation;
+}
+.upgrade-modal-close:hover {
+  color: var(--ink);
+}
+.upgrade-modal-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.upgrade-modal-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.upgrade-modal-sub {
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.upgrade-modal-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  background: var(--cream2);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s;
+  touch-action: manipulation;
+}
+.upgrade-modal-btn:hover {
+  background: var(--cream3);
+}
+.upgrade-modal-btn-primary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--cream);
+}
+.upgrade-modal-btn-primary:hover {
+  opacity: 0.85;
+  background: var(--ink);
+}
+.upgrade-modal-divider {
+  font-size: 12px;
+  color: var(--ink3);
+  margin: 16px 0;
+}
+.upgrade-modal-label {
+  font-size: 12px;
+  color: var(--ink2);
+  margin-bottom: 8px;
+  text-align: left;
+}
+.upgrade-modal-label.lost-key {
+  margin-top: 16px;
+}
+.upgrade-modal-row {
+  display: flex;
+  gap: 8px;
+}
+.upgrade-modal-input {
+  flex: 1;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 13px;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+}
+.upgrade-modal-input:focus {
+  border-color: var(--focus-border);
+}
+.upgrade-modal-msg {
+  font-size: 12px;
+  color: var(--ink2);
+  margin-top: 6px;
+  text-align: left;
+  min-height: 18px;
+}
+.upgrade-modal-msg.ok {
+  color: #059669;
+}
+.upgrade-modal-msg.err {
+  color: #dc2626;
+}
+.upgrade-modal-disclaimer {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink3);
+  opacity: 0.85;
+  text-align: center;
+}
+:root.dark .upgrade-modal-content {
+  background: #2a2a2a;
+}
+:root.dark .upgrade-modal-input {
+  background: #333;
+  color: #ffffeb;
+  border-color: rgba(255,255,235,0.15);
+}
+:root.dark .upgrade-modal-btn {
+  background: #333;
+  border-color: rgba(255,255,235,0.15);
+  color: #ffffeb;
+}
+:root.dark .upgrade-modal-btn:hover {
+  background: #444;
+}
