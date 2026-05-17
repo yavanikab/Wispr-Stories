@@ -100,16 +100,20 @@
   background-size: 100% 100%;
   background-repeat: no-repeat;
 }
+/* Tone icon watermark in the top-right corner of the card.
+   Fully visible (not clipped), sized to feel like an accent not a glitch,
+   transparent enough to sit behind text without competing with it. */
 .card-ghost {
   position: absolute;
-  top: 50%;
-  right: 8%;
-  transform: translateY(-50%);
-  font-size: clamp(64px, 14vw, 132px);
+  top: 0px;
+  right: -6px;
+  font-size: clamp(42px, 9vw, 64px);
   line-height: 1;
-  color: rgba(255, 255, 255, 0.18);
-  z-index: 1;
+  color: rgba(255, 255, 255, 0.2);
+  user-select: none;
   pointer-events: none;
+  z-index: 1;
+  transition: color 0.3s;
 }
 .card-empty .card-ghost {
   display: none;

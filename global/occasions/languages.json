@@ -1,0 +1,303 @@
+[
+  {
+    "id": "en-US",
+    "lang_code": "en-US",
+    "lang_name": "English",
+    "flag_code": "us",
+    "normal_example": "Life is a collection of moments worth sharing. Speak them, capture them, share them."
+  },
+  {
+    "id": "en-GB",
+    "lang_code": "en-GB",
+    "lang_name": "English",
+    "flag_code": "gb",
+    "normal_example": "Words spoken from the heart carry more weight than words written on a page."
+  },
+  {
+    "id": "hi-IN",
+    "lang_code": "hi-IN",
+    "lang_name": "Hindi",
+    "flag_code": "in",
+    "normal_example": "आपके शब्द आपकी सबसे सुंदर संपत्ति हैं। उन्हें साझा करें।"
+  },
+  {
+    "id": "es-ES",
+    "lang_code": "es-ES",
+    "lang_name": "Español",
+    "flag_code": "es",
+    "normal_example": "Las palabras habladas desde el corazón crean conexiones duraderas."
+  },
+  {
+    "id": "es-MX",
+    "lang_code": "es-MX",
+    "lang_name": "Español",
+    "flag_code": "mx",
+    "normal_example": "Tu voz es tu historia más hermosa. Comparte tu verdad."
+  },
+  {
+    "id": "fr-FR",
+    "lang_code": "fr-FR",
+    "lang_name": "Français",
+    "flag_code": "fr",
+    "normal_example": "Les paroles du cœur créent des souvenirs inoubliables."
+  },
+  {
+    "id": "de-DE",
+    "lang_code": "de-DE",
+    "lang_name": "Deutsch",
+    "flag_code": "de",
+    "normal_example": "Deine Stimme erzählt deine einzigartige Geschichte. Teile sie mit der Welt."
+  },
+  {
+    "id": "it-IT",
+    "lang_code": "it-IT",
+    "lang_name": "Italiano",
+    "flag_code": "it",
+    "normal_example": "Le parole pronunciate dal cuore lasciano un segno indelebile."
+  },
+  {
+    "id": "pt-BR",
+    "lang_code": "pt-BR",
+    "lang_name": "Português",
+    "flag_code": "br",
+    "normal_example": "As palavras do coração são as mais bonitas que podemos compartilhar."
+  },
+  {
+    "id": "pt-PT",
+    "lang_code": "pt-PT",
+    "lang_name": "Português",
+    "flag_code": "pt",
+    "normal_example": "A voz é a expressão mais autêntica da alma."
+  },
+  {
+    "id": "ar-SA",
+    "lang_code": "ar-SA",
+    "lang_name": "Arabic",
+    "flag_code": "sa",
+    "normal_example": "الكلمات المنطوقة من القلب تخلق ذكريات أبدية."
+  },
+  {
+    "id": "zh-CN",
+    "lang_code": "zh-CN",
+    "lang_name": "Mandarin [CH]",
+    "flag_code": "cn",
+    "normal_example": "用你的声音讲述你的故事，分享你的心声。"
+  },
+  {
+    "id": "zh-TW",
+    "lang_code": "zh-TW",
+    "lang_name": "Mandarin [TW]",
+    "flag_code": "tw",
+    "normal_example": "用心說出的話語最能打動人心。"
+  },
+  {
+    "id": "ja-JP",
+    "lang_code": "ja-JP",
+    "lang_name": "Japanese",
+    "flag_code": "jp",
+    "normal_example": "心から話された言葉は、最も美しい贈り物です。"
+  },
+  {
+    "id": "ko-KR",
+    "lang_code": "ko-KR",
+    "lang_name": "Korean",
+    "flag_code": "kr",
+    "normal_example": "목소리로 전하는 말은 가장 진실한 감정이다."
+  },
+  {
+    "id": "ru-RU",
+    "lang_code": "ru-RU",
+    "lang_name": "Russian",
+    "flag_code": "ru",
+    "normal_example": "Слова, произнесённые от сердца, оставляют вечный след."
+  },
+  {
+    "id": "nl-NL",
+    "lang_code": "nl-NL",
+    "lang_name": "Dutch",
+    "flag_code": "nl",
+    "normal_example": "Woorden gesproken van het hart creëren blijvende herinneringen."
+  },
+  {
+    "id": "pl-PL",
+    "lang_code": "pl-PL",
+    "lang_name": "Polski",
+    "flag_code": "pl",
+    "normal_example": "Słowa wypowiadane z serca są najpiękniejszym prezentem."
+  },
+  {
+    "id": "tr-TR",
+    "lang_code": "tr-TR",
+    "lang_name": "Turkish",
+    "flag_code": "tr",
+    "normal_example": "Kalpten söylenen sözler kalıcı anılar yaratır."
+  },
+  {
+    "id": "sv-SE",
+    "lang_code": "sv-SE",
+    "lang_name": "Svenska",
+    "flag_code": "se",
+    "normal_example": "Ord från hjärtat skapar de vackraste minnena."
+  },
+  {
+    "id": "da-DK",
+    "lang_code": "da-DK",
+    "lang_name": "Dansk",
+    "flag_code": "dk",
+    "normal_example": "Ord talt fra hjertet skaber de varigste minder."
+  },
+  {
+    "id": "fi-FI",
+    "lang_code": "fi-FI",
+    "lang_name": "Suomi",
+    "flag_code": "fi",
+    "normal_example": "Sydämestä puhutut sanat luovat kestävimpiä muistoja."
+  },
+  {
+    "id": "he-IL",
+    "lang_code": "he-IL",
+    "lang_name": "Hebrew",
+    "flag_code": "il",
+    "normal_example": "מילים הנאמרות מהלב יוצרות זיכרונות לנצח."
+  },
+  {
+    "id": "uk-UA",
+    "lang_code": "uk-UA",
+    "lang_name": "Ukrainian",
+    "flag_code": "ua",
+    "normal_example": "Слова, сказані від серця, залишають вічний слід."
+  },
+  {
+    "id": "ro-RO",
+    "lang_code": "ro-RO",
+    "lang_name": "Română",
+    "flag_code": "ro",
+    "normal_example": "Cuvintele rostite din inimă creează amintiri veșnice."
+  },
+  {
+    "id": "hu-HU",
+    "lang_code": "hu-HU",
+    "lang_name": "Hungarian",
+    "flag_code": "hu",
+    "normal_example": "A szívből kimondott szavak maradandó emlékeket hoznak létre."
+  },
+  {
+    "id": "th-TH",
+    "lang_code": "th-TH",
+    "lang_name": "Thai",
+    "flag_code": "th",
+    "normal_example": "คำพูดที่ออกมาจากหัวใจสร้างความทรงจำที่ไม่มีวันลืม"
+  },
+  {
+    "id": "vi-VN",
+    "lang_code": "vi-VN",
+    "lang_name": "Vietnamese",
+    "flag_code": "vn",
+    "normal_example": "Lời nói từ trái tim tạo nên những kỷ niệm không quên."
+  },
+  {
+    "id": "id-ID",
+    "lang_code": "id-ID",
+    "lang_name": "Indonesian",
+    "flag_code": "id",
+    "normal_example": "Kata-kata dari hati menciptakan kenangan yang abadi."
+  },
+  {
+    "id": "ms-MY",
+    "lang_code": "ms-MY",
+    "lang_name": "Malay",
+    "flag_code": "my",
+    "normal_example": "Kata-kata yang diucapkan dari hati menciptakan kenangan abadi."
+  },
+  {
+    "id": "fil-PH",
+    "lang_code": "fil-PH",
+    "lang_name": "Filipino",
+    "flag_code": "ph",
+    "normal_example": "Ang mga salitang mula sa puso ay lumilikha ng walang malilimutang alaala."
+  },
+  {
+    "id": "hi-Latn",
+    "lang_code": "hi-Latn",
+    "lang_name": "Hinglish",
+    "flag_code": "in",
+    "normal_example": "Dil se bole gaye shabd sabse sundar yaadein banate hain."
+  },
+  {
+    "id": "hi-IN-mixed",
+    "lang_code": "hi-IN",
+    "lang_name": "Mixed Script",
+    "flag_code": "in",
+    "normal_example": "दिल से बोले गए शब्द create lasting memories that never fade."
+  },
+  {
+    "id": "ta-IN",
+    "lang_code": "ta-IN",
+    "lang_name": "Tamil",
+    "flag_code": "in",
+    "normal_example": "கதை கூறப்பட்ட வார்த்தைகள் நிரந்தரமான நினைவுகளை உருவாக்குகின்றன."
+  },
+  {
+    "id": "te-IN",
+    "lang_code": "te-IN",
+    "lang_name": "Telugu",
+    "flag_code": "in",
+    "normal_example": "హృదయం నుండి చెప్పిన మాటలు శాశ్వత జ్ఞాపకాలను సృష్టిస్తాయి."
+  },
+  {
+    "id": "kn-IN",
+    "lang_code": "kn-IN",
+    "lang_name": "Kannada",
+    "flag_code": "in",
+    "normal_example": "ಹೃದಯದಿಂದ ಹೇಳಿದ ಮಾತುಗಳು ನಿರಂತರ ನೆನಪುಗಳನ್ನು ಸೃಷ್ಟಿ ಮಾಡುತ್ತವೆ."
+  },
+  {
+    "id": "ml-IN",
+    "lang_code": "ml-IN",
+    "lang_name": "Malayalam",
+    "flag_code": "in",
+    "normal_example": "ഹൃദയത്തിൽ നിന്നുള്ള വാക്കുകൾ അവിസ്മരണീയ സ്മൃതികൾ സൃഷ്ടിക്കുന്നു."
+  },
+  {
+    "id": "bn-IN",
+    "lang_code": "bn-IN",
+    "lang_name": "Bengali",
+    "flag_code": "in",
+    "normal_example": "হৃদয় থেকে বলা কথাগুলি চিরস্থায়ী স্মৃতি তৈরি করে।"
+  },
+  {
+    "id": "mr-IN",
+    "lang_code": "mr-IN",
+    "lang_name": "Marathi",
+    "flag_code": "in",
+    "normal_example": "हृदयातून बोलले शब्द कायम स्मृती निर्माण करतात."
+  },
+  {
+    "id": "gu-IN",
+    "lang_code": "gu-IN",
+    "lang_name": "Gujarati",
+    "flag_code": "in",
+    "normal_example": "હૃદયથી બોલેલા શબ્દો કાયમી સ્મૃતિ બનાવે છે."
+  },
+  {
+    "id": "pa-IN",
+    "lang_code": "pa-IN",
+    "lang_name": "Punjabi",
+    "flag_code": "in",
+    "normal_example": "ਦਿਲੋਂ ਬੋਲੇ ਸ਼ਬਦ ਹਮੇਸ਼ਾਂ ਯਾਦ ਰਹਿ ਜਾਂਦੇ ਹਨ।"
+  },
+  {
+    "id": "ur-PK",
+    "lang_code": "ur-PK",
+    "lang_name": "Urdu",
+    "flag_code": "pk",
+    "normal_example": "دل سے کہے ہوئے الفاظ ہمیشہ یاد رہتے ہیں۔"
+  },
+  {
+    "id": "fa-IR",
+    "lang_code": "fa-IR",
+    "lang_name": "Farsi",
+    "flag_code": "ir",
+    "normal_example": "کلماتی که از دل بیرون می آید، ماندگار می شود."
+  }
+]

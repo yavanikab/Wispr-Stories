@@ -186,7 +186,7 @@ function applyPal(idx) {
   const light = isLightColor(col);
   document.getElementById("cardLabel").style.color = light ? "#1a1a1a" : "";
   document.getElementById("cardGhost").style.color = light
-    ? "rgba(0,0,0,0.15)"
+    ? "rgba(0,0,0,0.32)"
     : "";
   const lt = document.querySelector(".card-logo-text");
   if (lt) lt.style.color = light ? "#1a1a1a" : "";
@@ -1124,7 +1124,9 @@ document.getElementById("shareCopyLink").addEventListener("click", function () {
   var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 10));
   var tone = curTone || "original";
   var p = curP != null ? curP : 0;
-  var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p;
+  var ratio = (document.getElementById("card")?.dataset.ratio || "4/5").replace("/", "x");
+  var corners = (typeof useRounded !== "undefined" && useRounded) ? "rounded" : "sharp";
+  var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&ratio=" + ratio + "&r=" + corners;
   navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
 });
 

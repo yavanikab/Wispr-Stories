@@ -13,6 +13,14 @@ const PALS = [
   '#4f46e5',
 ];
 const VALID_TONES = new Set(['original', 'warm', 'bold', 'poetic', 'playful', 'reflective', 'honest']);
+const VALID_RATIOS = new Set(['2x2', '3x4', '4x5', '9x16']);
+const VALID_CORNERS = new Set(['rounded', 'sharp']);
+const RATIO_DIMS = {
+  '2x2': { w: 1080, h: 1080 },
+  '3x4': { w: 1080, h: 1440 },
+  '4x5': { w: 1080, h: 1350 },
+  '9x16': { w: 1080, h: 1920 },
+};
 
 function escapeHtml(value) {
   return String(value)
@@ -38,12 +46,17 @@ export default function handler(req) {
   const name = (searchParams.get('name') || '').slice(0, 80);
   const tone = safeTone(searchParams.get('tone') || 'original');
   const p = safePalette(searchParams.get('p') || '0');
+  const rawRatio = searchParams.get('ratio') || '4x5';
+  const ratio = VALID_RATIOS.has(rawRatio) ? rawRatio : '4x5';
+  const rawCorners = searchParams.get('r') || 'rounded';
+  const corners = VALID_CORNERS.has(rawCorners) ? rawCorners : 'rounded';
+  const { w: ogW, h: ogH } = RATIO_DIMS[ratio];
 
   const enc = s => encodeURIComponent(s || '');
-  const ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}`;
-  const appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}`;
+  const ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}&ratio=${ratio}&r=${corners}`;
+  const appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&ratio=${ratio}&r=${corners}`;
   const homeUrl = origin + '/';
-  const shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}`;
+  const shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&ratio=${ratio}&r=${corners}`;
 
   const title = name ? `A Wispr Story by ${name}` : 'A Wispr Story';
   const desc = text.length > 160 ? text.slice(0, 160) + '...' : (text || 'A voice-made card from Wispr Stories.');
@@ -69,8 +82,10 @@ export default function handler(req) {
 <meta property="og:title" content="${safeTitle}">
 <meta property="og:description" content="${safeDesc}">
 <meta property="og:image" content="${safeOgUrl}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="${ogW}">
+<meta property="og:image:height" content="${ogH}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="${safeTitle}">
 <meta property="og:url" content="${safeShareUrl}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wispr Stories">
