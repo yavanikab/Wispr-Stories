@@ -32,8 +32,8 @@ export default function handler(req, res) {
     return;
   }
 
-  // OG image is padded 1.91:1 version in og/ directory
-  const ogUrl = `https://${BLOB_HOST}/og/${id}.png`;
+  // OG image is served from our domain via proxy (avoids cross-domain issues with WhatsApp)
+  const ogUrl = `${origin}/api/og-image/${id}`;
   // Card image is original square version in cards/ directory
   const cardUrl = `https://${BLOB_HOST}/cards/${id}.png`;
   const shareUrl = `${origin}/c/${id}`;
@@ -50,6 +50,8 @@ export default function handler(req, res) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wispr Stories</title>
+<meta property="og:title" content="Wispr Stories">
+<meta property="og:description" content="Create and share voice-made cards">
 <meta property="og:image" content="${safeOgUrl}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -58,6 +60,8 @@ export default function handler(req, res) {
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wispr Stories">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Wispr Stories">
+<meta name="twitter:description" content="Create and share voice-made cards">
 <meta name="twitter:image" content="${safeOgUrl}">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}

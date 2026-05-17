@@ -1143,6 +1143,36 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
   btn.innerHTML = origHTML;
   btn.disabled = false;
 });
+document.getElementById("shareCopyImage").addEventListener("click", async function () {
+  if (!_shareBlob) return;
+  var btn = document.getElementById("shareCopyImage");
+  var origHTML = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+  try {
+    // Copy image to clipboard using Clipboard API
+    var item = new ClipboardItem({ "image/png": _shareBlob });
+    await navigator.clipboard.write([item]);
+    showToast("Image copied!");
+  } catch (e) {
+    // Fallback: copy as data URL for older browsers
+    try {
+      var reader = new FileReader();
+      reader.onloadend = function () {
+        navigator.clipboard.writeText(reader.result).then(function () {
+          showToast("Image copied as link!");
+        }).catch(function () {
+          showToast("Copy failed — try Download instead");
+        });
+      };
+      reader.readAsDataURL(_shareBlob);
+    } catch (e2) {
+      showToast("Copy failed — try Download instead");
+    }
+  }
+  btn.innerHTML = origHTML;
+  btn.disabled = false;
+});
 
 // Tooltips
 document.querySelectorAll(".ii").forEach((icon) => {
