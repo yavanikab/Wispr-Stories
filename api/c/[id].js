@@ -32,8 +32,8 @@ export default function handler(req, res) {
     return;
   }
 
-  // OG image is served from our domain via proxy (avoids cross-domain issues with WhatsApp)
-  const ogUrl = `${origin}/api/og-image/${id}`;
+  // OG image - use direct Blob URL (public, accessible, no cross-domain issues)
+  const ogUrl = `https://${BLOB_HOST}/og/${id}.png`;
   // Card image is original square version in cards/ directory
   const cardUrl = `https://${BLOB_HOST}/cards/${id}.png`;
   const shareUrl = `${origin}/c/${id}`;
