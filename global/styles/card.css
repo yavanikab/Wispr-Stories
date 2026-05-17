@@ -11,7 +11,7 @@
 /* CARD WRAP */
 .card-wrap {
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   position: relative;
   padding-block-end: 60px;
 }
@@ -19,7 +19,7 @@
 /* THE CARD */
 .card {
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   position: relative;
   background: transparent;
@@ -87,10 +87,7 @@
 }
 
 
-.card-wrap:has(> .card[data-ratio="2/2"]) {
-  max-width: 360px !important;
-}
-.card[data-ratio="2/2"] {
+.card {
   min-height: 240px;
 }
 

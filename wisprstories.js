@@ -11,21 +11,23 @@ const PALS = [
   "#4f46e5",
 ];
 const PAL_NAMES = ['violet', 'amber', 'crimson', 'emerald', 'ocean', 'rose', 'orange', 'teal', 'fuchsia', 'indigo'];
-const CARD_RATIOS = ['2x2', '3x4', '4x5', '9x16'];
+// Card is standardized on 2:2 (square) so the share/OG image reliably
+// triggers the large-preview format in WhatsApp/iMessage/etc. (Spotify uses
+// the same square strategy for lyrics card shares.)
+const CARD_RATIO = '2x2';
 const CARD_CORNERS = ['rounded', 'sharp'];
-function cardBgUrl(ratio, corners, palName) {
-  return `assets/card-bgs/${ratio}_${corners}_${palName}.webp`;
+function cardBgUrl(corners, palName) {
+  return `assets/card-bgs/${CARD_RATIO}_${corners}_${palName}.webp`;
 }
 function getCardBgImage() {
-  const ratio = (document.getElementById('card')?.dataset.ratio || '4/5').replace('/', 'x');
   const corners = useRounded ? 'rounded' : 'sharp';
-  return cardBgUrl(ratio, corners, PAL_NAMES[curP]);
+  return cardBgUrl(corners, PAL_NAMES[curP]);
 }
 // Cache for already-preloaded URLs so we don't re-fire Image() requests.
 const _cardBgPreloaded = new Set();
-function preloadCardBgVariant(ratio, corners) {
+function preloadCardBgVariant(corners) {
   PAL_NAMES.forEach((name) => {
-    const src = cardBgUrl(ratio, corners, name);
+    const src = cardBgUrl(corners, name);
     if (_cardBgPreloaded.has(src)) return;
     _cardBgPreloaded.add(src);
     const img = new Image();
@@ -34,7 +36,7 @@ function preloadCardBgVariant(ratio, corners) {
   });
 }
 function preloadAllCardBgs() {
-  CARD_RATIOS.forEach((r) => CARD_CORNERS.forEach((c) => preloadCardBgVariant(r, c)));
+  CARD_CORNERS.forEach((c) => preloadCardBgVariant(c));
 }
 function isLightColor(hex) {
   const r = parseInt(hex.slice(1, 3), 16),
@@ -95,8 +97,6 @@ function saveDraft() {
       inputSource: inputSource,
       lang: curLang,
       isRTL: isRTL,
-      ratio: document.getElementById("card").getAttribute("data-ratio") || "4/5",
-      mw: document.querySelector(".card-wrap").style.maxWidth || "320px",
       rounded: useRounded,
       cardReady: cardReady,
     };
@@ -119,7 +119,6 @@ function loadDraft() {
       isRTL = draft.isRTL || false;
       window.setLanguageByCode(draft.lang);
     }
-    if (draft.ratio) applySize(draft.ratio, draft.mw || "320px");
     if (draft.rounded != null) {
       useRounded = draft.rounded;
       const card = document.getElementById("card");
@@ -175,10 +174,9 @@ function applyPal(idx) {
   bg.style.backgroundColor = col;
   bg.style.backgroundImage = `url(${getCardBgImage()})`;
   bg.style.backgroundSize = '100% 100%';
-  // Warm the cache for the rest of the palettes in this ratio+corner combo so
+  // Warm the cache for the rest of the palettes (current corner style) so
   // subsequent palette clicks are instant.
-  const ratio = (document.getElementById('card')?.dataset.ratio || '4/5').replace('/', 'x');
-  preloadCardBgVariant(ratio, useRounded ? 'rounded' : 'sharp');
+  preloadCardBgVariant(useRounded ? 'rounded' : 'sharp');
   document.querySelectorAll(".pd").forEach((d) => d.classList.remove("on"));
   document.querySelector('.pd[data-p="' + idx + '"]').classList.add("on");
   wave(document.getElementById("sta").value);
@@ -406,17 +404,17 @@ function updateCard() {
   checkOccasions();
 }
 
-function applySize(ratio, mw) {
-  document.getElementById("card").style.aspectRatio = ratio;
-  document.getElementById("card").setAttribute("data-ratio", ratio);
-  const px = mw || "320px";
+// Card is fixed at 2:2 (square) so the share preview reliably renders as the
+// Spotify-style large image-first preview on WhatsApp/iMessage/etc. Kept as
+// a no-op-ish helper so legacy callers (e.g. saved drafts) don't break.
+function applySize() {
+  const card = document.getElementById("card");
+  card.style.aspectRatio = "2 / 2";
+  card.setAttribute("data-ratio", "2/2");
   if (window.innerWidth > 720) {
-    document.querySelector(".card-wrap").style.maxWidth = px;
-    document.getElementById("wcta").style.maxWidth = px;
+    document.querySelector(".card-wrap").style.maxWidth = "360px";
+    document.getElementById("wcta").style.maxWidth = "360px";
   }
-  document
-    .querySelectorAll(".sz")
-    .forEach((b) => b.classList.toggle("on", b.dataset.ratio === ratio));
   applyPal(curP);
 }
 
@@ -698,13 +696,6 @@ document.getElementById("palRow").addEventListener("keydown", (e) => {
   applyPal(parseInt(d.dataset.p));
   saveDraft();
 });
-document.getElementById("sizeRow").addEventListener("click", (e) => {
-  const b = e.target.closest(".sz");
-  if (!b) return;
-  if (!hasCardContent()) return;
-  applySize(b.dataset.ratio, (b.dataset.mw || "320") + "px");
-  saveDraft();
-});
 document.getElementById("roundnessRow").addEventListener("click", (e) => {
   const b = e.target.closest(".sz");
   if (!b) return;
@@ -772,7 +763,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     r.classList.toggle("on", r.dataset.rounded === "true");
   });
   applyPal(0);
-  applySize("4/5", "320px");
+  applySize();
   document.getElementById("cardGhost").innerHTML = '\u201C';
   updateCard();
 });
@@ -1124,9 +1115,8 @@ document.getElementById("shareCopyLink").addEventListener("click", function () {
   var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 10));
   var tone = curTone || "original";
   var p = curP != null ? curP : 0;
-  var ratio = (document.getElementById("card")?.dataset.ratio || "4/5").replace("/", "x");
   var corners = (typeof useRounded !== "undefined" && useRounded) ? "rounded" : "sharp";
-  var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&ratio=" + ratio + "&r=" + corners;
+  var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&r=" + corners;
   navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
 });
 
