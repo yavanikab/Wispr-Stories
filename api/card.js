@@ -48,8 +48,8 @@ export default function handler(req) {
   const title = name ? `A Wispr Story by ${name}` : 'A Wispr Story';
   const desc = text.length > 160 ? text.slice(0, 160) + '...' : (text || 'A voice-made card from Wispr Stories.');
   const sharerLine = name
-    ? `${name} shared a Wispr Story with you.`
-    : 'Someone shared a Wispr Story with you.';
+    ? `${name} shared the card with you.`
+    : 'Someone shared the card with you.';
 
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(desc);
@@ -123,6 +123,13 @@ body{
   font-size:15px;
   color:#77776a;
 }
+.card-share-inline{
+  color:#1a1a1a;
+  font-weight:600;
+  text-decoration:none;
+  border-bottom:1px solid #cfcfb8;
+}
+.card-share-inline:hover{border-bottom-color:#1a1a1a}
 .card-share-cta{
   display:inline-block;
   background:#1a1a1a;
@@ -150,6 +157,8 @@ body{
   .card-share-cta:hover{background:#fff}
   .card-share-foot{color:#77776a}
   .card-share-foot a{color:#cfcfb8;border-bottom-color:#555548}
+  .card-share-inline{color:#ffffeb;border-bottom-color:#555548}
+  .card-share-inline:hover{border-bottom-color:#ffffeb}
 }
 </style>
 </head>
@@ -159,11 +168,10 @@ body{
     <img src="${safeOgUrl}" alt="${safeTitle}" width="1200" height="630">
   </div>
   <p class="card-share-sharer">${safeSharerLine}</p>
-  <p class="card-share-tagline">Create your own voice card &mdash; it&rsquo;s free and takes a minute.</p>
+  <p class="card-share-tagline">Create your own at <a class="card-share-inline" href="${safeHomeUrl}">Wispr Stories</a>.</p>
   <a class="card-share-cta" href="${safeHomeUrl}">Create your own &rarr;</a>
   <p class="card-share-foot">
-    Made with <a href="${safeHomeUrl}">Wispr Stories</a>
-    &middot; <a href="${safeAppUrl}">Open this card in the editor</a>
+    <a href="${safeAppUrl}">Open this card in the editor</a>
   </p>
 </main>
 </body>
