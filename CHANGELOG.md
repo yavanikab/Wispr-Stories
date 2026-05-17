@@ -6,6 +6,7 @@
 
 - Vercel Blob upload for exact card PNG as WhatsApp OG preview. When user clicks Share or Copy Link, the card PNG is uploaded to Vercel Blob storage and the share URL points to `/card?img=<blob-url>`. WhatsApp crawler fetches the exact card image — no regeneration, no text overlay. Cards auto-expire after 5 days via daily cron cleanup.
 - Short share URLs (`/c/xyz123`) with fast raw PNG upload (~1.5s). Upload accepts raw bytes (no multipart parsing) for speed. Random 8-char alphanumeric IDs. Landing page shows card image + "Create Your Own" button. Silent loading with spinner icon (no "Uploading" text).
+- Padded OG images (1200×630) with card centered on background-matched padding for WhatsApp large preview. Original card displayed at natural size on landing page. Removed title/description from OG meta tags.
 
 ### Fixed
 
