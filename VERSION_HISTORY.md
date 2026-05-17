@@ -1,8 +1,9 @@
 # Version History
 
-## [Unreleased] — WhatsApp share URL fix + OG image static files + agsync + mobile + testing infrastructure
+## [Unreleased] — WhatsApp share URL fix + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
 - WhatsApp share sends card URL (OG meta preview) instead of PNG file attachment
-- OG image endpoint switched from broken `/api/og` (500 errors) to static 1080×1080 PNG files
+- OG images changed from 1080×1080 square to 1200×630 landscape (1.91:1 ratio) for WhatsApp large preview
+- Dynamic `/api/og` endpoint rebuilt with sharp + SVG overlay — renders user name/text/branding on palette backgrounds
 - agsync skill/subagent for AGENTS.md maintenance
 - OpenRouter Whisper fallback
 - Dark mode support

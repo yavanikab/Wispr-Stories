@@ -102,8 +102,8 @@
    transparent enough to sit behind text without competing with it. */
 .card-ghost {
   position: absolute;
-  top: 0px;
-  right: -6px;
+  top: 3px;
+  right: 0px;
   font-size: clamp(42px, 9vw, 64px);
   line-height: 1;
   color: rgba(255, 255, 255, 0.2);

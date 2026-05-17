@@ -21,10 +21,10 @@ const VALID_TONES = new Set([
 ]);
 const VALID_CORNERS = new Set(['rounded', 'sharp']);
 
-// Card is standardized on 2:2 (square). Spotify uses the same square
-// strategy to reliably trigger WhatsApp's large image-first preview format.
-const OG_WIDTH = 1080;
-const OG_HEIGHT = 1080;
+// Card uses 1.91:1 (1200×630) landscape — the universal aspect ratio
+// that triggers WhatsApp's large image-first preview (Spotify uses this).
+const OG_WIDTH = 1200;
+const OG_HEIGHT = 630;
 
 function escapeHtml(value) {
   return String(value)
@@ -61,11 +61,10 @@ export default function handler(req, res) {
   const corners = VALID_CORNERS.has(rawCorners) ? rawCorners : 'rounded';
 
   const enc = (s) => encodeURIComponent(s || '');
-  // Static 1080×1080 PNG per palette+corners combo. Dynamic /api/og was
-  // abandoned after repeated Vercel runtime failures. Static files guarantee
-  // every share gets the Spotify-style large preview in WhatsApp/iMessage.
-  const palName = PAL_NAMES[Number.parseInt(p, 10)] || PAL_NAMES[0];
-  const ogUrl = `${origin}/assets/og-1080/2x2_${corners}_${palName}.png`;
+  // Dynamic OG endpoint renders the user's actual card (name + text on top
+  // of the palette gradient) at 1200×630. /api/og runs on Edge runtime
+  // using @vercel/og with WOFF2 font support.
+  const ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}&r=${corners}`;
   const appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
   const homeUrl = origin + '/';
   const shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;

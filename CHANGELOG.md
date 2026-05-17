@@ -5,7 +5,9 @@
 ### Fixed
 
 - WhatsApp share now sends card URL instead of PNG file, triggering OG meta preview (Spotify-style rich card with image + text). `navigator.share()` no longer includes `files: [blob]` — shares only the `/card?text=...&name=...` URL so WhatsApp crawler reads OG tags.
-- OG image endpoint switched from broken `/api/og` (500 errors on Vercel) to static 1080×1080 PNG files in `assets/og-1080/`. WhatsApp crawler now successfully fetches preview images for all 10 palettes × 2 corner styles.
+- OG image endpoint switched from broken `/api/og` (500 errors on Vercel) to static PNG files.
+- OG images changed from 1080×1080 square (1:1) to 1200×630 landscape (1.91:1) — the universal aspect ratio that triggers WhatsApp's large image-first preview format. All 20 palette+corner combos regenerated via sharp.
+- Dynamic `/api/og` endpoint rebuilt using `sharp` + SVG overlay (Node.js runtime) — now renders user name, story text, and branding on top of palette backgrounds. All 20 palette+corner combos return HTTP 200. Background images fetched via HTTP to avoid Vercel filesystem path issues.
 
 ### Changed
 
