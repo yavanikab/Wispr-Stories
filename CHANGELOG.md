@@ -5,6 +5,7 @@
 ### Fixed
 
 - WhatsApp share now sends card URL instead of PNG file, triggering OG meta preview (Spotify-style rich card with image + text). `navigator.share()` no longer includes `files: [blob]` — shares only the `/card?text=...&name=...` URL so WhatsApp crawler reads OG tags.
+- OG image endpoint switched from broken `/api/og` (500 errors on Vercel) to static 1080×1080 PNG files in `assets/og-1080/`. WhatsApp crawler now successfully fetches preview images for all 10 palettes × 2 corner styles.
 
 ### Changed
 
