@@ -1,10 +1,20 @@
-// Import the edge bundle directly to avoid Vercel's bundler resolving the
-// node bundle via the package's exports map. The @vercel/og package ships
-// a pre-built ESM edge bundle at this path; using it directly is a known
-// workaround when the bundler refuses to honor the edge-light condition.
-import { ImageResponse } from '@vercel/og/dist/index.edge.js';
+// OG image generator. Runs on Vercel's Node.js serverless runtime (the
+// default for /api/* files with no explicit runtime config).
+//
+// Why Node and not Edge: Vercel's Edge runtime statically analyzes function
+// bundles and rejects any module that references `process.X`. The
+// @vercel/og edge bundle (and satori, its underlying renderer) both contain
+// such references — so they hit "unsupported modules" build errors on Edge.
+// Node runtime has no such restriction.
+//
+// Why plain objects instead of JSX: JSX in .js files isn't auto-transpiled
+// by Vercel's bundler, and using .jsx requires a React dependency for the
+// JSX transform. Building the element tree as plain `{type, props}` objects
+// (which is what JSX compiles to anyway) sidesteps both issues. The
+// $$typeof: Symbol.for('react.element') marker makes Satori treat these as
+// real React elements.
 
-export const config = { runtime: 'edge' };
+import { ImageResponse } from '@vercel/og';
 
 const PAL_NAMES = [
   'violet', 'amber', 'crimson', 'emerald', 'ocean',
@@ -16,9 +26,22 @@ const PALS = [
 ];
 const VALID_CORNERS = ['rounded', 'sharp'];
 
-// Detect the dominant non-Latin script in the text so we can fetch the right
-// Noto Sans variant from Google Fonts. Falls through to plain "Noto Sans"
-// which covers Latin + Cyrillic + Greek + Vietnamese out of the box.
+// Minimal React-element factory. Mirrors what React.createElement returns,
+// so Satori accepts the output without an actual React dependency.
+const REACT_ELEMENT = Symbol.for('react.element');
+function el(type, props, children) {
+  return {
+    type,
+    key: null,
+    ref: null,
+    props: { ...(props || {}), children: children == null ? undefined : children },
+    $$typeof: REACT_ELEMENT,
+  };
+}
+
+// Detect the dominant non-Latin script so we can fetch the right Noto Sans
+// variant from Google Fonts. Falls through to plain "Noto Sans" which
+// covers Latin + Cyrillic + Greek + Vietnamese out of the box.
 function pickFontFamily(text) {
   if (/[一-鿿㐀-䶿]/.test(text)) return 'Noto+Sans+SC';
   if (/[぀-ゟ゠-ヿ]/.test(text)) return 'Noto+Sans+JP';
@@ -37,15 +60,13 @@ function pickFontFamily(text) {
   return 'Noto+Sans';
 }
 
-// Resolve a Google Fonts family name → woff URL → ArrayBuffer. Satori (under
-// @vercel/og) needs the font data as an ArrayBuffer to render glyphs.
+// Resolve a Google Fonts family name → woff URL → ArrayBuffer. Satori
+// needs the font data as an ArrayBuffer to render glyphs.
 async function loadFont(family) {
   const cssRes = await fetch(
     `https://fonts.googleapis.com/css2?family=${family}:wght@400;700`,
     {
       headers: {
-        // Pretending to be a real browser yields woff2 with a plain url()
-        // we can extract via regex.
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
@@ -66,16 +87,20 @@ async function loadFont(family) {
   return await fontRes.arrayBuffer();
 }
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   try {
-    const { searchParams, origin } = new URL(req.url);
-    const text = (searchParams.get('text') || 'Your story').slice(0, 200);
-    const name = (searchParams.get('name') || '').slice(0, 40);
-    const rawP = Number.parseInt(searchParams.get('p'), 10);
+    const host = req.headers.host || 'localhost';
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const origin = `${proto}://${host}`;
+    const url = new URL(req.url, origin);
+
+    const text = (url.searchParams.get('text') || 'Your story').slice(0, 200);
+    const name = (url.searchParams.get('name') || '').slice(0, 40);
+    const rawP = Number.parseInt(url.searchParams.get('p'), 10);
     const p =
       Number.isInteger(rawP) && rawP >= 0 && rawP < PALS.length ? rawP : 0;
     const palName = PAL_NAMES[p];
-    let corners = searchParams.get('r') || 'rounded';
+    let corners = url.searchParams.get('r') || 'rounded';
     if (!VALID_CORNERS.includes(corners)) corners = 'rounded';
 
     // Always 1080×1080 square. WhatsApp/iMessage/Twitter reliably render
@@ -100,37 +125,43 @@ export default async function handler(req) {
     const displayText = text.length > 150 ? text.slice(0, 150) + '…' : text;
     const displayName = name || 'Wispr Stories';
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '64px',
-            backgroundImage: `url(${bgUrl})`,
-            backgroundSize: '100% 100%',
-            backgroundRepeat: 'no-repeat',
-            fontFamily: 'CardFont',
-          }}
-        >
-          {/* Top: name label */}
-          <div
-            style={{
+    // Element tree as plain `{type, props, $$typeof}` objects — what JSX
+    // compiles to. Avoids needing React or a JSX transpiler.
+    const tree = el(
+      'div',
+      {
+        style: {
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '64px',
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: '100% 100%',
+          backgroundRepeat: 'no-repeat',
+          fontFamily: 'CardFont',
+        },
+      },
+      [
+        // Top: name label
+        el(
+          'div',
+          {
+            style: {
               display: 'flex',
               fontSize: 38,
               fontWeight: 600,
               color: 'rgba(255,255,255,0.95)',
-            }}
-          >
-            {displayName}
-          </div>
-
-          {/* Middle: white text panel holding the story */}
-          <div
-            style={{
+            },
+          },
+          displayName,
+        ),
+        // Middle: white text panel
+        el(
+          'div',
+          {
+            style: {
               display: 'flex',
               flexDirection: 'column',
               backgroundColor: '#ffffff',
@@ -138,63 +169,81 @@ export default async function handler(req) {
               padding: '44px 40px',
               maxHeight: 560,
               overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
+            },
+          },
+          el(
+            'div',
+            {
+              style: {
                 display: 'flex',
                 fontSize: 44,
                 color: '#1a1a1a',
                 lineHeight: 1.45,
                 fontWeight: 400,
-              }}
-            >
-              {displayText}
-            </div>
-          </div>
-
-          {/* Bottom: brand + domain */}
-          <div
-            style={{
+              },
+            },
+            displayText,
+          ),
+        ),
+        // Bottom: footer
+        el(
+          'div',
+          {
+            style: {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 30,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.95)',
-              }}
-            >
-              Wispr Stories
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 22,
-                color: 'rgba(255,255,255,0.75)',
-              }}
-            >
-              wisprflow.ai
-            </div>
-          </div>
-        </div>
-      ),
-      {
-        width: W,
-        height: H,
-        fonts: [
-          { name: 'CardFont', data: fontData, style: 'normal', weight: 400 },
-        ],
-      },
+            },
+          },
+          [
+            el(
+              'div',
+              {
+                style: {
+                  display: 'flex',
+                  fontSize: 30,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.95)',
+                },
+              },
+              'Wispr Stories',
+            ),
+            el(
+              'div',
+              {
+                style: {
+                  display: 'flex',
+                  fontSize: 22,
+                  color: 'rgba(255,255,255,0.75)',
+                },
+              },
+              'wisprflow.ai',
+            ),
+          ],
+        ),
+      ],
     );
+
+    const imageResponse = new ImageResponse(tree, {
+      width: W,
+      height: H,
+      fonts: [
+        { name: 'CardFont', data: fontData, style: 'normal', weight: 400 },
+      ],
+    });
+
+    // ImageResponse extends the standard Response. In Node runtime we have
+    // to drain it to a Buffer ourselves before piping to res.
+    const buffer = Buffer.from(await imageResponse.arrayBuffer());
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    res.end(buffer);
   } catch (e) {
-    return new Response(
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(
       'OG render error: ' + (e && e.message ? e.message : 'unknown'),
-      { status: 500, headers: { 'Content-Type': 'text/plain' } },
     );
   }
 }
