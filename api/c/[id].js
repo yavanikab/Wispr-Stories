@@ -3,7 +3,7 @@
 // a landing page with card image + "Create Your Own" for humans.
 //
 // GET /c/:id
-// Reconstructs blob URL from short ID and serves HTML.
+// Uses padded OG image for meta tags and original card for display.
 
 const BLOB_HOST = 'jkzbaevzmimaelrr.public.blob.vercel-storage.com';
 
@@ -32,12 +32,15 @@ export default function handler(req, res) {
     return;
   }
 
-  // Reconstruct blob URL from short ID
-  const blobUrl = `https://${BLOB_HOST}/cards/${id}.png`;
+  // OG image is padded 1.91:1 version in og/ directory
+  const ogUrl = `https://${BLOB_HOST}/og/${id}.png`;
+  // Card image is original square version in cards/ directory
+  const cardUrl = `https://${BLOB_HOST}/cards/${id}.png`;
   const shareUrl = `${origin}/c/${id}`;
   const homeUrl = origin + '/';
 
-  const safeBlobUrl = escapeHtml(blobUrl);
+  const safeOgUrl = escapeHtml(ogUrl);
+  const safeCardUrl = escapeHtml(cardUrl);
   const safeShareUrl = escapeHtml(shareUrl);
   const safeHomeUrl = escapeHtml(homeUrl);
 
@@ -46,22 +49,16 @@ export default function handler(req, res) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Wispr Story</title>
-<meta name="description" content="A voice-made card from Wispr Stories.">
-<meta property="og:title" content="A Wispr Story">
-<meta property="og:description" content="A voice-made card from Wispr Stories.">
-<meta property="og:image" content="${safeBlobUrl}">
+<title>Wispr Stories</title>
+<meta property="og:image" content="${safeOgUrl}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="A Wispr Story">
 <meta property="og:url" content="${safeShareUrl}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wispr Stories">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="A Wispr Story">
-<meta name="twitter:description" content="A voice-made card from Wispr Stories.">
-<meta name="twitter:image" content="${safeBlobUrl}">
+<meta name="twitter:image" content="${safeOgUrl}">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
@@ -71,55 +68,46 @@ html,body{
   align-items:center;
   justify-content:center;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:#ffffeb;
-  color:#1a1a1a;
+  background:#1a1a1a;
+  color:#ffffeb;
   padding:24px;
 }
 .card-wrap{
   width:100%;
-  max-width:800px;
+  max-width:600px;
   text-align:center;
 }
 .card-img{
   width:100%;
-  aspect-ratio:1200/630;
   border-radius:16px;
   overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,0.12),0 4px 12px rgba(0,0,0,0.06);
-  background:#eee9d0;
+  box-shadow:0 20px 60px rgba(0,0,0,0.3);
   display:block;
 }
 .card-img img{
   width:100%;
-  height:100%;
-  object-fit:cover;
+  height:auto;
   display:block;
 }
 .cta{
   display:inline-block;
-  margin-top:32px;
-  background:#1a1a1a;
-  color:#ffffeb;
+  margin-top:24px;
+  background:#ffffeb;
+  color:#1a1a1a;
   text-decoration:none;
-  padding:14px 32px;
+  padding:12px 28px;
   border-radius:999px;
-  font-size:16px;
+  font-size:15px;
   font-weight:600;
   transition:transform .15s ease,background .15s ease;
 }
-.cta:hover{background:#000;transform:translateY(-1px)}
-@media (prefers-color-scheme: dark){
-  body{background:#1a1a1a;color:#ffffeb}
-  .card-img{background:#2a2a2a;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-  .cta{background:#ffffeb;color:#1a1a1a}
-  .cta:hover{background:#fff}
-}
+.cta:hover{background:#fff;transform:translateY(-1px)}
 </style>
 </head>
 <body>
 <main class="card-wrap">
   <div class="card-img">
-    <img src="${safeBlobUrl}" alt="A Wispr Story" width="1200" height="630">
+    <img src="${safeCardUrl}" alt="Wispr Story">
   </div>
   <a class="cta" href="${safeHomeUrl}">Create your own &rarr;</a>
 </main>
