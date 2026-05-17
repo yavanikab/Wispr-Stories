@@ -1,6 +1,6 @@
 // Short URL endpoint for shared cards.
 // Serves OG meta for bots (WhatsApp/Twitter crawlers) and
-// a landing page with card image + "Create Your Own" for humans.
+// a landing page with branding + card image + "Create Your Own" for humans.
 //
 // GET /c/:id
 // Uses padded OG image for meta tags and original card for display.
@@ -66,7 +66,8 @@ export default function handler(req, res) {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
-  min-height:100vh;
+  height:100vh;
+  overflow:hidden;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -76,13 +77,45 @@ html,body{
   color:#ffffeb;
   padding:24px;
 }
-.card-wrap{
+.landing-wrap{
   width:100%;
   max-width:600px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+}
+.branding{
   text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.branding-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.branding-logo{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+}
+.branding-name{
+  font-size:clamp(18px, 3vw, 24px);
+  font-weight:700;
+  color:#ffffeb;
+}
+.branding-sub{
+  font-size:clamp(12px, 2vw, 14px);
+  color:#a5a596;
+  max-width:320px;
+  line-height:1.4;
 }
 .card-img{
   width:100%;
+  max-width:500px;
   border-radius:16px;
   overflow:hidden;
   box-shadow:0 20px 60px rgba(0,0,0,0.3);
@@ -95,21 +128,39 @@ html,body{
 }
 .cta{
   display:inline-block;
-  margin-top:24px;
   background:#ffffeb;
   color:#1a1a1a;
   text-decoration:none;
   padding:12px 28px;
   border-radius:999px;
-  font-size:15px;
+  font-size:clamp(13px, 2vw, 15px);
   font-weight:600;
   transition:transform .15s ease,background .15s ease;
+  margin-top:8px;
 }
 .cta:hover{background:#fff;transform:translateY(-1px)}
+@media (max-height:700px){
+  .branding{gap:2px}
+  .branding-sub{font-size:11px}
+  .card-img{max-width:400px}
+  .cta{padding:10px 24px}
+}
+@media (max-width:400px){
+  html,body{padding:16px}
+  .branding-logo{width:24px;height:24px}
+  .card-img{max-width:100%}
+}
 </style>
 </head>
 <body>
-<main class="card-wrap">
+<main class="landing-wrap">
+  <div class="branding">
+    <div class="branding-row">
+      <img class="branding-logo" src="${safeHomeUrl}assets/ws-logo-wh.png" alt="Wispr Stories">
+      <span class="branding-name">Wispr Stories</span>
+    </div>
+    <p class="branding-sub">Turn your voice into something beautiful</p>
+  </div>
   <div class="card-img">
     <img src="${safeCardUrl}" alt="Wispr Story">
   </div>
