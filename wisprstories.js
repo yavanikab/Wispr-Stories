@@ -1099,15 +1099,25 @@ document.getElementById("shareClose").addEventListener("click", function () { do
 document.getElementById("shareBackdrop").addEventListener("click", function () { document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
 document.getElementById("shareNative").addEventListener("click", async function () {
   if (!_shareBlob) return;
-  var text = encodeURIComponent((document.getElementById("sta").value || "").slice(0, 500));
-  var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 80));
-  var tone = curTone || "original";
-  var p = curP != null ? curP : 0;
-  var corners = (typeof useRounded !== "undefined" && useRounded) ? "rounded" : "sharp";
-  var shareUrl = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&r=" + corners;
-  var sharerName = document.getElementById("nin").value || "";
-  var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
-  navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
+  var btn = document.getElementById("shareNative");
+  var origHTML = btn.innerHTML;
+  btn.textContent = "Uploading card…";
+  btn.disabled = true;
+  try {
+    var fd = new FormData();
+    fd.append("card", new File([_shareBlob], "card.png", { type: "image/png" }));
+    var res = await fetch("/api/upload", { method: "POST", body: fd });
+    if (!res.ok) throw new Error("Upload failed");
+    var data = await res.json();
+    var shareUrl = "https://wisprstories.vercel.app/card?img=" + encodeURIComponent(data.url);
+    var sharerName = document.getElementById("nin").value || "";
+    var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
+    navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
+  } catch (e) {
+    showToast("Upload failed — try again");
+  }
+  btn.innerHTML = origHTML;
+  btn.disabled = false;
 });
 document.getElementById("shareDownload").addEventListener("click", function () {
   if (!_shareBlob) return;
@@ -1117,14 +1127,25 @@ document.getElementById("shareDownload").addEventListener("click", function () {
   a.click();
   showToast("Downloaded!");
 });
-document.getElementById("shareCopyLink").addEventListener("click", function () {
-  var text = encodeURIComponent((document.getElementById("sta").value || "").slice(0, 150));
-  var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 10));
-  var tone = curTone || "original";
-  var p = curP != null ? curP : 0;
-  var corners = (typeof useRounded !== "undefined" && useRounded) ? "rounded" : "sharp";
-  var url = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&r=" + corners;
-  navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
+document.getElementById("shareCopyLink").addEventListener("click", async function () {
+  if (!_shareBlob) return;
+  var btn = document.getElementById("shareCopyLink");
+  var origHTML = btn.innerHTML;
+  btn.textContent = "Uploading…";
+  btn.disabled = true;
+  try {
+    var fd = new FormData();
+    fd.append("card", new File([_shareBlob], "card.png", { type: "image/png" }));
+    var res = await fetch("/api/upload", { method: "POST", body: fd });
+    if (!res.ok) throw new Error("Upload failed");
+    var data = await res.json();
+    var url = "https://wisprstories.vercel.app/card?img=" + encodeURIComponent(data.url);
+    navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
+  } catch (e) {
+    showToast("Upload failed — try again");
+  }
+  btn.innerHTML = origHTML;
+  btn.disabled = false;
 });
 
 // Tooltips

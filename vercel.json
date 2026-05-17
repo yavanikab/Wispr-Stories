@@ -14,5 +14,11 @@
         { "key": "Permissions-Policy", "value": "camera=(), geolocation=(), gyroscope=(), magnetometer=(), payment=(), usb=(), microphone=(self)" }
       ]
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cleanup",
+      "schedule": "0 3 * * *"
+    }
   ]
 }

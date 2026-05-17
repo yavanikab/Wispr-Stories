@@ -53,38 +53,56 @@ export default function handler(req, res) {
   const url = new URL(req.url, origin);
   const { searchParams } = url;
 
-  const text = (searchParams.get('text') || '').slice(0, 500);
-  const name = (searchParams.get('name') || '').slice(0, 80);
-  const tone = safeTone(searchParams.get('tone') || 'original');
-  const p = safePalette(searchParams.get('p') || '0');
-  const rawCorners = searchParams.get('r') || 'rounded';
-  const corners = VALID_CORNERS.has(rawCorners) ? rawCorners : 'rounded';
+  // Direct image URL mode: use uploaded card PNG as OG image
+  const directImg = searchParams.get('img');
+  const imgParam = searchParams.get('img');
 
-  const enc = (s) => encodeURIComponent(s || '');
-  // Dynamic OG endpoint renders the user's actual card (name + text on top
-  // of the palette gradient) at 1200×630. /api/og runs on Edge runtime
-  // using @vercel/og with WOFF2 font support.
-  const ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}&r=${corners}`;
-  const appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
-  const homeUrl = origin + '/';
-  const shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
+  let ogUrl, title, desc, sharerLine, appUrl, shareUrl;
 
-  const title = name ? `A Wispr Story by ${name}` : 'A Wispr Story';
-  const desc =
-    text.length > 160
-      ? text.slice(0, 160) + '...'
-      : text || 'A voice-made card from Wispr Stories.';
-  const sharerLine = name
-    ? `${name} shared the card with you.`
-    : 'Someone shared the card with you.';
+  if (directImg) {
+    // Direct image mode — uploaded card PNG is the OG image
+    ogUrl = directImg.startsWith('http') ? directImg : `${origin}${directImg}`;
+    title = 'A Wispr Story';
+    desc = 'A voice-made card from Wispr Stories.';
+    sharerLine = 'Someone shared a card with you.';
+    appUrl = origin + '/';
+    shareUrl = `${origin}/card?img=${encodeURIComponent(directImg)}`;
+  } else {
+    // Legacy text params mode — dynamic OG generation
+    const text = (searchParams.get('text') || '').slice(0, 500);
+    const name = (searchParams.get('name') || '').slice(0, 80);
+    const tone = safeTone(searchParams.get('tone') || 'original');
+    const p = safePalette(searchParams.get('p') || '0');
+    const rawCorners = searchParams.get('r') || 'rounded';
+    const corners = VALID_CORNERS.has(rawCorners) ? rawCorners : 'rounded';
+
+    const enc = (s) => encodeURIComponent(s || '');
+    // Dynamic OG endpoint renders the user's actual card (name + text on top
+    // of the palette gradient) at 1200×630. /api/og runs on Node.js runtime
+    // using sharp + SVG overlay.
+    const palName = PAL_NAMES[Number.parseInt(p, 10)] || PAL_NAMES[0];
+    ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}&r=${corners}`;
+    appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
+    shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
+
+    title = name ? `A Wispr Story by ${name}` : 'A Wispr Story';
+    desc =
+      text.length > 160
+        ? text.slice(0, 160) + '...'
+        : text || 'A voice-made card from Wispr Stories.';
+    sharerLine = name
+      ? `${name} shared the card with you.`
+      : 'Someone shared the card with you.';
+  }
 
   const safeTitle = escapeHtml(title);
   const safeDesc = escapeHtml(desc);
   const safeOgUrl = escapeHtml(ogUrl);
   const safeShareUrl = escapeHtml(shareUrl);
-  const safeHomeUrl = escapeHtml(homeUrl);
   const safeAppUrl = escapeHtml(appUrl);
   const safeSharerLine = escapeHtml(sharerLine);
+  const homeUrl = origin + '/';
+  const safeHomeUrl = escapeHtml(homeUrl);
 
   const html = `<!DOCTYPE html>
 <html lang="en">
