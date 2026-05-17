@@ -1,6 +1,9 @@
 # Version History
 
-## [Unreleased] — WhatsApp share with short URLs + fast raw PNG upload + padded OG images + Vercel Blob exact card preview + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+## [Unreleased] — WhatsApp share with short URLs + fast raw PNG upload + padded OG images + proxy endpoint + Vercel Blob exact card preview + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+- Proxy endpoint `/api/og-image/:id` serves OG images from our domain (avoids cross-domain issues)
+- Added minimal og:title and og:description tags (required for WhatsApp large preview)
+- Added "Copy image" button to share modal (copies PNG to clipboard)
 - Padded OG images (1200×630) with card centered on background-matched padding for WhatsApp large preview
 - Short share URLs (`/c/xyz123`) with fast raw PNG upload (~1.5s)
 - Vercel Blob upload for exact card PNG as WhatsApp OG preview (no regeneration)
