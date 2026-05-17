@@ -1,4 +1,8 @@
-import { ImageResponse } from '@vercel/og';
+// Import the edge bundle directly to avoid Vercel's bundler resolving the
+// node bundle via the package's exports map. The @vercel/og package ships
+// a pre-built ESM edge bundle at this path; using it directly is a known
+// workaround when the bundler refuses to honor the edge-light condition.
+import { ImageResponse } from '@vercel/og/dist/index.edge.js';
 
 export const config = { runtime: 'edge' };
 
