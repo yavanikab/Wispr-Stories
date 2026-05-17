@@ -1,7 +1,8 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/wisprstories.html" },
-    { "source": "/card", "destination": "/api/card" }
+    { "source": "/card", "destination": "/api/card" },
+    { "source": "/c/:id", "destination": "/api/c/[id]" }
   ],
   "headers": [
     {
@@ -13,12 +14,6 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), geolocation=(), gyroscope=(), magnetometer=(), payment=(), usb=(), microphone=(self)" }
       ]
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/cleanup",
-      "schedule": "0 3 * * *"
     }
   ]
 }

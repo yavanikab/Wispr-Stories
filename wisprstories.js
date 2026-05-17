@@ -1101,15 +1101,13 @@ document.getElementById("shareNative").addEventListener("click", async function 
   if (!_shareBlob) return;
   var btn = document.getElementById("shareNative");
   var origHTML = btn.innerHTML;
-  btn.textContent = "Uploading card…";
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var fd = new FormData();
-    fd.append("card", new File([_shareBlob], "card.png", { type: "image/png" }));
-    var res = await fetch("/api/upload", { method: "POST", body: fd });
+    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png" } });
     if (!res.ok) throw new Error("Upload failed");
     var data = await res.json();
-    var shareUrl = "https://wisprstories.vercel.app/card?img=" + encodeURIComponent(data.url);
+    var shareUrl = "https://wisprstories.vercel.app/c/" + data.shortId;
     var sharerName = document.getElementById("nin").value || "";
     var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
     navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
@@ -1131,15 +1129,13 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
   if (!_shareBlob) return;
   var btn = document.getElementById("shareCopyLink");
   var origHTML = btn.innerHTML;
-  btn.textContent = "Uploading…";
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var fd = new FormData();
-    fd.append("card", new File([_shareBlob], "card.png", { type: "image/png" }));
-    var res = await fetch("/api/upload", { method: "POST", body: fd });
+    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png" } });
     if (!res.ok) throw new Error("Upload failed");
     var data = await res.json();
-    var url = "https://wisprstories.vercel.app/card?img=" + encodeURIComponent(data.url);
+    var url = "https://wisprstories.vercel.app/c/" + data.shortId;
     navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
   } catch (e) {
     showToast("Upload failed — try again");
