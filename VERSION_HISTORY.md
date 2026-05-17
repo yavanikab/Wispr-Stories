@@ -1,9 +1,11 @@
 # Version History
 
-## [Unreleased] — WhatsApp share URL fix + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+## [Unreleased] — WhatsApp share with Vercel Blob upload + exact card PNG preview + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+- Vercel Blob upload for exact card PNG as WhatsApp OG preview (no regeneration)
+- Cards auto-expire after 5 days via daily cron cleanup
 - WhatsApp share sends card URL (OG meta preview) instead of PNG file attachment
 - OG images changed from 1080×1080 square to 1200×630 landscape (1.91:1 ratio) for WhatsApp large preview
-- Dynamic `/api/og` endpoint rebuilt with sharp + SVG overlay — renders user name/text/branding on palette backgrounds
+- Dynamic `/api/og` endpoint rebuilt with sharp + SVG overlay — renders user name/text/branding on palette backgrounds (fallback)
 - agsync skill/subagent for AGENTS.md maintenance
 - OpenRouter Whisper fallback
 - Dark mode support

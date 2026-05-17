@@ -2,12 +2,16 @@
 
 ## [Unreleased]
 
+### Added
+
+- Vercel Blob upload for exact card PNG as WhatsApp OG preview. When user clicks Share or Copy Link, the card PNG is uploaded to Vercel Blob storage and the share URL points to `/card?img=<blob-url>`. WhatsApp crawler fetches the exact card image — no regeneration, no text overlay. Cards auto-expire after 5 days via daily cron cleanup.
+
 ### Fixed
 
 - WhatsApp share now sends card URL instead of PNG file, triggering OG meta preview (Spotify-style rich card with image + text). `navigator.share()` no longer includes `files: [blob]` — shares only the `/card?text=...&name=...` URL so WhatsApp crawler reads OG tags.
 - OG image endpoint switched from broken `/api/og` (500 errors on Vercel) to static PNG files.
 - OG images changed from 1080×1080 square (1:1) to 1200×630 landscape (1.91:1) — the universal aspect ratio that triggers WhatsApp's large image-first preview format. All 20 palette+corner combos regenerated via sharp.
-- Dynamic `/api/og` endpoint rebuilt using `sharp` + SVG overlay (Node.js runtime) — now renders user name, story text, and branding on top of palette backgrounds. All 20 palette+corner combos return HTTP 200. Background images fetched via HTTP to avoid Vercel filesystem path issues.
+- Dynamic `/api/og` endpoint rebuilt using `sharp` + SVG overlay (Node.js runtime) — now renders user name, story text, and branding on top of palette backgrounds. All 20 palette+corner combos return HTTP 200. Background images fetched via HTTP to avoid Vercel filesystem path issues. (Kept as fallback for legacy shares.)
 
 ### Changed
 
