@@ -61,12 +61,10 @@ export default function handler(req, res) {
   const corners = VALID_CORNERS.has(rawCorners) ? rawCorners : 'rounded';
 
   const enc = (s) => encodeURIComponent(s || '');
-  // OG image is a STATIC pre-rendered 1080x1080 PNG, one per palette+corners
-  // combo. Dynamic generation via /api/og was abandoned after repeated
-  // Vercel build/runtime failures with @vercel/og. Static files guarantee
-  // every share gets the Spotify-style large preview in WhatsApp/iMessage.
-  const palName = PAL_NAMES[Number.parseInt(p, 10)] || PAL_NAMES[0];
-  const ogUrl = `${origin}/assets/og-1080/2x2_${corners}_${palName}.png`;
+  // Dynamic OG endpoint renders the user's actual card (name + text on top
+  // of the palette gradient) at 1080×1080. /api/og runs on Node.js runtime
+  // using @vercel/og with plain element objects (no JSX/React deps).
+  const ogUrl = `${origin}/api/og?text=${enc(text)}&name=${enc(name)}&p=${p}&r=${corners}`;
   const appUrl = `${origin}/#text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;
   const homeUrl = origin + '/';
   const shareUrl = `${origin}/card?text=${enc(text)}&name=${enc(name)}&tone=${tone}&p=${p}&r=${corners}`;

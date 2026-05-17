@@ -1099,8 +1099,15 @@ document.getElementById("shareClose").addEventListener("click", function () { do
 document.getElementById("shareBackdrop").addEventListener("click", function () { document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
 document.getElementById("shareNative").addEventListener("click", async function () {
   if (!_shareBlob) return;
-  var f = new File([_shareBlob], "wispr-story.png", { type: "image/png" });
-  navigator.share({ files: [f], url: "https://wisprstories.vercel.app", text: "Make your own voice card:" }).catch(function () {});
+  var text = encodeURIComponent((document.getElementById("sta").value || "").slice(0, 500));
+  var name = encodeURIComponent((document.getElementById("nin").value || "").replace(/[^\p{L}]/gu, "").slice(0, 80));
+  var tone = curTone || "original";
+  var p = curP != null ? curP : 0;
+  var corners = (typeof useRounded !== "undefined" && useRounded) ? "rounded" : "sharp";
+  var shareUrl = "https://wisprstories.vercel.app/card?text=" + text + "&name=" + name + "&tone=" + tone + "&p=" + p + "&r=" + corners;
+  var sharerName = document.getElementById("nin").value || "";
+  var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
+  navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
 });
 document.getElementById("shareDownload").addEventListener("click", function () {
   if (!_shareBlob) return;

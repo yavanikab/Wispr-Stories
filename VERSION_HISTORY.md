@@ -1,6 +1,7 @@
 # Version History
 
-## [Unreleased] — agsync + mobile + testing infrastructure
+## [Unreleased] — WhatsApp share URL fix + agsync + mobile + testing infrastructure
+- WhatsApp share sends card URL (OG meta preview) instead of PNG file attachment
 - agsync skill/subagent for AGENTS.md maintenance
 - OpenRouter Whisper fallback
 - Dark mode support

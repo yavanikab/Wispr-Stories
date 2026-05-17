@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- WhatsApp share now sends card URL instead of PNG file, triggering OG meta preview (Spotify-style rich card with image + text). `navigator.share()` no longer includes `files: [blob]` — shares only the `/card?text=...&name=...` URL so WhatsApp crawler reads OG tags.
+
 ### Changed
 
 - Disabled auto-demo animation on page load to allow ghost decoration to appear on fresh empty state. Original animation backed up to `backup/demo-auto-animation.js` for restoration.
