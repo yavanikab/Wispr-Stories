@@ -78,6 +78,12 @@ export default function handler(req) {
 <meta name="twitter:title" content="${safeTitle}">
 <meta name="twitter:description" content="${safeDesc}">
 <meta name="twitter:image" content="${safeOgUrl}">
+<script>
+// Bots (WhatsApp/Facebook/Twitter crawlers) don't execute JS, so they read the
+// OG meta tags above and stop. Real browsers run this and get sent straight
+// into the editor with the card pre-loaded — no landing-page friction.
+try { window.location.replace(${JSON.stringify(appUrl)}); } catch (e) {}
+</script>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}

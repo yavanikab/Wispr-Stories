@@ -1,164 +1,113 @@
-import { ImageResponse } from '@vercel/og';
+import sharp from 'sharp';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
-const PAL_NAMES = [
-  'violet',
-  'amber',
-  'crimson',
-  'emerald',
-  'ocean',
-  'rose',
-  'orange',
-  'teal',
-  'fuchsia',
-  'indigo',
+const PALS = [
+  '#7c3aed',
+  '#f59e0b',
+  '#dc2626',
+  '#059669',
+  '#0284c7',
+  '#db2777',
+  '#ea580c',
+  '#0d9488',
+  '#c026d3',
+  '#4f46e5',
 ];
 
-export default async function handler(req) {
+function escapeXml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+// Greedy word-wrap to fit ~maxChars per line. Returns an array of lines.
+function wrap(text, maxChars) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const candidate = cur ? cur + ' ' + w : w;
+    if (candidate.length <= maxChars) {
+      cur = candidate;
+    } else {
+      if (cur) lines.push(cur);
+      cur = w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+export default async function handler(req, res) {
   try {
-    const { searchParams, origin } = new URL(req.url);
-    const text = (searchParams.get('text') || 'Your story').slice(0, 200);
-    const name = (searchParams.get('name') || '').slice(0, 40);
-    const rawP = Number.parseInt(searchParams.get('p'), 10);
-    const p = Number.isInteger(rawP) && rawP >= 0 && rawP < PAL_NAMES.length ? rawP : 0;
-    const palName = PAL_NAMES[p];
+    const host = req.headers.host || 'localhost';
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const url = new URL(req.url, `${proto}://${host}`);
 
-    // Card background: 4/5 ratio rounded variant from the real asset library.
-    const cardBgUrl = `${origin}/assets/card-bgs/4x5_rounded_${palName}.webp`;
-    const logoUrl = `${origin}/assets/ws-logo-wh.png`;
+    const text = (url.searchParams.get('text') || 'Your story').slice(0, 200);
+    const name = (url.searchParams.get('name') || '').slice(0, 40);
+    const rawP = parseInt(url.searchParams.get('p'), 10);
+    const p =
+      Number.isFinite(rawP) && rawP >= 0 && rawP < PALS.length ? rawP : 0;
+    const bg = PALS[p];
 
-    const displayText = text.length > 150 ? text.slice(0, 150) + '…' : text;
-    const labelText = name ? `${name}` : 'Wispr Stories';
+    const displayText =
+      text.length > 150 ? text.slice(0, 150) + '…' : text;
+    const lines = wrap(displayText, 32).slice(0, 7);
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#ffffeb',
-            fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-          }}
-        >
-          {/* Card — 4/5 aspect ratio, centered in 1200x630 frame */}
-          <div
-            style={{
-              width: 480,
-              height: 600,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              borderRadius: 32,
-              padding: '28px 24px',
-              backgroundImage: `url(${cardBgUrl})`,
-              backgroundSize: '100% 100%',
-              backgroundRepeat: 'no-repeat',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.22)',
-            }}
-          >
-            {/* Top label: name */}
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 18,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.92)',
-              }}
-            >
-              {labelText}
-            </div>
+    // Canvas: 1200x630 cream background.
+    // Card: 480x600 (4:5), centered horizontally, 15px from top.
+    const cardX = 360;
+    const cardY = 15;
+    const cardW = 480;
+    const cardH = 600;
 
-            {/* Text panel */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                backgroundColor: '#ffffff',
-                borderRadius: 14,
-                padding: '22px 20px 14px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  fontSize: 24,
-                  color: '#1a1a1a',
-                  lineHeight: 1.5,
-                  fontWeight: 400,
-                }}
-              >
-                {displayText}
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  marginTop: 14,
-                  fontSize: 12,
-                  color: 'rgba(26,26,26,0.55)',
-                  letterSpacing: 1,
-                }}
-              >
-                Story Original
-              </div>
-            </div>
+    // Inner white text panel inside the card.
+    const panelX = cardX + 26;
+    const panelY = cardY + 220;
+    const panelW = cardW - 52;
+    const panelH = 280;
 
-            {/* Footer: logo + domain */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <img
-                  src={logoUrl}
-                  width="22"
-                  height="22"
-                  style={{ marginRight: 8 }}
-                />
-                <div
-                  style={{
-                    display: 'flex',
-                    fontSize: 16,
-                    fontWeight: 600,
-                    color: 'rgba(255,255,255,0.9)',
-                  }}
-                >
-                  Wispr Stories
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  fontSize: 12,
-                  color: 'rgba(255,255,255,0.6)',
-                }}
-              >
-                wisprflow.ai
-              </div>
-            </div>
-          </div>
-        </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-      },
-    );
+    // Text positioning inside the white panel.
+    const txtX = panelX + 22;
+    const txtY = panelY + 44;
+    const lh = 32;
+
+    const tspans = lines
+      .map(
+        (line, i) =>
+          `<tspan x="${txtX}" dy="${i === 0 ? 0 : lh}">${escapeXml(line)}</tspan>`,
+      )
+      .join('');
+
+    const displayName = name || 'Wispr Stories';
+
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#ffffeb"/>
+  <rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="32" fill="${bg}"/>
+  <text x="${cardX + 26}" y="${cardY + 54}" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="600" fill="white">${escapeXml(displayName)}</text>
+  <rect x="${panelX}" y="${panelY}" width="${panelW}" height="${panelH}" rx="14" fill="#ffffff"/>
+  <text font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#1a1a1a" x="${txtX}" y="${txtY}">${tspans}</text>
+  <text x="${panelX + 22}" y="${panelY + panelH - 20}" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#77776a">Story Original</text>
+  <text x="${cardX + 26}" y="${cardY + cardH - 34}" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="white">Wispr Stories</text>
+  <text x="${cardX + cardW - 26}" y="${cardY + cardH - 34}" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="white" fill-opacity="0.7" text-anchor="end">wisprflow.ai</text>
+</svg>`;
+
+    const png = await sharp(Buffer.from(svg)).png().toBuffer();
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    res.end(png);
   } catch (e) {
-    return new Response('OG render error: ' + (e && e.message ? e.message : 'unknown'), {
-      status: 500,
-      headers: { 'Content-Type': 'text/plain' },
-    });
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(
+      'OG render error: ' + (e && e.message ? e.message : 'unknown'),
+    );
   }
 }
