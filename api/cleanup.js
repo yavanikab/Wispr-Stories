@@ -3,13 +3,14 @@
 
 import { list, del } from '@vercel/blob';
 
-export const runtime = 'edge';
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   // Only allow cron-triggered requests
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
+  const authHeader = req.headers.authorization || '';
+  const cronSecret = process.env.CRON_SECRET || '';
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    res.statusCode = 401;
+    res.end('Unauthorized');
+    return;
   }
 
   try {
@@ -33,13 +34,13 @@ export default async function handler(req) {
       cursor = response.cursor;
     } while (cursor);
 
-    return new Response(JSON.stringify({ deleted }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ deleted }));
   } catch (e) {
-    return new Response(
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end(
       'Cleanup error: ' + (e && e.message ? e.message : 'unknown'),
-      { status: 500, headers: { 'Content-Type': 'text/plain' } },
     );
   }
 }
