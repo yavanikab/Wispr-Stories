@@ -1,8 +1,9 @@
 # Version History
 
-## [Unreleased] — WhatsApp share with Vercel Blob upload + exact card PNG preview + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+## [Unreleased] — WhatsApp share with short URLs + fast raw PNG upload + Vercel Blob exact card preview + OG 1200×630 landscape images + dynamic OG renderer + agsync + mobile + testing infrastructure
+- Short share URLs (`/c/xyz123`) with fast raw PNG upload (~1.5s)
 - Vercel Blob upload for exact card PNG as WhatsApp OG preview (no regeneration)
-- Cards auto-expire after 5 days via daily cron cleanup
+- Cards auto-expire after 5 days via Blob TTL
 - WhatsApp share sends card URL (OG meta preview) instead of PNG file attachment
 - OG images changed from 1080×1080 square to 1200×630 landscape (1.91:1 ratio) for WhatsApp large preview
 - Dynamic `/api/og` endpoint rebuilt with sharp + SVG overlay — renders user name/text/branding on palette backgrounds (fallback)
