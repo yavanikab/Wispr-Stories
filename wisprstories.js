@@ -288,24 +288,34 @@ function applyTone(tone) {
   const wrap = document.getElementById("tonePillWrap");
   const pill = document.getElementById("tonePill");
   const upgBtn = document.getElementById("upgradeBtn");
-  const bar = document.getElementById("rewriteBar");
-  const barText = document.getElementById("rewriteBarText");
   const isMobile = window.innerWidth <= 720;
   const limitReached = !isSupporter() && getCardsLeft() === 0;
   toneBtns.forEach((c) => {
     if (c.dataset.tone === "original") { c.disabled = false; return; }
     c.disabled = limitReached;
+    // Update or create limited counter badge on non-original tones
+    let badge = c.querySelector(".tone-badge-limited");
+    if (isSupporter()) {
+      if (badge) badge.remove();
+    } else {
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "tone-badge tone-badge-limited";
+        badge.setAttribute("aria-hidden", "true");
+        c.appendChild(badge);
+      }
+      badge.textContent = limitReached ? "0" : getCardsLeft();
+    }
   });
 
-  function showPill() { wrap.style.display = ""; if (bar) bar.style.display = "none"; document.body.classList.remove("has-rewrite-bar"); }
-  function showBar(txt) { wrap.style.display = "none"; if (bar) { bar.style.display = "flex"; barText.textContent = txt; } document.body.classList.add("has-rewrite-bar"); }
-  function hideBoth() { wrap.style.display = "none"; if (bar) bar.style.display = "none"; document.body.classList.remove("has-rewrite-bar"); }
+  function showPill() { wrap.style.display = ""; }
+  function hidePill() { wrap.style.display = "none"; }
 
   if (tone === "original") {
     btn.textContent = "Create card";
     if (limitReached) {
       if (isMobile) {
-        showBar("0 rewrites left");
+        hidePill();
       } else {
         showPill();
         pill.textContent = "0 rewrites remaining \u2014 Original is unlimited";
@@ -313,20 +323,20 @@ function applyTone(tone) {
         upgBtn.style.display = "";
       }
     } else {
-      hideBoth();
+      hidePill();
     }
   } else {
     const label = tone.charAt(0).toUpperCase() + tone.slice(1);
     btn.textContent = "Create " + label + " card";
     if (isSupporter()) {
       showPill();
-      pill.textContent = "\u221e Unlimited \u2014 no daily cap";
+      pill.textContent = "\u221E Unlimited \u2014 no daily cap";
       pill.className = "tone-pill supporter";
       upgBtn.style.display = "none";
     } else {
       const left = getCardsLeft();
       if (isMobile) {
-        showBar(left === 0 ? "0 rewrites \u2014 Upgrade for unlimited" : left + ( left === 1 ? " rewrite" : " rewrites") + " left today");
+        hidePill();
       } else {
         showPill();
         if (left === 0) {
@@ -340,6 +350,7 @@ function applyTone(tone) {
       }
     }
   }
+  updateMobileBar();
   updateSourceLabel();
 }
 
@@ -498,7 +509,7 @@ function startRec() {
     clearTimeout(recogTimeout);
     recogTimeout = null;
   }
-  curLang = document.getElementById("langSel").value;
+  curLang = curLang || "en-US";
   fullTx = "";
   recogRestartCount = 0;
   recog = new SR();
@@ -666,12 +677,15 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   }
   startRec();
 });
-document.getElementById("langSel").addEventListener("change", (e) => {
-  curLang = e.target.value;
-  isRTL = RTL.includes(curLang);
-  updateCard();
-  saveDraft();
-});
+const langSelEl = document.getElementById("langSel");
+if (langSelEl) {
+  langSelEl.addEventListener("change", (e) => {
+    curLang = e.target.value;
+    isRTL = RTL.includes(curLang);
+    updateCard();
+    saveDraft();
+  });
+}
 document.getElementById("toneRow").addEventListener("click", (e) => {
   const c = e.target.closest(".tc");
   if (!c || c.disabled) return;
@@ -766,6 +780,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   applySize();
   document.getElementById("cardGhost").innerHTML = '\u201C';
   updateCard();
+  updateMobileBar();
 });
 // Restore card from draft or shared URL
 var restored = false;
@@ -813,29 +828,71 @@ try {
   }
 } catch(e) {}
 
-// Mobile: examples sit below the preview. Desktop: examples sit inside .left
-// before the closing line. Reversible on resize so rotating a tablet or
-// resizing devtools restores the correct layout.
-function arrangeMobileLayout() {
-  var exWrap = document.querySelector(".ex-section-wrap");
-  var right = document.querySelector(".right");
-  var left = document.querySelector(".left");
-  var leftClosing = document.querySelector(".left-closing");
-  if (!exWrap || !right || !left) return;
-  if (window.innerWidth <= 720) {
-    if (exWrap.parentNode !== right.parentNode) {
-      right.parentNode.insertBefore(exWrap, right.nextSibling);
-    }
-  } else if (exWrap.parentNode !== left) {
-    if (leftClosing && leftClosing.parentNode === left) {
-      left.insertBefore(exWrap, leftClosing);
+// Unified mobile sticky bar: Create+Share left, Rewrites+Upgrade right
+function updateMobileBar() {
+  var bar = document.getElementById("mobileBar");
+  if (!bar) return;
+  var isMobile = window.innerWidth <= 720;
+  if (!isMobile) {
+    bar.style.display = "none";
+    document.body.classList.remove("has-mobile-bar");
+    return;
+  }
+  bar.style.display = "flex";
+  document.body.classList.add("has-mobile-bar");
+
+  // Left group: always visible
+  var shareBtn = document.getElementById("mobileBtnS");
+  if (shareBtn) shareBtn.disabled = !cardReady;
+
+  // Right group: show only when a styled tone is selected or limit reached
+  var rightGroup = document.getElementById("mobileBarRight");
+  var rewriteText = document.getElementById("mobileRewriteText");
+  if (!rightGroup || !rewriteText) return;
+
+  var limitReached = !isSupporter() && getCardsLeft() === 0;
+  var isStyled = curTone !== "original";
+
+  if (isStyled || limitReached) {
+    rightGroup.style.display = "flex";
+    if (isSupporter()) {
+      rewriteText.innerHTML = '<span class="rewrite-count">\u221E</span><span class="rewrite-label">Unlimited</span>';
+      rewriteText.className = "mobile-bar-rewrite-text";
+    } else if (limitReached) {
+      rewriteText.innerHTML = '<span class="rewrite-count">0</span><span class="rewrite-label">Upgrade</span>';
+      rewriteText.className = "mobile-bar-rewrite-text exhausted";
     } else {
-      left.appendChild(exWrap);
+      var left = getCardsLeft();
+      rewriteText.innerHTML = '<span class="rewrite-count">' + left + '</span><span class="rewrite-label">rewrite' + (left === 1 ? "" : "s") + ' left</span>';
+      rewriteText.className = "mobile-bar-rewrite-text";
     }
+  } else {
+    rightGroup.style.display = "none";
   }
 }
-arrangeMobileLayout();
-window.addEventListener("resize", arrangeMobileLayout);
+window.addEventListener("resize", updateMobileBar);
+
+// Auto-detect language from browser on first load (no UI dropdown)
+function tryAutoDetectLang() {
+  const saved = sessionStorage.getItem("wisprDraft");
+  if (saved) return; // respect saved draft language
+  if (typeof allLanguages === "undefined" || !allLanguages.length) return; // not loaded yet
+  const navLang = navigator.language || "en-US";
+  const tryCodes = [navLang, navLang.split("-")[0], "en-US"];
+  for (const code of tryCodes) {
+    if (allLanguages.find((l) => l.code === code)) {
+      curLang = code;
+      isRTL = RTL.includes(code);
+      window.setLanguageByCode(code);
+      return;
+    }
+  }
+  curLang = "en-US";
+  isRTL = false;
+  window.setLanguageByCode("en-US");
+}
+tryAutoDetectLang();
+document.addEventListener("languagesReady", tryAutoDetectLang);
 
 // Update bar/pill display when crossing mobile breakpoint on resize
 var _prevMobile = window.innerWidth <= 720;
@@ -847,9 +904,9 @@ window.addEventListener("resize", function() {
 document.querySelector(".nav-brand")?.addEventListener("click", (e) => {
   e.preventDefault();
   if (window.innerWidth <= 720) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector(".card-wrap").scrollIntoView({ behavior: "smooth", block: "center" });
   } else {
-    document.querySelector(".left").scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("card").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 });
 const prefersReducedMotion =
@@ -929,6 +986,16 @@ if (!isMobile()) {
 }
 bindHoverWave(document);
 
+// Re-bind wave animations when resizing from mobile to desktop
+let _wavePrevMobile = window.innerWidth <= 720;
+window.addEventListener("resize", () => {
+  const _nowMobile = window.innerWidth <= 720;
+  if (_wavePrevMobile && !_nowMobile) {
+    bindHoverWave(document);
+  }
+  _wavePrevMobile = _nowMobile;
+});
+
 // Theme toggle
 function setTheme(dark, animate) {
   const html = document.documentElement;
@@ -959,7 +1026,7 @@ document.getElementById('themeToggle').addEventListener('click', function() {
 
 // Upgrade modal
 document.getElementById("upgradeBtn").addEventListener("click", openUpgradeModal);
-document.getElementById("rewriteBarBtn")?.addEventListener("click", openUpgradeModal);
+document.getElementById("mobileBtnUpgrade")?.addEventListener("click", openUpgradeModal);
 document.getElementById("upgradeClose").addEventListener("click", closeUpgradeModal);
 document.getElementById("upgradeBackdrop").addEventListener("click", closeUpgradeModal);
 document.getElementById("upgradeKeyGo").addEventListener("click", handleUpgradeKey);
@@ -998,9 +1065,12 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   document.getElementById("btnS").disabled = false;
   document.getElementById("wcta").classList.add("show");
   document.getElementById("dlBtn").style.display = "";
-  document
-    .getElementById("card")
-    .scrollIntoView({ behavior: "smooth", block: "center" });
+  if (window.innerWidth <= 720) {
+    document.querySelector(".card-wrap").scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    document.getElementById("card").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  updateMobileBar();
 });
 
 // Create card
@@ -1039,9 +1109,13 @@ document.getElementById("btnC").addEventListener("click", () => {
   document.getElementById("wcta").classList.add("show");
   const dl = document.getElementById("dlBtn");
   dl.style.display = "";
+  updateMobileBar();
   setTimeout(() => {
-    const target = window.innerWidth <= 720 ? dl : card;
-    target.scrollIntoView({ behavior: "smooth", block: window.innerWidth <= 720 ? "start" : "center" });
+    if (window.innerWidth <= 720) {
+      document.querySelector(".card-wrap").scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }, 120);
   showToast("Card ready \u2014 tap Share to download");
 });
@@ -1067,16 +1141,24 @@ document.getElementById("dlBtn").addEventListener("click", async () => {
   }
 });
 
+// Unified mobile bar buttons mirror inline buttons
+document.getElementById("mobileBtnC")?.addEventListener("click", () => {
+  document.getElementById("btnC").click();
+});
+document.getElementById("mobileBtnS")?.addEventListener("click", () => {
+  document.getElementById("btnS").click();
+});
+
 // Share modal
 let _shareBlob = null;
 document.getElementById("btnS").addEventListener("click", async () => {
   if (!cardReady) { document.getElementById("btnC").click(); return; }
-  if (!window.html2canvas) { showToast("Export loading \u2014 try again"); return; }
   const btn = document.getElementById("btnS");
   btn.textContent = "Generating\u2026";
   btn.disabled = true;
   try {
     await window.ensureHtml2canvas();
+    if (!window.html2canvas) throw new Error("html2canvas not loaded");
     await document.fonts.ready;
     _shareBlob = await generateBlobWithProgress();
     btn.innerHTML = '<i class="fas fa-share-nodes"></i> Share card';

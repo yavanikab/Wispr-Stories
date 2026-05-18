@@ -269,7 +269,8 @@
     stopOn(document.getElementById("palRow"), "click");
     stopOn(document.getElementById("sizeRow"), "click");
     stopOn(document.getElementById("roundnessRow"), "click");
-    stopOn(document.getElementById("langBtn"), "click");
+    const langBtnEl = document.getElementById("langBtn");
+    if (langBtnEl) stopOn(langBtnEl, "click");
     stopOn(document.getElementById("resetBtn"), "click");
   }
 

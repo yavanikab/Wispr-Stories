@@ -16,7 +16,7 @@
   grid-column: 1;
   grid-row: 1;
   border-right: 1px solid var(--rule);
-  padding: 40px 32px 80px;
+  padding: 35px 32px 80px;
   display: flex;
   flex-direction: column;
   gap: 24px;

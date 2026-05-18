@@ -2,7 +2,30 @@
 
 ## [Unreleased]
 
-### Added
+### Mobile UI refinements (2026-05-18, follow-up)
+
+#### Changed
+- **Mobile bar theme-aware backgrounds** — Enhanced `.mobile-bar` with stronger shadow (`0 -8px 24px`), `backdrop-filter: blur(8px)`, and thicker border (`2px`). Uses CSS variables (`--cream`, `--rule`) which auto-swap in dark mode.
+- **Rewrite text vertical stacking** — Changed `.mobile-bar-rewrite-text` from single-line text to flex column with `.rewrite-count` (18px/900 weight/red `#dc2626`) and `.rewrite-label` (9px/uppercase). Updated JS in `updateMobileBar()` to inject the new HTML structure instead of flat textContent.
+- **Hidden inline actions on mobile** — `.actions { display: none; }` at `@media (max-width: 720px)` since the sticky bar now handles all actions (was previously stacking columns).
+- **Share modal mobile fix** — Added `margin-bottom: 80px` and `max-height` constraints to `.share-modal-content` so it clears the mobile bar. Toast lifted to `bottom: max(80px, env(safe-area-inset-bottom) + 70px)` to appear above sticky bar.
+- **Light/dark mode validation** — All changes use CSS variables (`--cream`, `--ink`, `--rule`) that auto-swap between themes. Red `#dc2626` is visible on both light and dark backgrounds.
+
+#### Files modified
+- `global/styles/responsive.css` — Mobile bar styling, toast positioning, share modal margins, hidden `.actions`
+- `wisprstories.js` — `updateMobileBar()` rewrite text HTML injection
+
+### Wispr Flow research files updated** (2026-05-18):
+  - Created `docs/wispr_flow_improvement_areas.md` with strategic recommendations for Wispr Flow product and marketing improvements (interview prep)
+  - Added cross-reference links between `docs/wispr_flow_research.md`, `docs/wispr_flow_company_intelligence.md`, and `docs/wispr_flow_improvement_areas.md`
+  - Created HTML versions for visual reference:
+    - `docs/wispr_flow_research.html`
+    - `docs/wispr_flow_company_intelligence.html`
+    - `docs/wispr_flow_improvement_areas.html`
+  - Updated `AGENTS.md` to include new files in Key files and Documents referenced every session sections
+  - Comprehensive verification conducted against primary sources: TechCrunch, Economic Times, official Wispr Flow website, App Store, Product Hunt, LinkedIn, official docs, Times of India, Bloomberg, Reddit, Hacker News, YouTube
+
+### Existing (continued from previous sessions)
 
 - Vercel Blob upload for exact card PNG as WhatsApp OG preview. When user clicks Share or Copy Link, the card PNG is uploaded to Vercel Blob storage and the share URL points to `/card?img=<blob-url>`. WhatsApp crawler fetches the exact card image — no regeneration, no text overlay. Cards auto-expire after 5 days via daily cron cleanup.
 - Short share URLs (`/c/xyz123`) with fast raw PNG upload (~1.5s). Upload accepts raw bytes (no multipart parsing) for speed. Random 8-char alphanumeric IDs. Landing page shows card image + "Create Your Own" button. Silent loading with spinner icon (no "Uploading" text).
@@ -17,6 +40,24 @@
 - Dynamic `/api/og` endpoint rebuilt using `sharp` + SVG overlay (Node.js runtime) — now renders user name, story text, and branding on top of palette backgrounds. All 20 palette+corner combos return HTTP 200. Background images fetched via HTTP to avoid Vercel filesystem path issues. (Kept as fallback for legacy shares.)
 
 ### Changed
+
+- **Layout hierarchy redesign** (2026-05-18) to improve first-use clarity for elderly and non-technical users:
+  - Removed language dropdown; language is now auto-detected from `navigator.language` on first load (saved drafts still restore their language)
+  - Headline rewritten from poetic "Speak anything / Get something beautiful" to instructional "Tap the mic and say something lovely" with a guiding sub-line
+  - Record button + textarea + "or type" divider wrapped in a single `.input-hero` visual zone to create one unmistakable starting point
+  - Examples section moved up to immediately follow the input zone, serving as a safety net for users who feel stuck
+  - Name field compacted from a full "Step 4 · Your name" block into a single inline "From" row
+  - "Customize" section renamed to "Make it yours", `<details>` toggle removed (always open), and steps renumbered 3-5
+  - "Corner style" renamed to "Shape" for brevity
+  - "Create card" button is now full-width and more prominent; "Share card" sits directly below it
+  - Mobile: replaced competing sticky bars (`.actions-sticky` + `.rewrite-bar`) with **single unified mobile bar** (`.mobile-bar`) — Create+Share buttons on left, rewrite count+Upgrade on right; no more z-index conflicts
+  - Mobile: unified bar uses icon-first buttons (✨ Create, 📤 Share, ☕ Upgrade) with 44×44px minimum tap targets for accessibility
+  - Mobile: tone buttons increased from `11px/8px 12px` to `13px/10px 14px`
+  - Mobile: shape buttons increased from `11px/10px 14px` to `13px/12px 18px`
+  - Mobile: example-click scroll target changed from `#card` to `.card-wrap` with `block: "center"`
+  - Mobile: create-card scroll target changed from `#dlBtn` to `.card-wrap` with `block: "center"`
+  - Backup snapshot saved to `backup/wisprstories_v15_pre_hierarchy.html`
+  - Design spec saved to `docs/superpowers/specs/2026-05-18-layout-hierarchy-redesign-design.md`
 
 - Disabled auto-demo animation on page load to allow ghost decoration to appear on fresh empty state. Original animation backed up to `backup/demo-auto-animation.js` for restoration.
 - Right column scrollbar hidden (`scrollbar-width: none`, `::-webkit-scrollbar { display: none }`) so the scrollbar doesn't appear in the middle of the page. Column remains scrollable via mouse wheel/touch/keyboard.

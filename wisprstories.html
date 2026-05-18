@@ -164,9 +164,9 @@
       <!-- LEFT -->
       <div class="left">
         <div>
-          <div class="hl-eye">Your voice, ready to share</div>
-          <h1 class="hl-h1">Speak anything</h1>
-          <p class="hl-h2">Get something beautiful</p>
+          <h1 class="hl-h1">Say it once, share it forever</h1>
+          <p class="hl-h2">Dictate with Wispr Flow; style with care; share with love.</p>
+          <p class="hl-emotion">&ldquo;Hold onto memories; they will hold onto you.&rdquo;</p>
         </div>
 
         <div class="shared-cta" id="sharedCta">
@@ -174,158 +174,119 @@
           <em>Create my card</em> to make your own.
         </div>
 
-        <p class="intro">
-          Press record and speak, or paste from Wispr Flow. Your words become a
-          vivid card to share on WhatsApp, Instagram, or anywhere.
-        </p>
-
         <div class="ff-notice" id="ffNotice">
           &#127990; Voice recording is not supported in Firefox. Use Chrome or
           Safari &mdash; or paste your text below.
         </div>
 
-        <!-- 1. LANGUAGE -->
-        <div>
-          <label class="lbl" for="langSel"
-            >1 &middot; Language for recording
-            <span class="iw"
-              ><span class="ii" tabindex="0"
-                ><i class="fa-solid fa-circle-info"></i
-              ></span>
-              <span class="tip"
-                >Only needed when using Record. Sets which language your browser
-                listens for. Typing or pasting works in any language without
-                changing this. Chrome supports the most languages.</span
-              ></span
-            >
-          </label>
-          <div class="lang-wrap-sel">
-            <button class="lang-sel" id="langBtn">
-              <span id="langBtnText">Loading languages...</span>
-              <i class="fa-solid fa-chevron-down lang-arr"></i>
-            </button>
-            <input type="hidden" id="langSel" value="en-US" />
-            <div class="lang-dropdown" id="langDropdown"></div>
-          </div>
-        </div>
-
-        <!-- 2. RECORD -->
-        <div>
-          <div class="lbl">
-            2 &middot; Tap to speak
-            <span class="iw"
-              ><span class="ii" tabindex="0"
-                ><i class="fa-solid fa-circle-info"></i
-              ></span>
-              <span class="tip"
-                >Press record and speak naturally. Your words appear live. Tap
-                again to stop &mdash; your words move into the text box ready
-                for the card.</span
-              ></span
-            >
-          </div>
-          <div class="rec-row">
-            <button class="rec-btn" id="recBtn" aria-label="Record">
-              <svg viewBox="0 0 20 20" fill="none">
-                <rect
-                  x="7"
-                  y="1"
-                  width="6"
-                  height="11"
-                  rx="3"
-                  fill="currentColor"
-                />
-                <path
-                  d="M3 9a7 7 0 0014 0"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  fill="none"
-                />
-                <line
-                  x1="10"
-                  y1="16"
-                  x2="10"
-                  y2="19"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-                <line
-                  x1="7"
-                  y1="19"
-                  x2="13"
-                  y2="19"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-            <div>
-              <div class="rec-st" id="recSt">Tap to speak</div>
-              <div class="rec-sub" id="recSub">
-                Your words appear as you speak
+        <!-- HERO INPUT ZONE: Record + OR + Textarea -->
+        <div class="input-hero">
+          <!-- 1. RECORD -->
+          <div>
+            <div class="lbl">
+              1 &middot; Tap to speak
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip"
+                  >Press record and speak naturally. Your words appear live. Tap
+                  again to stop &mdash; your words move into the text box ready
+                  for the card.</span
+                ></span
+              >
+            </div>
+            <div class="rec-row">
+              <button class="rec-btn" id="recBtn" aria-label="Record">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <rect
+                    x="7"
+                    y="1"
+                    width="6"
+                    height="11"
+                    rx="3"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M3 9a7 7 0 0014 0"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    fill="none"
+                  />
+                  <line
+                    x1="10"
+                    y1="16"
+                    x2="10"
+                    y2="19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="7"
+                    y1="19"
+                    x2="13"
+                    y2="19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+              <div>
+                <div class="rec-st" id="recSt">Tap to speak</div>
+                <div class="rec-sub" id="recSub">
+                  Your words appear as you speak
+                </div>
               </div>
             </div>
+            <div class="live-box" id="liveBox"></div>
           </div>
-          <div class="live-box" id="liveBox"></div>
-        </div>
 
-        <div class="or">
-          <div class="orl"></div>
-          <span class="ort">or type or paste your words</span>
-          <div class="orl"></div>
-        </div>
+          <div class="or">
+            <div class="orl"></div>
+            <span class="ort">or type or paste your words</span>
+            <div class="orl"></div>
+          </div>
 
-        <!-- 3. TEXT -->
-        <div>
-          <label class="lbl" for="sta"
-            >3 &middot; Your words
-            <span class="iw"
-              ><span class="ii" tabindex="0"
-                ><i class="fa-solid fa-circle-info"></i
-              ></span>
-              <span class="tip"
-                >Speak first using Record above &mdash; words land here
-                automatically. Or type directly. Or paste from Wispr Flow. Any
-                language works here without changing the dropdown.</span
-              ></span
-            >
-          </label>
-          <textarea
-            class="sta"
-            id="sta"
-            maxlength="150"
-            aria-label="Your words"
-            placeholder="Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
-          ></textarea>
-          <div class="char-r">
-            <span class="char-c" id="charC">0 / 150</span
-            ><button class="reset-btn" id="resetBtn">Reset all</button>
+          <!-- 2. TEXT -->
+          <div>
+            <label class="lbl" for="sta"
+              >2 &middot; Your words
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip"
+                  >Speak first using Record above &mdash; words land here
+                  automatically. Or type directly. Or paste from Wispr Flow. Any
+                  language works here.</span
+                ></span
+              >
+            </label>
+            <textarea
+              class="sta"
+              id="sta"
+              maxlength="150"
+              aria-label="Your words"
+              placeholder="Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
+            ></textarea>
+            <div class="char-r">
+              <span class="char-c" id="charC">0 / 150</span
+              ><button class="reset-btn" id="resetBtn">Reset all</button>
+            </div>
           </div>
         </div>
 
-        <!-- 4. NAME -->
-        <div>
-          <label class="lbl" for="nin"
-            >4 &middot; Your name
-            <span class="iw"
-              ><span class="ii" tabindex="0"
-                ><i class="fa-solid fa-circle-info"></i
-              ></span>
-              <span class="tip"
-                >Appears at the bottom of the card. Use your name, nickname, or
-                initials &mdash; e.g. Nani, Dad, Priya. Leave blank to show
-                Wispr Stories.</span
-              ></span
-            >
-          </label>
+        <!-- COMPACT NAME ROW (right after input, before examples) -->
+        <div class="name-row">
+          <span class="name-label">From</span>
           <input
             class="nin"
             id="nin"
             aria-label="Your name"
-            placeholder="e.g. Nani"
+            placeholder="e.g. Mom, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
             maxlength="10"
             inputmode="text"
             autocomplete="off"
@@ -333,12 +294,18 @@
           />
         </div>
 
-        <!-- CUSTOMIZE (steps 5-8 open by default on desktop and mobile) -->
+        <!-- EXAMPLES (safety net after input + name) -->
+        <div class="ex-section-wrap">
+          <div class="ex-lbl">Need inspiration? Click an example</div>
+          <div class="ex-grid" id="exGrid"></div>
+        </div>
+
+        <!-- MAKE IT YOURS (collapsible, open by default) -->
         <details class="customize" open>
           <summary class="customize-summary">
-            <span class="customize-summary-label">Customize</span>
+            <span class="customize-summary-label">Make it yours</span>
             <span class="customize-summary-hint"
-              >Tone &middot; color &middot; size &middot; corners</span
+              >Tone &middot; color &middot; shape</span
             >
             <i
               class="fa-solid fa-chevron-right customize-chevron"
@@ -346,10 +313,10 @@
             ></i>
           </summary>
 
-          <!-- 5. TONE -->
+          <!-- 3. TONE -->
           <div>
             <div class="lbl">
-              5 &middot; Tone
+              3 &middot; Tone
               <span class="iw"
                 ><span class="ii" tabindex="0"
                   ><i class="fa-solid fa-circle-info"></i
@@ -371,9 +338,10 @@
               <button
                 class="tc on"
                 data-tone="original"
-                aria-label="Tone: Original"
+                aria-label="Tone: Original (unlimited)"
               >
                 <i class="fas fa-pen" aria-hidden="true"></i> Original
+                <span class="tone-badge tone-badge-unlimited" aria-hidden="true">∞</span>
               </button>
               <button class="tc" data-tone="warm" aria-label="Tone: Warm">
                 <i class="fas fa-heart" aria-hidden="true"></i> Warm
@@ -400,10 +368,10 @@
             </div>
           </div>
 
-          <!-- 6. COLOUR -->
+          <!-- 4. COLOUR -->
           <div>
             <div class="lbl">
-              6 &middot; Card color
+              4 &middot; Card color
               <span class="iw"
                 ><span class="ii" tabindex="0"
                   ><i class="fa-solid fa-circle-info"></i
@@ -513,10 +481,10 @@
             </div>
           </div>
 
-          <!-- 7. CORNER STYLE -->
+          <!-- 5. SHAPE -->
           <div>
             <div class="lbl">
-              7 &middot; Corner style
+              5 &middot; Shape
               <span class="iw"
                 ><span class="ii" tabindex="0"
                   ><i class="fa-solid fa-circle-info"></i
@@ -531,7 +499,7 @@
               class="sz-row"
               id="roundnessRow"
               role="radiogroup"
-              aria-label="Corner style"
+              aria-label="Shape"
             >
               <button class="sz" data-rounded="false" aria-label="Sharp edges">
                 Sharp edges
@@ -547,7 +515,7 @@
           </div>
         </details>
 
-        <!-- ACTIONS -->
+        <!-- ACTIONS (full-width buttons) -->
         <div class="actions">
           <button class="btn-c" id="btnC">
             <i class="fas fa-wand-sparkles"></i
@@ -558,15 +526,8 @@
           </button>
         </div>
 
-        <div class="ex-hint">More inspiration below &darr;</div>
-
-        <!-- EXAMPLES -->
-        <div class="ex-section-wrap">
-          <div class="ex-lbl">Need inspiration? Click an example</div>
-          <div class="ex-grid" id="exGrid"></div>
-        </div>
         <div class="left-closing">
-          <span class="left-closing-text">Your voice, beautifully shared</span>
+          <span class="left-closing-text wave-on-hover" tabindex="0">Your voice, beautifully shared</span>
         </div>
       </div>
       <!-- /left -->
@@ -745,21 +706,31 @@
       <span class="export-progress-text">Generating card&hellip;</span>
     </div>
 
+    <div class="mobile-bar" id="mobileBar" aria-label="Card actions">
+      <div class="mobile-bar-left">
+        <button class="mobile-bar-btn mobile-bar-btn-create" id="mobileBtnC">
+          <i class="fas fa-wand-sparkles"></i>
+          <span class="mobile-bar-btn-label">Create</span>
+        </button>
+        <button class="mobile-bar-btn mobile-bar-btn-share" id="mobileBtnS" disabled>
+          <i class="fas fa-share-nodes"></i>
+          <span class="mobile-bar-btn-label">Share</span>
+        </button>
+      </div>
+      <div class="mobile-bar-right" id="mobileBarRight" style="display: none">
+        <span class="mobile-bar-rewrite-text" id="mobileRewriteText"></span>
+        <button class="mobile-bar-btn mobile-bar-btn-upgrade" id="mobileBtnUpgrade">
+          <i class="fas fa-mug-hot"></i>
+          <span class="mobile-bar-btn-label">Upgrade</span>
+        </button>
+      </div>
+    </div>
+
     <script src="assets/languages/languages-loader.js"></script>
     <script src="global/occasions/examples-loader.js"></script>
     <script src="global/occasions/occasions.js"></script>
     <script src="fonts.js"></script>
     <script src="wisprstories.js?v=20260515-responsive"></script>
     <script src="global/demo.js"></script>
-    <div class="rewrite-bar" id="rewriteBar" style="display: none">
-      <span class="rewrite-bar-text" id="rewriteBarText"></span>
-      <button
-        class="rewrite-bar-btn"
-        id="rewriteBarBtn"
-        onclick="openUpgradeModal()"
-      >
-        Upgrade
-      </button>
-    </div>
   </body>
 </html>

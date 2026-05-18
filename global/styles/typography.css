@@ -17,21 +17,33 @@
 }
 .hl-h1 {
   font-family: var(--serif);
-  font-size: clamp(36px, 5vw, 56px);
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-size: clamp(30px, 3vw, 45px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
   color: var(--ink);
   margin-top: 6px;
 }
 .hl-h2 {
+  font-family: var(--sans);
+  font-size: clamp(13px, 1.4vw, 16px);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  color: var(--ink2);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.hl-emotion {
   font-family: var(--serif);
-  font-size: clamp(18px, 2vw, 26px);
-  font-weight: 500;
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-weight: 400;
   font-style: italic;
-  letter-spacing: 0.02em;
   color: var(--ink3);
-  margin-top: 6px;
+  opacity: 0.6;
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 }
 .intro {
   font-size: 12px;

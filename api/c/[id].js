@@ -67,10 +67,8 @@ export default function handler(req, res) {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
-  height:100dvh;
-  height:100vh;
-  min-height:100dvh;
-  min-height:100vh;
+  position:fixed;
+  inset:0;
   overflow:hidden;
   display:flex;
   flex-direction:column;
