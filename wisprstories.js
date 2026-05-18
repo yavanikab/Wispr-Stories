@@ -1143,31 +1143,52 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
   btn.innerHTML = origHTML;
   btn.disabled = false;
 });
+// Platform detection for mobile clipboard limitations
+var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+var isAndroid = /Android/.test(navigator.userAgent);
+
 document.getElementById("shareCopyImage").addEventListener("click", async function () {
   if (!_shareBlob) return;
   var btn = document.getElementById("shareCopyImage");
   var origHTML = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
+
+  // iOS Safari does not support image clipboard — trigger download instead
+  if (isIOS) {
+    try {
+      var a = document.createElement("a");
+      a.download = "wispr-story.png";
+      a.href = URL.createObjectURL(_shareBlob);
+      a.click();
+      showToast("Image saved — open Photos to paste");
+    } catch (e) {
+      showToast("Download failed — try Share instead");
+    }
+    btn.innerHTML = origHTML;
+    btn.disabled = false;
+    return;
+  }
+
   try {
     // Copy image to clipboard using Clipboard API
     var item = new ClipboardItem({ "image/png": _shareBlob });
     await navigator.clipboard.write([item]);
     showToast("Image copied!");
   } catch (e) {
-    // Fallback: copy as data URL for older browsers
-    try {
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        navigator.clipboard.writeText(reader.result).then(function () {
-          showToast("Image copied as link!");
-        }).catch(function () {
-          showToast("Copy failed — try Download instead");
-        });
-      };
-      reader.readAsDataURL(_shareBlob);
-    } catch (e2) {
-      showToast("Copy failed — try Download instead");
+    // Android fallback: download to device
+    if (isAndroid) {
+      try {
+        var a = document.createElement("a");
+        a.download = "wispr-story.png";
+        a.href = URL.createObjectURL(_shareBlob);
+        a.click();
+        showToast("Image saved to downloads");
+      } catch (e2) {
+        showToast("Download failed — try Share instead");
+      }
+    } else {
+      showToast("Copy not supported — try Download instead");
     }
   }
   btn.innerHTML = origHTML;

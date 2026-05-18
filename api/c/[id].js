@@ -32,8 +32,8 @@ export default function handler(req, res) {
     return;
   }
 
-  // OG image - use direct Blob URL (public, accessible, no cross-domain issues)
-  const ogUrl = `https://${BLOB_HOST}/og/${id}.png`;
+  // OG image - serve from our own domain via proxy (WhatsApp/crawlers block third-party blob URLs)
+  const ogUrl = `${origin}/api/og-image/${id}`;
   // Card image is original square version in cards/ directory
   const cardUrl = `https://${BLOB_HOST}/cards/${id}.png`;
   const shareUrl = `${origin}/c/${id}`;
@@ -49,9 +49,10 @@ export default function handler(req, res) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="${safeHomeUrl}assets/ws-logo-wh.png" type="image/png">
 <title>Wispr Stories</title>
-<meta property="og:title" content="Wispr Stories">
-<meta property="og:description" content="Create and share voice-made cards">
+<meta property="og:title" content="A Wispr Story — Turn your voice into something beautiful">
+<meta property="og:description" content="Created with Wispr Stories. Tap to make your own.">
 <meta property="og:image" content="${safeOgUrl}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -60,13 +61,16 @@ export default function handler(req, res) {
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wispr Stories">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Wispr Stories">
-<meta name="twitter:description" content="Create and share voice-made cards">
+<meta name="twitter:title" content="A Wispr Story — Turn your voice into something beautiful">
+<meta name="twitter:description" content="Created with Wispr Stories. Tap to make your own.">
 <meta name="twitter:image" content="${safeOgUrl}">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
+  height:100dvh;
   height:100vh;
+  min-height:100dvh;
+  min-height:100vh;
   overflow:hidden;
   display:flex;
   flex-direction:column;
@@ -133,7 +137,7 @@ html,body{
   text-decoration:none;
   padding:12px 28px;
   border-radius:999px;
-  font-size:clamp(13px, 2vw, 15px);
+  font-size:clamp(15px, 2.2vw, 18px);
   font-weight:600;
   transition:transform .15s ease,background .15s ease;
   margin-top:8px;
@@ -161,10 +165,12 @@ html,body{
     </div>
     <p class="branding-sub">Turn your voice into something beautiful</p>
   </div>
+  <br>
   <div class="card-img">
     <img src="${safeCardUrl}" alt="Wispr Story">
   </div>
   <a class="cta" href="${safeHomeUrl}">Create your own &rarr;</a>
+  <br>
 </main>
 </body>
 </html>`;
