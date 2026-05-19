@@ -74,6 +74,9 @@
           matchMedia("(prefers-color-scheme:dark)").matches)
       )
         document.documentElement.classList.add("dark");
+      // Prevent flash of wrong language: hide body until i18n loads
+      document.documentElement.style.visibility = 'hidden';
+      document.documentElement.style.opacity = '0';
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

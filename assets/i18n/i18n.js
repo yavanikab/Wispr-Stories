@@ -4,6 +4,10 @@
 (function() {
   var _cache = {};
   var _currentLang = 'en';
+  var _showTimeout = setTimeout(function() {
+    document.documentElement.style.visibility = '';
+    document.documentElement.style.opacity = '';
+  }, 3000);
 
   function loadTranslations(code) {
     if (_cache[code]) return Promise.resolve(_cache[code]);
@@ -64,6 +68,10 @@
         var val = resolveKey(translations, key);
         if (val) el.title = val;
       });
+      // Show page after language is applied
+      clearTimeout(_showTimeout);
+      document.documentElement.style.visibility = '';
+      document.documentElement.style.opacity = '';
     });
   };
 
