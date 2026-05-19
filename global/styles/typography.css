@@ -34,6 +34,15 @@
   margin-top: 8px;
   line-height: 1.5;
 }
+.wispr-flow-link {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink3);
+  transition: border-color 0.2s;
+}
+.wispr-flow-link:hover {
+  border-bottom-color: var(--ink);
+}
 .hl-emotion {
   font-family: var(--serif);
   font-size: clamp(14px, 1.2vw, 18px);

@@ -1,14 +1,16 @@
-// Upload card PNG to Vercel Blob storage.
+// Upload card to Vercel Blob storage.
 // Accepts raw PNG bytes (no multipart parsing) for fast uploads.
 // Creates two versions:
 //   1. Original card PNG (for landing page display)
-//   2. Padded 1200×630 OG image (for WhatsApp large preview)
-// Returns short IDs for clean share URLs.
+//   2. Card re-encoded as JPEG at native aspect (for WhatsApp large preview)
+// JPEG keeps the file ~5× smaller than PNG, comfortably under WhatsApp's
+// mobile preview size threshold. The card fills the OG frame instead of
+// sitting inside padding bars, so the preview reads as a large hero image.
 //
 // POST /api/upload
 // Body: raw PNG bytes
 // Content-Type: image/png
-// Response: { shortId: "aB3xK9mP", ogId: "cD4yL0nQ" }
+// Response: { shortId: "aB3xK9mP" }
 
 import { put } from '@vercel/blob';
 import sharp from 'sharp';
@@ -43,82 +45,28 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Get image dimensions to calculate padding
-    const metadata = await sharp(pngBuffer).metadata();
-    const cardWidth = metadata.width;
-    const cardHeight = metadata.height;
-
     // Generate short random ID
     const shortId = randomId();
 
-    // Upload original card PNG
+    // Upload original card PNG (used by the landing page hero image)
     await put(`cards/${shortId}.png`, pngBuffer, {
       access: 'public',
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 5, // 5 days
     });
 
-    // Create padded 1200×630 OG image
-    // Card is centered with background color padding
-    const ogWidth = 1200;
-    const ogHeight = 630;
-    
-    // Calculate scale to fit card within OG dimensions with padding
-    const padding = 40;
-    const maxCardWidth = ogWidth - (padding * 2);
-    const maxCardHeight = ogHeight - (padding * 2);
-    const scale = Math.min(maxCardWidth / cardWidth, maxCardHeight / cardHeight, 1);
-    const scaledWidth = Math.floor(cardWidth * scale);
-    const scaledHeight = Math.floor(cardHeight * scale);
-    const offsetX = Math.floor((ogWidth - scaledWidth) / 2);
-    const offsetY = Math.floor((ogHeight - scaledHeight) / 2);
-
-    // Detect dominant background color from card edges for padding
-    // Sample pixels from the edges to find the background color
-    const edgeSample = await sharp(pngBuffer)
-      .extract({ left: 0, top: 0, width: Math.min(10, cardWidth), height: Math.min(10, cardHeight) })
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    
-    // Calculate average color from edge pixels
-    const edgeData = edgeSample.data;
-    let r = 0, g = 0, b = 0;
-    const pixelCount = edgeSample.info.width * edgeSample.info.height;
-    for (let i = 0; i < edgeData.length; i += 3) {
-      r += edgeData[i];
-      g += edgeData[i + 1];
-      b += edgeData[i + 2];
-    }
-    r = Math.round(r / pixelCount);
-    g = Math.round(g / pixelCount);
-    b = Math.round(b / pixelCount);
-
-    // Create padded OG image
-    const ogBuffer = await sharp({
-      create: {
-        width: ogWidth,
-        height: ogHeight,
-        channels: 3,
-        background: { r, g, b },
-      },
-    })
-      .composite([
-        {
-          input: await sharp(pngBuffer)
-            .resize(scaledWidth, scaledHeight, { fit: 'contain' })
-            .toBuffer(),
-          top: offsetY,
-          left: offsetX,
-        },
-      ])
-      .png({ quality: 90 })
+    // Re-encode the original card as JPEG for the OG image.
+    // mozjpeg + quality 82 typically lands ~30–60 KB for a 1080×1080 card.
+    const ogBuffer = await sharp(pngBuffer)
+      .flatten({ background: '#ffffff' }) // strip alpha so JPEG bg is predictable
+      .jpeg({ quality: 82, mozjpeg: true, chromaSubsampling: '4:2:0' })
       .toBuffer();
 
-    // Upload padded OG image with same ID in og/ directory
-    await put(`og/${shortId}.png`, ogBuffer, {
+    await put(`og/${shortId}.jpg`, ogBuffer, {
       access: 'public',
       addRandomSuffix: false,
       cacheControlMaxAge: 60 * 60 * 24 * 5, // 5 days
+      contentType: 'image/jpeg',
     });
 
     res.setHeader('Content-Type', 'application/json');

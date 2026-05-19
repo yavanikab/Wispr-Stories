@@ -1,0 +1,175 @@
+{
+  "nav": {
+    "tagline": "Konuş · Oluştur · Paylaş",
+    "help": "Nasıl kullanılır",
+    "theme": "Karanlık modu aç/kapat"
+  },
+  "hero": {
+    "title": "Bir kez söyle, sonsuza dek paylaş",
+    "subtitle": "<strong><em>Wispr Flow</em></strong> ile dikte et; özenle biçimlendir; sevgiyle paylaş.",
+    "quote": "\"Anılara sıkı sıkıya tutun; onlar da size tutunacaktır.\""
+  },
+  "sharedCta": "✨ <strong>Bir Wispr Story aldınız!</strong> Kendinkini yapmak için <em>Kartımı oluştur</em> dokunun.",
+  "ffNotice": "🌐 Firefox'ta ses kaydı desteklenmiyor. Chrome veya Safari kullanın — veya metninizi aşağıya yapıştırın.",
+  "record": {
+    "label": "1 · Konuşmak için dokunun",
+    "tip": "Kaydet'e basın ve doğal bir şekilde konuşun. Kelimeleriniz canlı olarak görünür. Durdurmak için tekrar dokunun — kelimeleriniz kart için hazır metin kutusuna taşınır.",
+    "status": "Konuşmak için dokunun",
+    "sub": "Konuşurken kelimeleriniz görünür"
+  },
+  "orText": "veya kelimelerinizi yazın veya yapıştırın",
+  "textarea": {
+    "label": "2 · Kelimeleriniz",
+    "tip": "Önce yukarıdaki Kaydet'i kullanarak konuşun — kelimeler buraya otomatik olarak gelir. Veya doğrudan yazın. Veya Wispr Flow'dan yapıştırın. Burada herhangi bir dil çalışır.",
+    "placeholder": "Sesinizi kaydedin veya herhangi bir şey yazın: doğum günü dileği, anı, tarif, aşk mektubu, minnettarlık, tavsiye..."
+  },
+  "resetBtn": "Tümünü sıfırla",
+  "nameRow": {
+    "label": "Kimden",
+    "placeholder": "Ör: Anne, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+  },
+  "examples": {
+    "label": "İlham mı lazım? Bir örneğe tıklayın"
+  },
+  "customize": {
+    "summary": "Kendinize özgü yapın",
+    "hint": "Ton · renk · şekil"
+  },
+  "tone": {
+    "label": "3 · Ton",
+    "tip": "Kelimelerinizin kartta nasıl hissettirdiğini değiştirir. Sıcak naziktir. Cesur doğrudandır. Şiirsel ritimle akar. Oyuncu hafiftir. Düşünceli yavaştır. Dürüst hamdır. Yalnızca harf aralığını ve eğimi değiştirir — boyut veya kalınlık değil.",
+    "original": "Orijinal",
+    "warm": "Sıcak",
+    "bold": "Cesur",
+    "poetic": "Şiirsel",
+    "playful": "Oyuncu",
+    "reflective": "Düşünceli",
+    "honest": "Dürüst"
+  },
+  "color": {
+    "label": "4 · Kart rengi",
+    "tip": "Kart arka planını ayarlar. Canlı önizleme anında güncellenir.",
+    "violet": "Menekşe",
+    "amber": "Kehribar",
+    "crimson": "Kızıl",
+    "emerald": "Zümrüt",
+    "ocean": "Okyanus",
+    "rose": "Gül",
+    "orange": "Turuncu",
+    "teal": "Turkuaz",
+    "fuchsia": "Fuşya",
+    "indigo": "Çivit"
+  },
+  "shape": {
+    "label": "5 · Şekil",
+    "tip": "Keskin kenarlar WhatsApp için en iyisidir. Yuvarlak köşeler galeriler ve web için uygundur.",
+    "sharp": "Keskin kenarlar",
+    "rounded": "Yuvarlak köşeler"
+  },
+  "actions": {
+    "create": "Kart oluştur",
+    "share": "Kart paylaş"
+  },
+  "closing": "Sesiniz, güzelce paylaşıldı",
+  "preview": {
+    "label": "Canlı önizleme"
+  },
+  "upgrade": "Yükselt",
+  "download": "Kart indir",
+  "cardEmpty": "Detayları doldurun —<br />kartınız burada görünecek",
+  "cardPlaceholder": "Konuşurken veya yazarken hikayeniz burada görünür.",
+  "wcta": {
+    "text": "Yazdığınız her yerde sesinizi kullanın — WhatsApp, Gmail, Slack, herhangi bir uygulama.",
+    "link": "Wispr Flow'u ücretsiz deneyin →"
+  },
+  "footer": {
+    "text": "Wispr Stories — <strong><em>Wispr Flow</em></strong> için yapıldı",
+    "independent": "Bağımsız proje · Wispr Flow ile bağlantılı değil",
+    "copyright": "© 2026"
+  },
+  "shareModal": {
+    "title": "Kartınızı paylaşın",
+    "sub": "Görseli doğrudan yayınlayın veya başkalarının kendi kartlarını yapması için uygulama bağlantısını paylaşın.",
+    "native": "Uygulamalara paylaş",
+    "download": "Kart görselini indir",
+    "copyLink": "Görsel bağlantısını kopyala",
+    "copyImage": "Görseli kopyala"
+  },
+  "upgradeModal": {
+    "title": "Pro'ya yükselt",
+    "sub": "Sınırsız ton yeniden yazma. Artık günlük limit yok.",
+    "buyCoffee": "☕ Bana kahve ısmarla",
+    "or": "— veya —",
+    "haveKey": "Zaten destekçi anahtarınız var mı?",
+    "keyPlaceholder": "Anahtarınızı yapıştırın...",
+    "go": "Git",
+    "lostKey": "Anahtarınızı mı kaybettiniz?",
+    "emailPlaceholder": "E-postanızı girin",
+    "emailSend": "Kurtarma e-postası gönder",
+    "disclaimer": "Wispr Stories — Wispr Flow için yapıldı"
+  },
+  "capacity": {
+    "title": "Sevgiyle dolup taşıyoruz!",
+    "text": "Muhteşem yanıt için teşekkürler. Günlük kapasitemize ulaştık ve sunucularımıza biraz dinlenme vermemiz gerekiyor.",
+    "reset": "UTC gece yarısı döneceğiz.",
+    "btn": "Geri dönüp dönmediğimizi kontrol et"
+  },
+  "onboarding": {
+    "title": "Wispr Stories'a hoş geldiniz",
+    "step1": "Mesajınızı <strong>konuşun veya yazın</strong>. Mikrofona dokunun veya metin yapıştırın.",
+    "step2": "Kartınızı <strong>özelleştirin</strong> — ton, renk ve köşe stili seçin.",
+    "step3": "<strong>Oluşturun ve paylaşın</strong> — PNG olarak indirin veya sosyal platformlarda doğrudan paylaşın.",
+    "gotIt": "Anladım — başlayalım!",
+    "hint": "Sonra yardıma mı ihtiyacınız var? Üst çubuktaki ❐ simgesine dokunun."
+  },
+  "mobileBar": {
+    "create": "Oluştur",
+    "share": "Paylaş",
+    "upgrade": "Yükselt"
+  },
+  "toasts": {
+    "downloaded": "İndirildi!",
+    "exportFailed": "Dışa aktarma başarısız — tekrar deneyin",
+    "uploadFailed": "Yükleme başarısız — tekrar deneyin",
+    "linkCopied": "Bağlantı kopyalandı!",
+    "copyFailed": "Bağlantı kopyalanamadı",
+    "imageSaved": "Görsel kaydedildi — yapıştırmak için Fotoğraflar'ı açın",
+    "downloadFailed": "İndirme başarısız — Paylaş'ı deneyin",
+    "imageCopied": "Görsel kopyalandı!",
+    "imageSavedDownloads": "Görsel indirilenlere kaydedildi",
+    "copyNotSupported": "Kopyalama desteklenmiyor — İndir'i deneyin",
+    "cardReady": "Kart hazır — indirmek için Paylaş'a dokunun",
+    "speakFirst": "Önce hikayenizi konuşun veya yazın",
+    "dailyRewritesUsed": "Günlük yeniden yazmalar kullanıldı — Orijinal olarak gösteriliyor",
+    "rewriteLimit": "Günlük yeniden yazma limitine ulaşıldı",
+    "rewriteFailed": "Yeniden yazma başarısız — orijinal gösteriliyor",
+    "rewriteApplied": "Yeniden yazma uygulandı!",
+    "silence": "Bunu yakalayamadık — daha yüksek sesle konuşmayı deneyin",
+    "recordingWorks": "Kayıt çalışıyor! Gerçek transkripsiyon için Deepgram anahtarı ekleyin",
+    "transcriptionFailed": "Transkripsiyon başarısız — 'vercel dev' çalıştırmanız veya dağıtmanız gerekiyor",
+    "voiceNotSupported": "Firefox'ta ses desteklenmiyor",
+    "requiresHttps": "Ses kaydı HTTPS gerektirir — localhost üzerinden açın veya dağıtın",
+    "safariEnglish": "Safari ses tanıma için yalnızca İngilizce (ABD) destekliyor olabilir",
+    "speechNotResponding": "Konuşma hizmeti yanıt vermiyor — tekrar deneyin veya yazın",
+    "micDenied": "Mikrofon erişimi reddedildi — tarayıcı ayarlarını kontrol edin",
+    "speechUnavailable": "Konuşma hizmeti kullanılamıyor — alternatif deneniyor...",
+    "couldNotStart": "Kayıt başlatılamadı — yazmayı deneyin",
+    "noSpeech": "Konuşma algılanmadı — daha yüksek sesle konuşmayı deneyin",
+    "speechError": "Konuşma hatası — tekrar deneyin",
+    "noMatch": "Konuşma eşleştirilemedi — daha net konuşmayı deneyin",
+    "couldNotStartMic": "Mikrofon başlatılamadı",
+    "doneReview": "Tamam — kelimelerinizi gözden geçirin sonra Oluştur'a dokunun",
+    "freeLimit": "Ücretsiz limite ulaşıldı ({max}/gün). Daha fazlası için yükseltin.",
+    "proLimit": "Pro limite ulaşıldı ({max}/gün). Yarın tekrar gelin!",
+    "cumulativeLimit": "Günlük ses süresi limitine ulaşıldı. Yarın tekrar gelin!",
+    "tooLong": "Kayıt çok uzun (maks. {max} sn).",
+    "welcomePro": "Pro'ya hoş geldiniz!",
+    "invalidKey": "Geçersiz anahtar. Tekrar deneyin veya kahve ısmarlayın.",
+    "verifyFailed": "Anahtar doğrulanamadı. Tekrar deneyin.",
+    "enterKey": "Anahtarınızı girin",
+    "checking": "Kontrol ediliyor...",
+    "proUnlocked": "Pro'nun kilidi açıldı! Sınırsız her şeyin keyfini çıkarın.",
+    "thankYouEmail": "Teşekkürler! Size yakında döneceğim.",
+    "validEmail": "Lütfen geçerli bir e-posta adresi girin."
+  }
+}

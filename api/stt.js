@@ -7,9 +7,9 @@ export default async function handler(req) {
     });
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.DEEPGRAM_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'Server not configured' }), {
+    return new Response(JSON.stringify({ error: 'Server not configured — add DEEPGRAM_API_KEY' }), {
       status: 500, headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -20,26 +20,27 @@ export default async function handler(req) {
     const bytes = new Uint8Array(binaryStr.length);
     for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
 
-    const ext = format?.includes('wav') ? 'wav' : format?.includes('mp4') ? 'm4a' : 'webm';
-    const fd = new FormData();
-    fd.append('file', new Blob([bytes], { type: format || 'audio/webm' }), 'audio.' + ext);
-    fd.append('model', 'openai/whisper-1');
-
-    const res = await fetch('https://openrouter.ai/api/v1/audio/transcriptions', {
+    // Deepgram Nova-3 Multilingual (Batch) — single request, raw audio bytes
+    const url = 'https://api.deepgram.com/v1/listen?model=nova-3&language=multilingual&smart_format=true&punctuate=true';
+    const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + apiKey },
-      body: fd,
+      headers: {
+        'Authorization': 'Token ' + apiKey,
+        'Content-Type': format || 'audio/webm',
+      },
+      body: bytes,
     });
 
     if (!res.ok) {
       const err = await res.text();
-      return new Response(JSON.stringify({ error: 'Transcription failed', detail: err }), {
+      return new Response(JSON.stringify({ error: 'Deepgram API error', detail: err }), {
         status: res.status, headers: { 'Content-Type': 'application/json' },
       });
     }
 
     const data = await res.json();
-    return new Response(JSON.stringify({ text: data.text }), {
+    const text = data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+    return new Response(JSON.stringify({ text }), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {

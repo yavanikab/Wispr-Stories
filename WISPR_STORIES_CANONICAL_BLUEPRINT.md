@@ -157,23 +157,71 @@ Supported languages include English (US/UK), Hindi, Hinglish, Spanish (Spain/Mex
 
 ## 8. Technical Architecture
 
-### Current stack (fully client-side, no backend)
+### Current stack (client-side + serverless functions)
 
 | Layer | Technology | Cost |
 |---|---|---|
-| Voice transcription | Web Speech API (browser-native) | Free |
+| Voice transcription (primary) | Web Speech API (browser-native) | Free |
+| Voice transcription (fallback) | Deepgram Nova-3 Multilingual (Batch) via `api/stt.js` | $0.0043/min, $200 free credit (~555 hrs) |
 | Card rendering | HTML + CSS | Free |
 | PNG export | html2canvas (CDN) | Free |
 | Mobile sharing | Web Share API (native share sheet) | Free |
 | Fonts | Google Fonts CDN | Free |
 | Hosting | Vercel (wisprstories.vercel.app) | Free |
+| State / rate limiting | Upstash Redis (serverless) | Free tier (10K commands/day) |
+| Tone rewriting | DeepSeek V4 Flash Free via OpenRouter (`api/rewrite.js`) | $0 |
+| Upgrade key validation | Upstash Redis (`api/validate-key.js`) | Free tier |
+| BuyMeACoffee webhook | `api/webhook/bmc.js` — auto key generation | Free |
+| Blob storage | Vercel Blob — card PNGs + OG images | Free tier (1GB) |
+| Daily cleanup | `api/cleanup.js` — Vercel Cron (3 AM UTC, 36hr retention) | Free |
 
-The prototype is a single self-contained HTML file. No build step, no server, no database. No audio is stored anywhere — everything stays in browser memory and clears on page refresh.
+The app is no longer purely client-side. It uses Vercel serverless functions for STT fallback, tone rewriting, rate limiting, upgrade key validation, and blob storage. All serverless endpoints are stateless except Upstash Redis and Vercel Blob.
 
-### Planned backend (future, not required for prototype)
-A single Vercel serverless function proxying an **OpenRouter free model** (e.g. Llama 3.3 70B) would enable tone reformatting: raw spoken text is sent to the LLM with a tone-specific prompt, and the reshaped text replaces the transcript on the card. OpenRouter was chosen for its generous free tier, no credit card requirement, and access to multiple strong open models.
+### Serverless API routes
 
-Without this, tone changes visual style only. With it, tone would genuinely rewrite the content.
+| Route | Purpose | Auth |
+|---|---|---|
+| `api/stt.js` | Deepgram Nova-3 transcription fallback | `DEEPGRAM_API_KEY` env var |
+| `api/rewrite.js` | LLM tone rewriting (DeepSeek V4 Flash Free) | `OPENROUTER_API_KEY` env var |
+| `api/usage.js` | Daily user cap counter (99 users/day) | `CRON_SECRET` for cron calls |
+| `api/limits.js` | Per-user recording/rewrite limit enforcement | Session-based |
+| `api/validate-key.js` | Pro upgrade key validation | None (POST with email + key) |
+| `api/webhook/bmc.js` | BuyMeACoffee webhook → auto key generation | BMC webhook signature |
+| `api/pro-status.js` | Check if user has Pro status | Session-based |
+| `api/upload.js` | Upload card PNG + OG image to Vercel Blob | `BLOB_READ_WRITE_TOKEN` env var |
+| `api/c/[id].js` | Shared card landing page + OG metadata | None (public) |
+| `api/cleanup.js` | Delete blobs older than 36 hours | `CRON_SECRET` (Vercel Cron) |
+| `lib/redis.js` | Shared Upstash Redis client | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+
+### Usage limits
+
+| Limit | Free | Pro |
+|---|---|---|
+| Daily user cap | 99 users/day (shared pool) | Bypassed |
+| Recordings/user/day | 5 | 50 |
+| Max recording length | 15s | 30s |
+| Cumulative audio/user/day | 75s | 15 min (900s) |
+| Tone rewrites/user/day | 10 | Unlimited |
+
+### Cost safeguards (7 layers)
+
+1. **15s max recording length** — caps per-recording cost
+2. **5 recordings/user/day** — prevents single-user abuse
+3. **75s cumulative audio/user/day** — catches "5 × 14.9s" edge case
+4. **Silence detection (RMS < 0.01)** — prevents silent audio from hitting API (~20% savings)
+5. **Duplicate cache** — avoids re-transcribing identical audio in same session
+6. **10s request timeout** — prevents hanging requests from consuming quota
+7. **99-user daily cap (Upstash Redis)** — controls total daily load
+
+See `docs/cost-architecture.md` for full cost breakdown and scaling scenarios.
+
+### Planned architecture changes (v0.8.0)
+
+- **STT provider** — Migrate from OpenRouter Whisper-1 to Deepgram Nova-3 Multilingual (Batch). Better accuracy (5.26% vs 6.2% WER), $200 free credit (~555 hrs), no hallucination problem. See `docs/stt-provider-migration.md`.
+- **Daily user cap** — 99 users/day via Upstash Redis (`wispr:daily:YYYY-MM-DD`). Playful capacity page, Pro users bypass.
+- **Recording limits** — Free: 5 rec/day, 15s max, 75s cumulative. Pro: 50 rec/day, 30s max, 15 min cumulative.
+- **Silence detection** — Web Audio API RMS check before STT. Threshold: RMS < 0.01 over 2s.
+- **Tone rewriting** — DeepSeek V4 Flash Free (OpenRouter), 150-char limit, sentence-boundary truncation, 10/day free, unlimited Pro. See `docs/cost-architecture.md`.
 
 ---
 
@@ -284,26 +332,40 @@ This lets Wispr Flow's team see exactly how many visits and downloads originated
 
 ## 15. Open Questions for Next Phase
 
-1. **LLM tone reformatting:** Build the OpenRouter serverless function. What system prompt works best per tone — and should the reformatted text be shown alongside the original for the user to compare?
+1. **Deepgram STT integration:** Create `api/stt.js` with Deepgram Nova-3 Multilingual batch endpoint. Requires `DEEPGRAM_API_KEY` env var. See `docs/stt-provider-migration.md` for API comparison and fallback chain design.
 
-2. **Wispr Flow API:** Is there a documented API or OAuth that would allow in-app dictation instead of copy-paste? This would remove the manual step entirely and make the experience seamless. Worth researching before the next development phase.
+2. **15s recording limit enforcement:** Implement client-side timer + server-side validation. Pro tier gets 30s max. Needs UI feedback when limit is reached.
 
-3. **Mobile preview UX:** On mobile, the card preview sits below the inputs and requires scrolling. A floating "Preview" button or tab toggle would make the experience significantly better for older users who may not know to scroll down.
+3. **Silence detection:** Implement client-side Web Audio API RMS energy check. Threshold: RMS < 0.01 over 2 seconds = silence. Prevents silent audio from hitting Deepgram. Show "We didn't catch that — try again" for silent recordings.
 
-4. **PNG vs link sharing:** Currently the shared artefact is a PNG image. A future option is generating a shareable link (e.g. `wisprstories.vercel.app/s/abc123`) that opens the card in an animated, web-based view — more engaging than a static image and clickable through to the app. Requires a backend and database.
+4. **Remaining recordings counter:** Show user how many recordings they have left today (free: 5/day, Pro: 50/day). Server-side via `/api/limits`.
 
-5. **Voice-attached cards (DEFERRED — designed, not built):** Today the recipient of a card can read it but not hear it. The design intent is that the existing on-card waveform becomes the play surface — tapping it plays the original voice, with the bars drawn from the real audio amplitude. The sender chooses per card whether to attach voice or keep it text-only via a toggle in the left column. Two working prototypes capture the full UX and code patterns:
-   - [`prototype-voice-cards.html`](prototype-voice-cards.html) — the upload/record tabs, the voice toggle, and the recipient phone preview
-   - [`prototype-waveform-play.html`](prototype-waveform-play.html) — the waveform-as-play-button integrated into the real card aesthetic, including real-audio amplitude analysis via Web Audio API
+5. **Tone rewriting polish:** Client-side preview on card, preserve original in textarea. Enforce 150-char limit with sentence-boundary truncation. Currently the API exists and is wired, but the UX needs refinement.
 
-   **Implementation plan when resumed:**
-   - **Phase 1 (sender side, ~1 day):** Add Record/Upload tabs and the "Attach my voice" toggle to the left column. Make the live preview's waveform draw from real audio amplitudes and become clickable to play. No sharing changes yet — download still produces a silent PNG.
-   - **Phase 2 (closing the loop, ~1 day):** Store audio in Vercel Blob (free tier, ~1GB, generous bandwidth). On Share, upload audio and attach the URL to the shared-card link. Update `api/card.js` so the recipient's page plays the audio when the waveform is tapped.
-   - **Phase 3 (polish, ~half day):** "Voice attached" indicator on the share button, audio duration label, ~2MB / 60s cap, replace-audio control.
+6. **i18n (23 languages):** Create `assets/i18n/` directory, build `i18n.js` loader with `data-i18n` attribute system, translate UI strings to all 23 languages (zh, en, hi, es, ar, fr, pt, ru, ur, id, de, ja, pa, ko, te, ta, tr, it, th, gu, kn, ml, sv), add RTL support for Arabic/Urdu (`dir="rtl"` on `<html>`), wire language selector to nav. Card content stays English.
 
-   **Constraint:** the downloaded card stays a PNG (no audio embedded — no image format supports audio). Voice is delivered only via the shared link. The sender's own download is silent by design, matching today's behaviour. Optionally a small "Save voice file" link can let the sender keep the MP3 too.
+7. **Onboarding banner:** First-launch detection (localStorage flag), banner UI with dismiss animation, help icon trigger for re-access. Designed and planned, not built.
 
-   **Why deferred:** prioritised submission deadline. The two prototype files are the working spec — they should be referenced before any code is written in Phase 1.
+8. **Upgrade system (server-side):** Replace current localStorage stub with Upstash Redis validation. Key format: `WS-{OCCASION}-{YEAR}-{XXXX}`. BuyMeACoffee webhook for auto key generation. Designed and partially built (endpoints exist, need full integration).
+
+9. **Wispr Flow API:** Is there a documented API or OAuth that would allow in-app dictation instead of copy-paste? This would remove the manual step entirely and make the experience seamless. Worth researching before the next development phase.
+
+10. **Mobile preview UX:** On mobile, the card preview sits below the inputs and requires scrolling. A floating "Preview" button or tab toggle would make the experience significantly better for older users who may not know to scroll down.
+
+11. **PNG vs link sharing:** Currently the shared artefact is a PNG image. A future option is generating a shareable link (e.g. `wisprstories.vercel.app/s/abc123`) that opens the card in an animated, web-based view — more engaging than a static image and clickable through to the app. Already implemented via Vercel Blob + `api/c/[id].js`.
+
+12. **Voice-attached cards (DEFERRED — designed, not built):** Today the recipient of a card can read it but not hear it. The design intent is that the existing on-card waveform becomes the play surface — tapping it plays the original voice, with the bars drawn from the real audio amplitude. The sender chooses per card whether to attach voice or keep it text-only via a toggle in the left column. Two working prototypes capture the full UX and code patterns:
+    - [`prototype-voice-cards.html`](prototype-voice-cards.html) — the upload/record tabs, the voice toggle, and the recipient phone preview
+    - [`prototype-waveform-play.html`](prototype-waveform-play.html) — the waveform-as-play-button integrated into the real card aesthetic, including real-audio amplitude analysis via Web Audio API
+
+    **Implementation plan when resumed:**
+    - **Phase 1 (sender side, ~1 day):** Add Record/Upload tabs and the "Attach my voice" toggle to the left column. Make the live preview's waveform draw from real audio amplitudes and become clickable to play. No sharing changes yet — download still produces a silent PNG.
+    - **Phase 2 (closing the loop, ~1 day):** Store audio in Vercel Blob (free tier, ~1GB, generous bandwidth). On Share, upload audio and attach the URL to the shared-card link. Update `api/card.js` so the recipient's page plays the audio when the waveform is tapped.
+    - **Phase 3 (polish, ~half day):** "Voice attached" indicator on the share button, audio duration label, ~2MB / 60s cap, replace-audio control.
+
+    **Constraint:** the downloaded card stays a PNG (no audio embedded — no image format supports audio). Voice is delivered only via the shared link. The sender's own download is silent by design, matching today's behaviour. Optionally a small "Save voice file" link can let the sender keep the MP3 too.
+
+    **Why deferred:** prioritised submission deadline. The two prototype files are the working spec — they should be referenced before any code is written in Phase 1.
 
 ---
 

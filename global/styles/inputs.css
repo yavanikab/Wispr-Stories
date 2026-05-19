@@ -273,6 +273,16 @@
   background: rgba(220, 38, 38, 0.25);
   color: #dc2626;
 }
+/* Pro badge — infinity symbol for unlimited rewrites */
+.tone-badge-pro {
+  background: rgba(139, 92, 246, 0.2);
+  color: #7c3aed;
+  font-size: 11px;
+}
+.tc.on .tone-badge-pro {
+  background: rgba(139, 92, 246, 0.3);
+  color: #6d28d9;
+}
 
 /* Blank state: tone / colour / size / roundness rows are inert until the
    card has content. JS already early-returns clicks; this is the matching

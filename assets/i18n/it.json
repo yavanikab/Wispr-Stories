@@ -1,0 +1,175 @@
+{
+  "nav": {
+    "tagline": "Parla · Crea · Condividi",
+    "help": "Come usare",
+    "theme": "Attiva modalità scura"
+  },
+  "hero": {
+    "title": "Dillo una volta, condividilo per sempre",
+    "subtitle": "Ditta con <strong><em>Wispr Flow</em></strong>; stilizza con cura; condividi con amore.",
+    "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
+  },
+  "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
+  "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari — o incolla il tuo testo qui sotto.",
+  "record": {
+    "label": "1 · Tocca per parlare",
+    "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare — le tue parole si spostano nella casella di testo pronte per la card.",
+    "status": "Tocca per parlare",
+    "sub": "Le tue parole appaiono mentre parli"
+  },
+  "orText": "o digita o incolla le tue parole",
+  "textarea": {
+    "label": "2 · Le tue parole",
+    "tip": "Parla prima usando Registra sopra — le parole arrivano qui automaticamente. O digita direttamente. O incolla da Wispr Flow. Qualsiasi lingua funziona qui.",
+    "placeholder": "Registra la tua voce o digita qualsiasi cosa: un augurio di compleanno, un ricordo, una ricetta, una lettera d'amore, gratitudine, un consiglio..."
+  },
+  "resetBtn": "Reimposta tutto",
+  "nameRow": {
+    "label": "Da",
+    "placeholder": "Es: Mamma, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+  },
+  "examples": {
+    "label": "Hai bisogno di ispirazione? Clicca su un esempio"
+  },
+  "customize": {
+    "summary": "Rendila tua",
+    "hint": "Tono · colore · forma"
+  },
+  "tone": {
+    "label": "3 · Tono",
+    "tip": "Cambia come le tue parole si sentono sulla card. Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
+    "original": "Originale",
+    "warm": "Caldo",
+    "bold": "Audace",
+    "poetic": "Poetico",
+    "playful": "Giocoso",
+    "reflective": "Riflessivo",
+    "honest": "Onesto"
+  },
+  "color": {
+    "label": "4 · Colore della card",
+    "tip": "Imposta lo sfondo della card. L'anteprima dal vivo si aggiorna istantaneamente.",
+    "violet": "Viola",
+    "amber": "Ambra",
+    "crimson": "Cremisi",
+    "emerald": "Smeraldo",
+    "ocean": "Oceano",
+    "rose": "Rosa",
+    "orange": "Arancione",
+    "teal": "Verde acqua",
+    "fuchsia": "Fucsia",
+    "indigo": "Indaco"
+  },
+  "shape": {
+    "label": "5 · Forma",
+    "tip": "I bordi netti funzionano meglio per WhatsApp. Gli angoli arrotondati sono ideali per gallerie e web.",
+    "sharp": "Bordi netti",
+    "rounded": "Angoli arrotondati"
+  },
+  "actions": {
+    "create": "Crea card",
+    "share": "Condividi card"
+  },
+  "closing": "La tua voce, magnificamente condivisa",
+  "preview": {
+    "label": "Anteprima dal vivo"
+  },
+  "upgrade": "Aggiorna",
+  "download": "Scarica card",
+  "cardEmpty": "Compila i dettagli —<br />la tua card apparirà qui",
+  "cardPlaceholder": "La tua storia appare qui mentre parli o digiti.",
+  "wcta": {
+    "text": "Usa la tua voce ovunque tu digiti — WhatsApp, Gmail, Slack, qualsiasi app.",
+    "link": "Prova Wispr Flow gratis →"
+  },
+  "footer": {
+    "text": "Wispr Stories — creato per <strong><em>Wispr Flow</em></strong>",
+    "independent": "Progetto indipendente · Non affiliato con Wispr Flow",
+    "copyright": "© 2026"
+  },
+  "shareModal": {
+    "title": "Condividi la tua card",
+    "sub": "Pubblica l'immagine direttamente, o condividi il link dell'app così altri possono creare le proprie card.",
+    "native": "Condividi su app",
+    "download": "Scarica immagine della card",
+    "copyLink": "Copia link dell'immagine",
+    "copyImage": "Copia immagine"
+  },
+  "upgradeModal": {
+    "title": "Passa a Pro",
+    "sub": "Riscritture del tono illimitate. Niente più limiti giornalieri.",
+    "buyCoffee": "☕ Offrimi un caffè",
+    "or": "— o —",
+    "haveKey": "Hai già una chiave sostenitore?",
+    "keyPlaceholder": "Incolla la tua chiave...",
+    "go": "Vai",
+    "lostKey": "Hai perso la tua chiave?",
+    "emailPlaceholder": "Inserisci la tua email",
+    "emailSend": "Invia email di recupero",
+    "disclaimer": "Wispr Stories — creato per Wispr Flow"
+  },
+  "capacity": {
+    "title": "Siamo sommersi d'amore!",
+    "text": "Grazie per la risposta incredibile. Abbiamo raggiunto la nostra capacità giornaliera e dobbiamo dare un po' di riposo ai nostri server.",
+    "reset": "Torneremo a mezzanotte UTC.",
+    "btn": "Controlla se siamo tornati"
+  },
+  "onboarding": {
+    "title": "Benvenuto in Wispr Stories",
+    "step1": "<strong>Parla o digita</strong> il tuo messaggio. Tocca il microfono o incolla testo.",
+    "step2": "<strong>Personalizza</strong> la tua card — scegli un tono, colore e stile degli angoli.",
+    "step3": "<strong>Crea e condividi</strong> — scarica come PNG o condividi direttamente sui social.",
+    "gotIt": "Ho capito — andiamo!",
+    "hint": "Hai bisogno di aiuto dopo? Tocca l'icona ❐ nella barra superiore."
+  },
+  "mobileBar": {
+    "create": "Crea",
+    "share": "Condividi",
+    "upgrade": "Aggiorna"
+  },
+  "toasts": {
+    "downloaded": "Scaricato!",
+    "exportFailed": "Esportazione fallita — riprova",
+    "uploadFailed": "Caricamento fallito — riprova",
+    "linkCopied": "Link copiato!",
+    "copyFailed": "Impossibile copiare il link",
+    "imageSaved": "Immagine salvata — apri Foto per incollare",
+    "downloadFailed": "Download fallito — prova Condividi",
+    "imageCopied": "Immagine copiata!",
+    "imageSavedDownloads": "Immagine salvata nei download",
+    "copyNotSupported": "Copia non supportata — prova Scarica",
+    "cardReady": "Card pronta — tocca Condividi per scaricare",
+    "speakFirst": "Parla o scrivi prima la tua storia",
+    "dailyRewritesUsed": "Riscritture giornaliere usate — mostrato come Originale",
+    "rewriteLimit": "Limite giornaliero di riscritture raggiunto",
+    "rewriteFailed": "Riscrittura fallita — mostrato originale",
+    "rewriteApplied": "Riscrittura applicata!",
+    "silence": "Non l'abbiamo catturato — prova a parlare più forte",
+    "recordingWorks": "Registrazione funzionante! Aggiungi una chiave Deepgram per la trascrizione reale",
+    "transcriptionFailed": "Trascrizione fallita — devi eseguire 'vercel dev' o distribuire",
+    "voiceNotSupported": "Voce non supportata su Firefox",
+    "requiresHttps": "La registrazione vocale richiede HTTPS — apri tramite localhost o distribuisci",
+    "safariEnglish": "Safari potrebbe supportare solo l'inglese (US) per il riconoscimento vocale",
+    "speechNotResponding": "Il servizio vocale non risponde — riprova o digita",
+    "micDenied": "Accesso al microfono negato — controlla le impostazioni del browser",
+    "speechUnavailable": "Servizio vocale non disponibile — provo un'alternativa...",
+    "couldNotStart": "Impossibile avviare la registrazione — prova a digitare",
+    "noSpeech": "Nessun parlato rilevato — prova a parlare più forte",
+    "speechError": "Errore vocale — riprova",
+    "noMatch": "Impossibile riconoscere il parlato — prova a parlare più chiaramente",
+    "couldNotStartMic": "Impossibile avviare il microfono",
+    "doneReview": "Fatto — rivedi le tue parole poi tocca Crea",
+    "freeLimit": "Limite gratuito raggiunto ({max}/giorno). Aggiorna per di più.",
+    "proLimit": "Limite Pro raggiunto ({max}/giorno). Torna domani!",
+    "cumulativeLimit": "Limite giornaliero di tempo audio raggiunto. Torna domani!",
+    "tooLong": "Registrazione troppo lunga (max {max}s).",
+    "welcomePro": "Benvenuto in Pro!",
+    "invalidKey": "Chiave non valida. Riprova o offri un caffè.",
+    "verifyFailed": "Impossibile verificare la chiave. Riprova.",
+    "enterKey": "Inserisci la tua chiave",
+    "checking": "Verifica in corso...",
+    "proUnlocked": "Pro sbloccato! Goditi tutto illimitato.",
+    "thankYouEmail": "Grazie! Ti risponderò presto.",
+    "validEmail": "Inserisci un indirizzo email valido."
+  }
+}

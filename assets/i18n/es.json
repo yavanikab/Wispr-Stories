@@ -1,0 +1,175 @@
+{
+  "nav": {
+    "tagline": "Habla · Crea · Comparte",
+    "help": "Cómo usar",
+    "theme": "Cambiar modo oscuro"
+  },
+  "hero": {
+    "title": "Dilo una vez, compártelo para siempre",
+    "subtitle": "Dicta con <strong><em>Wispr Flow</em></strong>; estiliza con cuidado; comparte con amor.",
+    "quote": "\"Aférrate a los recuerdos; ellos se aferrarán a ti.\""
+  },
+  "sharedCta": "✨ <strong>¡Recibiste una Wispr Story!</strong> Toca <em>Crear mi tarjeta</em> para hacer la tuya.",
+  "ffNotice": "🌐 La grabación de voz no es compatible con Firefox. Usa Chrome o Safari — o pega tu texto abajo.",
+  "record": {
+    "label": "1 · Toca para hablar",
+    "tip": "Presiona grabar y habla naturalmente. Tus palabras aparecen en vivo. Toca de nuevo para detener — tus palabras pasan al cuadro de texto listas para la tarjeta.",
+    "status": "Toca para hablar",
+    "sub": "Tus palabras aparecen mientras hablas"
+  },
+  "orText": "o escribe o pega tus palabras",
+  "textarea": {
+    "label": "2 · Tus palabras",
+    "tip": "Habla primero usando Grabar arriba — las palabras llegan aquí automáticamente. O escribe directamente. O pega desde Wispr Flow. Cualquier idioma funciona aquí.",
+    "placeholder": "Graba tu voz o escribe lo que sea: un deseo de cumpleaños, un recuerdo, una receta, una carta de amor, gratitud, un consejo..."
+  },
+  "resetBtn": "Reiniciar todo",
+  "nameRow": {
+    "label": "De",
+    "placeholder": "Ej: Mamá, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+  },
+  "examples": {
+    "label": "¿Necesitas inspiración? Haz clic en un ejemplo"
+  },
+  "customize": {
+    "summary": "Hazla tuya",
+    "hint": "Tono · color · forma"
+  },
+  "tone": {
+    "label": "3 · Tono",
+    "tip": "Cambia cómo se sienten tus palabras en la tarjeta. Cálido es suave. Audaz es directo. Poético fluye con ritmo. Juguetón es ligero. Reflexivo es lento. Honesto es crudo. Cambia solo el espaciado y la inclinación — no el tamaño ni el peso.",
+    "original": "Original",
+    "warm": "Cálido",
+    "bold": "Audaz",
+    "poetic": "Poético",
+    "playful": "Juguetón",
+    "reflective": "Reflexivo",
+    "honest": "Honesto"
+  },
+  "color": {
+    "label": "4 · Color de tarjeta",
+    "tip": "Establece el fondo de la tarjeta. La vista previa en vivo se actualiza al instante.",
+    "violet": "Violeta",
+    "amber": "Ámbar",
+    "crimson": "Carmesí",
+    "emerald": "Esmeralda",
+    "ocean": "Océano",
+    "rose": "Rosa",
+    "orange": "Naranja",
+    "teal": "Turquesa",
+    "fuchsia": "Fucsia",
+    "indigo": "Índigo"
+  },
+  "shape": {
+    "label": "5 · Forma",
+    "tip": "Los bordes afilados funcionan mejor para WhatsApp. Las esquinas redondeadas son ideales para galerías y web.",
+    "sharp": "Bordes afilados",
+    "rounded": "Esquinas redondeadas"
+  },
+  "actions": {
+    "create": "Crear tarjeta",
+    "share": "Compartir tarjeta"
+  },
+  "closing": "Tu voz, bellamente compartida",
+  "preview": {
+    "label": "Vista previa en vivo"
+  },
+  "upgrade": "Actualizar",
+  "download": "Descargar tarjeta",
+  "cardEmpty": "Completa los detalles —<br />tu tarjeta aparecerá aquí",
+  "cardPlaceholder": "Tu historia aparece aquí mientras hablas o escribes.",
+  "wcta": {
+    "text": "Usa tu voz donde escribas — WhatsApp, Gmail, Slack, cualquier app.",
+    "link": "Prueba Wispr Flow gratis →"
+  },
+  "footer": {
+    "text": "Wispr Stories — hecho para <strong><em>Wispr Flow</em></strong>",
+    "independent": "Proyecto independiente · No afiliado con Wispr Flow",
+    "copyright": "© 2026"
+  },
+  "shareModal": {
+    "title": "Comparte tu tarjeta",
+    "sub": "Publica la imagen directamente, o comparte el enlace de la app para que otros hagan sus propias tarjetas.",
+    "native": "Compartir en apps",
+    "download": "Descargar imagen de tarjeta",
+    "copyLink": "Copiar enlace de imagen",
+    "copyImage": "Copiar imagen"
+  },
+  "upgradeModal": {
+    "title": "Actualizar a Pro",
+    "sub": "Reescrituras de tono ilimitadas. Sin más límites diarios.",
+    "buyCoffee": "☕ Invítame un café",
+    "or": "— o —",
+    "haveKey": "¿Ya tienes una clave de soporte?",
+    "keyPlaceholder": "Pega tu clave...",
+    "go": "Ir",
+    "lostKey": "¿Perdiste tu clave?",
+    "emailPlaceholder": "Ingresa tu email",
+    "emailSend": "Enviar email de recuperación",
+    "disclaimer": "Wispr Stories — hecho para Wispr Flow"
+  },
+  "capacity": {
+    "title": "¡Estamos abrumados de amor!",
+    "text": "Gracias por la increíble respuesta. Hemos alcanzado nuestra capacidad diaria y necesitamos dar un descanso a nuestros servidores.",
+    "reset": "Volveremos a medianoche UTC.",
+    "btn": "Verificar si ya volvimos"
+  },
+  "onboarding": {
+    "title": "Bienvenido a Wispr Stories",
+    "step1": "<strong>Habla o escribe</strong> tu mensaje. Toca el micrófono o pega texto.",
+    "step2": "<strong>Personaliza</strong> tu tarjeta — elige un tono, color y estilo de esquina.",
+    "step3": "<strong>Crea y comparte</strong> — descarga como PNG o comparte directamente en redes sociales.",
+    "gotIt": "¡Entendido — vamos!",
+    "hint": "¿Necesitas ayuda después? Toca el icono ❓ en la barra superior."
+  },
+  "mobileBar": {
+    "create": "Crear",
+    "share": "Compartir",
+    "upgrade": "Actualizar"
+  },
+  "toasts": {
+    "downloaded": "¡Descargado!",
+    "exportFailed": "Exportación fallida — intenta de nuevo",
+    "uploadFailed": "Subida fallida — intenta de nuevo",
+    "linkCopied": "¡Enlace copiado!",
+    "copyFailed": "No se pudo copiar el enlace",
+    "imageSaved": "Imagen guardada — abre Fotos para pegar",
+    "downloadFailed": "Descarga fallida — intenta Compartir",
+    "imageCopied": "¡Imagen copiada!",
+    "imageSavedDownloads": "Imagen guardada en descargas",
+    "copyNotSupported": "Copia no soportada — intenta Descargar",
+    "cardReady": "Tarjeta lista — toca Compartir para descargar",
+    "speakFirst": "Habla o escribe tu historia primero",
+    "dailyRewritesUsed": "Reescrituras diarias usadas — mostrando como Original",
+    "rewriteLimit": "Límite diario de reescrituras alcanzado",
+    "rewriteFailed": "Reescritura fallida — mostrando original",
+    "rewriteApplied": "¡Reescritura aplicada!",
+    "silence": "No pudimos captar eso — intenta hablar más fuerte",
+    "recordingWorks": "¡La grabación funciona! Agrega una clave Deepgram para transcripción real",
+    "transcriptionFailed": "Transcripción fallida — necesitas ejecutar 'vercel dev' o desplegar",
+    "voiceNotSupported": "Voz no soportada en Firefox",
+    "requiresHttps": "La grabación de voz requiere HTTPS — abre vía localhost o despliega para usar",
+    "safariEnglish": "Safari solo puede soportar inglés (US) para reconocimiento de voz",
+    "speechNotResponding": "El servicio de voz no responde — intenta de nuevo o escribe",
+    "micDenied": "Acceso al micrófono denegado — revisa la configuración del navegador",
+    "speechUnavailable": "Servicio de voz no disponible — intentando alternativa...",
+    "couldNotStart": "No se pudo iniciar la grabación — intenta escribir",
+    "noSpeech": "No se detectó voz — intenta hablar más fuerte",
+    "speechError": "Error de voz — intenta de nuevo",
+    "noMatch": "No se pudo reconocer el habla — intenta hablar más claramente",
+    "couldNotStartMic": "No se pudo iniciar el micrófono",
+    "doneReview": "Listo — revisa tus palabras y luego toca Crear",
+    "freeLimit": "Límite gratuito alcanzado ({max}/día). Actualiza para más.",
+    "proLimit": "Límite Pro alcanzado ({max}/día). ¡Vuelve mañana!",
+    "cumulativeLimit": "Límite diario de audio alcanzado. ¡Vuelve mañana!",
+    "tooLong": "Grabación demasiado larga (máx {max}s).",
+    "welcomePro": "¡Bienvenido a Pro!",
+    "invalidKey": "Clave inválida. Intenta de nuevo o invita un café.",
+    "verifyFailed": "No se pudo verificar la clave. Intenta de nuevo.",
+    "enterKey": "Ingresa tu clave",
+    "checking": "Verificando...",
+    "proUnlocked": "¡Pro desbloqueado! Disfruta todo ilimitado.",
+    "thankYouEmail": "¡Gracias! Te responderé pronto.",
+    "validEmail": "Por favor ingresa un email válido."
+  }
+}

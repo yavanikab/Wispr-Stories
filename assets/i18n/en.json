@@ -1,0 +1,175 @@
+{
+  "nav": {
+    "tagline": "Speak · Create · Share",
+    "help": "How to use",
+    "theme": "Toggle dark mode"
+  },
+  "hero": {
+    "title": "Say it once, share it forever",
+    "subtitle": "Dictate with <strong><em>Wispr Flow</em></strong>; style with care; share with love.",
+    "quote": "\"Hold onto memories; they will hold onto you.\""
+  },
+  "sharedCta": "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.",
+  "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.",
+  "record": {
+    "label": "1 · Tap to speak",
+    "tip": "Press record and speak naturally. Your words appear live. Tap again to stop — your words move into the text box ready for the card.",
+    "status": "Tap to speak",
+    "sub": "Your words appear as you speak"
+  },
+  "orText": "or type or paste your words",
+  "textarea": {
+    "label": "2 · Your words",
+    "tip": "Speak first using Record above — words land here automatically. Or type directly. Or paste from Wispr Flow. Any language works here.",
+    "placeholder": "Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
+  },
+  "resetBtn": "Reset all",
+  "nameRow": {
+    "label": "From",
+    "placeholder": "e.g. Mom, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+  },
+  "examples": {
+    "label": "Need inspiration? Click an example"
+  },
+  "customize": {
+    "summary": "Make it yours",
+    "hint": "Tone · color · shape"
+  },
+  "tone": {
+    "label": "3 · Tone",
+    "tip": "Changes how your words feel on the card. Warm is gentle. Bold is direct. Poetic flows with rhythm. Playful is light. Reflective is slow. Honest is raw. Changes letter-spacing and slant only — not size or weight.",
+    "original": "Original",
+    "warm": "Warm",
+    "bold": "Bold",
+    "poetic": "Poetic",
+    "playful": "Playful",
+    "reflective": "Reflective",
+    "honest": "Honest"
+  },
+  "color": {
+    "label": "4 · Card color",
+    "tip": "Sets the card background. The live preview updates instantly.",
+    "violet": "Violet",
+    "amber": "Amber",
+    "crimson": "Crimson",
+    "emerald": "Emerald",
+    "ocean": "Ocean",
+    "rose": "Rose",
+    "orange": "Orange",
+    "teal": "Teal",
+    "fuchsia": "Fuchsia",
+    "indigo": "Indigo"
+  },
+  "shape": {
+    "label": "5 · Shape",
+    "tip": "Sharp edges work best for WhatsApp. Rounded corners suit galleries and web.",
+    "sharp": "Sharp edges",
+    "rounded": "Rounded corners"
+  },
+  "actions": {
+    "create": "Create card",
+    "share": "Share card"
+  },
+  "closing": "Your voice, beautifully shared",
+  "preview": {
+    "label": "Live preview"
+  },
+  "upgrade": "Upgrade",
+  "download": "Download card",
+  "cardEmpty": "Fill the details —<br />your card appears here",
+  "cardPlaceholder": "Your story appears here as you speak or type.",
+  "wcta": {
+    "text": "Use your voice anywhere you type — WhatsApp, Gmail, Slack, any app.",
+    "link": "Try Wispr Flow free →"
+  },
+  "footer": {
+    "text": "Wispr Stories — made for <strong><em>Wispr Flow</em></strong>",
+    "independent": "Independent project · Not affiliated with Wispr Flow",
+    "copyright": "© 2026"
+  },
+  "shareModal": {
+    "title": "Share your card",
+    "sub": "Post the image directly, or share the app link so others can make their own cards.",
+    "native": "Share to apps",
+    "download": "Download card image",
+    "copyLink": "Copy image link",
+    "copyImage": "Copy image"
+  },
+  "upgradeModal": {
+    "title": "Upgrade to Pro",
+    "sub": "Unlimited tone rewrites. No more daily limits.",
+    "buyCoffee": "☕ Buy me a coffee",
+    "or": "— or —",
+    "haveKey": "Already have a supporter key?",
+    "keyPlaceholder": "Paste your key...",
+    "go": "Go",
+    "lostKey": "Lost your key?",
+    "emailPlaceholder": "Enter your email",
+    "emailSend": "Send recovery email",
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
+  },
+  "capacity": {
+    "title": "We're overwhelmed with love!",
+    "text": "Thank you for the incredible response. We've reached our daily capacity and need to give our servers a little rest.",
+    "reset": "We'll be back at midnight UTC.",
+    "btn": "Check if we're back"
+  },
+  "onboarding": {
+    "title": "Welcome to Wispr Stories",
+    "step1": "<strong>Speak or type</strong> your message. Tap the microphone or paste text.",
+    "step2": "<strong>Customize</strong> your card — choose a tone, color, and corner style.",
+    "step3": "<strong>Create & share</strong> — download as PNG or share directly on social platforms.",
+    "gotIt": "Got it — let's go!",
+    "hint": "Need help later? Tap the ❓ icon in the top bar."
+  },
+  "mobileBar": {
+    "create": "Create",
+    "share": "Share",
+    "upgrade": "Upgrade"
+  },
+  "toasts": {
+    "downloaded": "Downloaded!",
+    "exportFailed": "Export failed — try again",
+    "uploadFailed": "Upload failed — try again",
+    "linkCopied": "Link copied!",
+    "copyFailed": "Could not copy link",
+    "imageSaved": "Image saved — open Photos to paste",
+    "downloadFailed": "Download failed — try Share instead",
+    "imageCopied": "Image copied!",
+    "imageSavedDownloads": "Image saved to downloads",
+    "copyNotSupported": "Copy not supported — try Download instead",
+    "cardReady": "Card ready — tap Share to download",
+    "speakFirst": "Speak or write your story first",
+    "dailyRewritesUsed": "Daily rewrites used — showing as Original",
+    "rewriteLimit": "Daily rewrite limit reached",
+    "rewriteFailed": "Rewrite failed — showing original",
+    "rewriteApplied": "Rewrite applied!",
+    "silence": "We didn't catch that — try speaking louder",
+    "recordingWorks": "Recording works! Add Deepgram key for real transcription",
+    "transcriptionFailed": "Transcription failed — need to run 'vercel dev' or deploy",
+    "voiceNotSupported": "Voice not supported in Firefox",
+    "requiresHttps": "Voice recording requires HTTPS — open via localhost or deploy to use",
+    "safariEnglish": "Safari may only support English (US) for voice recognition",
+    "speechNotResponding": "Speech service not responding — try again or type instead",
+    "micDenied": "Microphone access denied — check browser settings",
+    "speechUnavailable": "Speech service unavailable — trying alternative...",
+    "couldNotStart": "Could not start recording — try typing instead",
+    "noSpeech": "No speech detected — try speaking louder",
+    "speechError": "Speech error — try again",
+    "noMatch": "Couldn't match speech — try speaking more clearly",
+    "couldNotStartMic": "Could not start microphone",
+    "doneReview": "Done — review your words then tap Create",
+    "freeLimit": "Free limit reached ({max}/day). Upgrade for more.",
+    "proLimit": "Pro limit reached ({max}/day). Come back tomorrow!",
+    "cumulativeLimit": "Daily audio time limit reached. Come back tomorrow!",
+    "tooLong": "Recording too long (max {max}s).",
+    "welcomePro": "Welcome to Pro!",
+    "invalidKey": "Invalid key. Try again or buy a coffee.",
+    "verifyFailed": "Could not verify key. Try again.",
+    "enterKey": "Enter your key",
+    "checking": "Checking...",
+    "proUnlocked": "Pro unlocked! Enjoy unlimited everything.",
+    "thankYouEmail": "Thank you! I'll get back to you shortly.",
+    "validEmail": "Please enter a valid email address."
+  }
+}

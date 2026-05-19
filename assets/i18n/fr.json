@@ -1,0 +1,175 @@
+{
+  "nav": {
+    "tagline": "Parlez · Créez · Partagez",
+    "help": "Comment utiliser",
+    "theme": "Basculer le mode sombre"
+  },
+  "hero": {
+    "title": "Dites-le une fois, partagez-le pour toujours",
+    "subtitle": "Dictez avec <strong><em>Wispr Flow</em></strong> ; stylisez avec soin ; partagez avec amour.",
+    "quote": "\"Accrochez-vous aux souvenirs ; ils s'accrocheront à vous.\""
+  },
+  "sharedCta": "✨ <strong>Vous avez reçu une Wispr Story !</strong> Appuyez sur <em>Créer ma carte</em> pour faire la vôtre.",
+  "ffNotice": "🌐 L'enregistrement vocal n'est pas pris en charge sur Firefox. Utilisez Chrome ou Safari — ou collez votre texte ci-dessous.",
+  "record": {
+    "label": "1 · Appuyez pour parler",
+    "tip": "Appuyez sur enregistrer et parlez naturellement. Vos mots apparaissent en direct. Appuyez à nouveau pour arrêter — vos mots passent dans la zone de texte prêts pour la carte.",
+    "status": "Appuyez pour parler",
+    "sub": "Vos mots apparaissent pendant que vous parlez"
+  },
+  "orText": "ou tapez ou collez vos mots",
+  "textarea": {
+    "label": "2 · Vos mots",
+    "tip": "Parlez d'abord en utilisant Enregistrer ci-dessus — les mots arrivent ici automatiquement. Ou tapez directement. Ou collez depuis Wispr Flow. Toute langue fonctionne ici.",
+    "placeholder": "Enregistrez votre voix ou tapez n'importe quoi : un vœu d'anniversaire, un souvenir, une recette, une lettre d'amour, de la gratitude, un conseil..."
+  },
+  "resetBtn": "Réinitialiser tout",
+  "nameRow": {
+    "label": "De",
+    "placeholder": "Ex : Maman, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+  },
+  "examples": {
+    "label": "Besoin d'inspiration ? Cliquez sur un exemple"
+  },
+  "customize": {
+    "summary": "Personnalisez",
+    "hint": "Ton · couleur · forme"
+  },
+  "tone": {
+    "label": "3 · Ton",
+    "tip": "Change la façon dont vos mots se ressentent sur la carte. Chaleureux est doux. Audacieux est direct. Poétique coule avec rythme. Ludique est léger. Réfléchi est lent. Honnête est brut. Change uniquement l'espacement et l'inclinaison — pas la taille ni le poids.",
+    "original": "Original",
+    "warm": "Chaleureux",
+    "bold": "Audacieux",
+    "poetic": "Poétique",
+    "playful": "Ludique",
+    "reflective": "Réfléchi",
+    "honest": "Honnête"
+  },
+  "color": {
+    "label": "4 · Couleur de la carte",
+    "tip": "Définit l'arrière-plan de la carte. L'aperçu en direct se met à jour instantanément.",
+    "violet": "Violet",
+    "amber": "Ambre",
+    "crimson": "Cramoisi",
+    "emerald": "Émeraude",
+    "ocean": "Océan",
+    "rose": "Rose",
+    "orange": "Orange",
+    "teal": "Sarcelle",
+    "fuchsia": "Fuchsia",
+    "indigo": "Indigo"
+  },
+  "shape": {
+    "label": "5 · Forme",
+    "tip": "Les bords nets fonctionnent mieux pour WhatsApp. Les coins arrondis conviennent aux galeries et au web.",
+    "sharp": "Bords nets",
+    "rounded": "Coins arrondis"
+  },
+  "actions": {
+    "create": "Créer la carte",
+    "share": "Partager la carte"
+  },
+  "closing": "Votre voix, magnifiquement partagée",
+  "preview": {
+    "label": "Aperçu en direct"
+  },
+  "upgrade": "Mettre à niveau",
+  "download": "Télécharger la carte",
+  "cardEmpty": "Remplissez les détails —<br />votre carte apparaîtra ici",
+  "cardPlaceholder": "Votre histoire apparaît ici pendant que vous parlez ou tapez.",
+  "wcta": {
+    "text": "Utilisez votre voix partout où vous tapez — WhatsApp, Gmail, Slack, toute application.",
+    "link": "Essayez Wispr Flow gratuitement →"
+  },
+  "footer": {
+    "text": "Wispr Stories — fait pour <strong><em>Wispr Flow</em></strong>",
+    "independent": "Projet indépendant · Non affilié à Wispr Flow",
+    "copyright": "© 2026"
+  },
+  "shareModal": {
+    "title": "Partagez votre carte",
+    "sub": "Publiez l'image directement, ou partagez le lien de l'app pour que d'autres puissent créer leurs propres cartes.",
+    "native": "Partager vers des apps",
+    "download": "Télécharger l'image de la carte",
+    "copyLink": "Copier le lien de l'image",
+    "copyImage": "Copier l'image"
+  },
+  "upgradeModal": {
+    "title": "Passer à Pro",
+    "sub": "Réécritures de ton illimitées. Plus de limites quotidiennes.",
+    "buyCoffee": "☕ Offrez-moi un café",
+    "or": "— ou —",
+    "haveKey": "Vous avez déjà une clé de soutien ?",
+    "keyPlaceholder": "Collez votre clé...",
+    "go": "Aller",
+    "lostKey": "Vous avez perdu votre clé ?",
+    "emailPlaceholder": "Entrez votre email",
+    "emailSend": "Envoyer un email de récupération",
+    "disclaimer": "Wispr Stories — fait pour Wispr Flow"
+  },
+  "capacity": {
+    "title": "Nous sommes submergés d'amour !",
+    "text": "Merci pour cette réponse incroyable. Nous avons atteint notre capacité quotidienne et devons donner un peu de repos à nos serveurs.",
+    "reset": "Nous serons de retour à minuit UTC.",
+    "btn": "Vérifier si nous sommes de retour"
+  },
+  "onboarding": {
+    "title": "Bienvenue sur Wispr Stories",
+    "step1": "<strong>Parlez ou tapez</strong> votre message. Appuyez sur le microphone ou collez du texte.",
+    "step2": "<strong>Personnalisez</strong> votre carte — choisissez un ton, une couleur et un style de coin.",
+    "step3": "<strong>Créez et partagez</strong> — téléchargez en PNG ou partagez directement sur les réseaux sociaux.",
+    "gotIt": "Compris — allons-y !",
+    "hint": "Besoin d'aide plus tard ? Appuyez sur l'icône ❓ dans la barre supérieure."
+  },
+  "mobileBar": {
+    "create": "Créer",
+    "share": "Partager",
+    "upgrade": "Mettre à niveau"
+  },
+  "toasts": {
+    "downloaded": "Téléchargé !",
+    "exportFailed": "Échec de l'exportation — réessayez",
+    "uploadFailed": "Échec du téléchargement — réessayez",
+    "linkCopied": "Lien copié !",
+    "copyFailed": "Impossible de copier le lien",
+    "imageSaved": "Image enregistrée — ouvrez Photos pour coller",
+    "downloadFailed": "Échec du téléchargement — essayez Partager",
+    "imageCopied": "Image copiée !",
+    "imageSavedDownloads": "Image enregistrée dans les téléchargements",
+    "copyNotSupported": "Copie non prise en charge — essayez Télécharger",
+    "cardReady": "Carte prête — appuyez sur Partager pour télécharger",
+    "speakFirst": "Parlez ou écrivez votre histoire d'abord",
+    "dailyRewritesUsed": "Réécritures quotidiennes utilisées — affiché comme Original",
+    "rewriteLimit": "Limite de réécriture quotidienne atteinte",
+    "rewriteFailed": "Échec de la réécriture — affichage de l'original",
+    "rewriteApplied": "Réécriture appliquée !",
+    "silence": "Nous n'avons pas capté cela — essayez de parler plus fort",
+    "recordingWorks": "L'enregistrement fonctionne ! Ajoutez une clé Deepgram pour une vraie transcription",
+    "transcriptionFailed": "Échec de la transcription — besoin d'exécuter 'vercel dev' ou de déployer",
+    "voiceNotSupported": "Voix non prise en charge sur Firefox",
+    "requiresHttps": "L'enregistrement vocal nécessite HTTPS — ouvrez via localhost ou déployez pour utiliser",
+    "safariEnglish": "Safari ne peut prendre en charge que l'anglais (US) pour la reconnaissance vocale",
+    "speechNotResponding": "Le service vocal ne répond pas — réessayez ou tapez",
+    "micDenied": "Accès au microphone refusé — vérifiez les paramètres du navigateur",
+    "speechUnavailable": "Service vocal indisponible — tentative d'alternative...",
+    "couldNotStart": "Impossible de démarrer l'enregistrement — essayez de taper",
+    "noSpeech": "Aucune parole détectée — essayez de parler plus fort",
+    "speechError": "Erreur vocale — réessayez",
+    "noMatch": "Impossible de reconnaître la parole — essayez de parler plus clairement",
+    "couldNotStartMic": "Impossible de démarrer le microphone",
+    "doneReview": "Terminé — vérifiez vos mots puis appuyez sur Créer",
+    "freeLimit": "Limite gratuite atteinte ({max}/jour). Mettez à niveau pour plus.",
+    "proLimit": "Limite Pro atteinte ({max}/jour). Revenez demain !",
+    "cumulativeLimit": "Limite quotidienne de temps audio atteinte. Revenez demain !",
+    "tooLong": "Enregistrement trop long (max {max}s).",
+    "welcomePro": "Bienvenue sur Pro !",
+    "invalidKey": "Clé invalide. Réessayez ou offrez un café.",
+    "verifyFailed": "Impossible de vérifier la clé. Réessayez.",
+    "enterKey": "Entrez votre clé",
+    "checking": "Vérification...",
+    "proUnlocked": "Pro débloqué ! Profitez de tout en illimité.",
+    "thankYouEmail": "Merci ! Je vous répondrai bientôt.",
+    "validEmail": "Veuillez entrer une adresse email valide."
+  }
+}

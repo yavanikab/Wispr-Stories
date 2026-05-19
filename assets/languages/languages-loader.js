@@ -46,6 +46,11 @@ function setLanguage(lang, btn, input) {
     if (btnText) btnText.innerHTML = `<i class="fi fi-${lang.flagCode}"></i><span>${lang.label}</span>`;
   }
   if (input) input.dispatchEvent(new Event('change', { bubbles: true }));
+  // Apply i18n translations if available
+  if (typeof window.applyI18n === 'function') {
+    const langCode = lang.i18nCode || lang.code.split('-')[0];
+    window.applyI18n(langCode);
+  }
 }
 
 window.setLanguageByCode = code => {

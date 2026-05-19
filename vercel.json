@@ -2,8 +2,10 @@
   "rewrites": [
     { "source": "/", "destination": "/wisprstories.html" },
     { "source": "/card", "destination": "/api/card" },
-    { "source": "/c/:id", "destination": "/api/c/[id]" },
-    { "source": "/api/og-image/:id", "destination": "/api/og-image/[id]" }
+    { "source": "/c/:id", "destination": "/api/c/[id]" }
+  ],
+  "crons": [
+    { "path": "/api/cleanup", "schedule": "0 3 * * *" }
   ],
   "headers": [
     {

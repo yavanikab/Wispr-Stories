@@ -194,10 +194,10 @@ function applyPal(idx) {
 
 function getCardsLeft() {
   const raw = localStorage.getItem("wsCards");
-  if (!raw) return 5;
+  if (!raw) return 10;
   const d = JSON.parse(raw);
-  if (d.date !== new Date().toDateString()) return 5;
-  return Math.max(0, 5 - d.count);
+  if (d.date !== new Date().toDateString()) return 10;
+  return Math.max(0, 10 - d.count);
 }
 
 function countCard() {
@@ -236,13 +236,41 @@ function closeUpgradeModal() {
   document.getElementById("upgradeKeyMsg").textContent = "";
   document.getElementById("upgradeEmailMsg").textContent = "";
 }
-function handleUpgradeKey() {
+async function handleUpgradeKey() {
   const input = document.getElementById("upgradeKeyInput");
   const msg = document.getElementById("upgradeKeyMsg");
   const key = input.value.trim();
   if (!key) { msg.textContent = "Enter your key"; msg.className = "upgrade-modal-msg err"; return; }
-  msg.textContent = "Invalid key. Try again or buy a coffee.";
-  msg.className = "upgrade-modal-msg err";
+
+  msg.textContent = "Checking...";
+  msg.className = "upgrade-modal-msg";
+
+  try {
+    const res = await fetch("/api/pro-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key }),
+    });
+    const data = await res.json();
+
+    if (data.isPro) {
+      localStorage.setItem("wsSupporter", "true");
+      sessionStorage.setItem("wsProKey", key);
+      updateSupporterBadge();
+      msg.textContent = "Pro unlocked! Enjoy unlimited everything.";
+      msg.className = "upgrade-modal-msg ok";
+      setTimeout(() => {
+        closeUpgradeModal();
+        showToast("Welcome to Pro!");
+      }, 1500);
+    } else {
+      msg.textContent = "Invalid key. Try again or buy a coffee.";
+      msg.className = "upgrade-modal-msg err";
+    }
+  } catch (e) {
+    msg.textContent = "Could not verify key. Try again.";
+    msg.className = "upgrade-modal-msg err";
+  }
 }
 function handleUpgradeEmail() {
   const input = document.getElementById("upgradeEmailInput");
@@ -293,10 +321,17 @@ function applyTone(tone) {
   toneBtns.forEach((c) => {
     if (c.dataset.tone === "original") { c.disabled = false; return; }
     c.disabled = limitReached;
-    // Update or create limited counter badge on non-original tones
+    // Update or create counter badge on non-original tones
     let badge = c.querySelector(".tone-badge-limited");
     if (isSupporter()) {
-      if (badge) badge.remove();
+      // Pro users see infinity symbol
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "tone-badge tone-badge-limited tone-badge-pro";
+        badge.setAttribute("aria-hidden", "true");
+        c.appendChild(badge);
+      }
+      badge.textContent = "\u221E";
     } else {
       if (!badge) {
         badge = document.createElement("span");
@@ -362,10 +397,50 @@ function updateSourceLabel() {
   const voiceIcon = "\u{1F399}\uFE0F";
   const storyIcon = "\u{1F58B}\uFE0F";
   if (isVoice) {
-    vl.textContent = voiceIcon + (isStyled ? " Voice Styled" : " Voice Original");
+    vl.textContent = voiceIcon + (isStyled ? " Voice Styles" : " Voice Original");
   } else {
-    vl.textContent = storyIcon + (isStyled ? " Story Styled" : " Story Original");
+    vl.textContent = storyIcon + (isStyled ? " Story Styles" : " Story Original");
   }
+}
+
+// Rewrite preview bar — shows Accept/Cancel after tone rewrite
+function showRewritePreview(originalText, rewrittenText, tone) {
+  const bar = document.getElementById("rewritePreviewBar");
+  if (!bar) return;
+  const label = tone.charAt(0).toUpperCase() + tone.slice(1);
+  bar.innerHTML =
+    '<span class="rewrite-preview-label">' + label + ' preview</span>' +
+    '<button class="rewrite-preview-btn rewrite-preview-accept" id="rewriteAccept"><i class="fas fa-check"></i> Accept</button>' +
+    '<button class="rewrite-preview-btn rewrite-preview-cancel" id="rewriteCancel"><i class="fas fa-xmark"></i> Keep original</button>';
+  bar.classList.add("show");
+
+  document.getElementById("rewriteAccept").addEventListener("click", () => {
+    document.getElementById("sta").value = rewrittenText;
+    window._originalText = null;
+    window._pendingRewrite = null;
+    hideRewritePreview();
+    updateCard();
+    saveDraft();
+    showToast("Rewrite applied!");
+  });
+  document.getElementById("rewriteCancel").addEventListener("click", () => {
+    document.getElementById("sta").value = originalText;
+    window._originalText = null;
+    window._pendingRewrite = null;
+    hideRewritePreview();
+    applyTone("original");
+    updateCard();
+    saveDraft();
+  });
+}
+
+function hideRewritePreview() {
+  const bar = document.getElementById("rewritePreviewBar");
+  if (bar) {
+    bar.classList.remove("show");
+    bar.innerHTML = "";
+  }
+}
 }
 
 function updateCard() {
@@ -429,6 +504,13 @@ function applySize() {
   applyPal(curP);
 }
 
+// Silence detection state
+let silenceAnalyser = null, silenceCheckInterval = null;
+let silenceRmsSamples = [];
+const SILENCE_RMS_THRESHOLD = 0.01;
+const SILENCE_SAMPLE_INTERVAL_MS = 500;
+const SILENCE_MIN_DURATION_MS = 2000;
+
 async function startWhisperFallback() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -440,6 +522,31 @@ async function startWhisperFallback() {
     mediaRec.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.push(e.data);
     };
+
+    // Set up silence detection via Web Audio API
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(stream);
+      silenceAnalyser = audioCtx.createAnalyser();
+      silenceAnalyser.fftSize = 2048;
+      source.connect(silenceAnalyser);
+      silenceRmsSamples = [];
+      silenceCheckInterval = setInterval(() => {
+        if (!silenceAnalyser) return;
+        const data = new Float32Array(silenceAnalyser.fftSize);
+        silenceAnalyser.getFloatTimeDomainData(data);
+        let sumSquares = 0;
+        for (let i = 0; i < data.length; i++) sumSquares += data[i] * data[i];
+        const rms = Math.sqrt(sumSquares / data.length);
+        silenceRmsSamples.push({ time: Date.now(), rms });
+        // Keep only last 5 seconds of samples
+        const cutoff = Date.now() - 5000;
+        silenceRmsSamples = silenceRmsSamples.filter(s => s.time >= cutoff);
+      }, SILENCE_SAMPLE_INTERVAL_MS);
+    } catch (e) {
+      console.warn("[Silence] Analyser setup failed:", e.message);
+    }
+
     mediaRec.start(250);
     return true;
   } catch (e) {
@@ -448,16 +555,47 @@ async function startWhisperFallback() {
   }
 }
 
+function isSilentRecording() {
+  if (silenceRmsSamples.length < SILENCE_MIN_DURATION_MS / SILENCE_SAMPLE_INTERVAL_MS) return false;
+  const recent = silenceRmsSamples.filter(s => s.time >= Date.now() - SILENCE_MIN_DURATION_MS);
+  if (recent.length < 2) return false;
+  const avgRms = recent.reduce((sum, s) => sum + s.rms, 0) / recent.length;
+  return avgRms < SILENCE_RMS_THRESHOLD;
+}
+
+function cleanupSilenceDetection() {
+  if (silenceCheckInterval) {
+    clearInterval(silenceCheckInterval);
+    silenceCheckInterval = null;
+  }
+  if (silenceAnalyser) {
+    try { silenceAnalyser.context.close(); } catch (e) {}
+    silenceAnalyser = null;
+  }
+  silenceRmsSamples = [];
+}
+
 function stopWhisperFallback() {
   return new Promise((resolve) => {
     if (!mediaRec || mediaRec.state === "inactive") {
+      cleanupSilenceDetection();
       resolve("");
       return;
     }
     mediaRec.onstop = () => {
       mediaRec.stream.getTracks().forEach((t) => t.stop());
+      cleanupSilenceDetection();
       const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
       audioChunks = [];
+
+      // Check for silence before sending to Deepgram
+      if (isSilentRecording()) {
+        console.log("[Silence] Recording detected as silent — skipping STT");
+        showToast("We didn't catch that \u2014 try speaking louder");
+        resolve("");
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = async () => {
         try {
@@ -477,6 +615,10 @@ function stopWhisperFallback() {
             return;
           }
           const data = await res.json();
+          if (data.mock) {
+            console.log("[STT] Mock transcription returned (no API key set)");
+            showToast("Recording works! Add Deepgram key for real transcription");
+          }
           resolve(data.text || "");
         } catch (e) {
           console.error("[Whisper] Error:", e);
@@ -502,7 +644,24 @@ function startRec() {
   }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    showToast("Voice not supported here \u2014 paste your text below");
+    console.warn("[Speech] Web Speech API not available — using Deepgram fallback");
+    showToast("Web Speech API unavailable — using direct recording...");
+    usingWhisper = true;
+    startWhisperFallback().then((ok) => {
+      if (ok) {
+        isRec = true;
+        document.getElementById("recBtn").classList.add("on");
+        document.getElementById("recSt").textContent = "Recording\u2026";
+        document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
+        document.getElementById("recSub").classList.add("live");
+        document.getElementById("liveBox").textContent = "Recording audio directly...";
+      } else {
+        showToast("Could not start recording \u2014 try typing instead");
+        usingWhisper = false;
+        isRec = false;
+        finishRec();
+      }
+    });
     return;
   }
   if (recogTimeout) {
@@ -656,6 +815,7 @@ function finishRec() {
     saveDraft();
     showToast("Done \u2014 review your words then tap Create");
     fullTx = "";
+    // Server-side limit already incremented in recBtn click handler
   }
 }
 
@@ -675,6 +835,39 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     if (recog) recog.stop();
     return;
   }
+
+  // Server-side limit check before starting recording
+  const sessionId = localStorage.getItem("wsSessionId");
+  if (!sessionId) {
+    const newId = "sess_" + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem("wsSessionId", newId);
+  }
+  const isPro = isSupporter();
+
+  try {
+    const res = await fetch("/api/limits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: 15 }),
+    });
+    const data = await res.json();
+
+    if (!data.allowed) {
+      if (data.reason === "too_many") {
+        showToast(isPro
+          ? `Pro limit reached (${data.max}/day). Come back tomorrow!`
+          : `Free limit reached (${data.max}/day). Upgrade for more.`);
+      } else if (data.reason === "cumulative_exceeded") {
+        showToast("Daily audio time limit reached. Come back tomorrow!");
+      } else if (data.reason === "too_long") {
+        showToast(`Recording too long (max ${data.maxSeconds}s).`);
+      }
+      return;
+    }
+  } catch (e) {
+    console.warn("[Limits] Check failed, allowing:", e.message);
+  }
+
   startRec();
 });
 const langSelEl = document.getElementById("langSel");
@@ -686,13 +879,101 @@ if (langSelEl) {
     saveDraft();
   });
 }
-document.getElementById("toneRow").addEventListener("click", (e) => {
+document.getElementById("toneRow").addEventListener("click", async (e) => {
   const c = e.target.closest(".tc");
   if (!c || c.disabled) return;
   if (!hasCardContent()) return;
-  applyTone(c.dataset.tone);
-  updateCard();
-  saveDraft();
+
+  const tone = c.dataset.tone;
+
+  // Original tone — restore original text if we had a pending rewrite
+  if (tone === "original") {
+    if (window._originalText) {
+      document.getElementById("sta").value = window._originalText;
+      window._originalText = null;
+    }
+    if (window._pendingRewrite) {
+      window._pendingRewrite = null;
+      hideRewritePreview();
+    }
+    applyTone(tone);
+    updateCard();
+    saveDraft();
+    return;
+  }
+
+  // If there's a pending rewrite from a previous tone, clear it
+  if (window._pendingRewrite) {
+    window._pendingRewrite = null;
+    hideRewritePreview();
+  }
+
+  // Non-original tone — call rewrite API
+  const text = document.getElementById("sta").value.trim();
+  if (!text) return;
+
+  // Check if Pro user (skip limit check)
+  const isPro = isSupporter();
+  if (!isPro && getCardsLeft() <= 0) {
+    showToast("Daily rewrites used — showing as Original");
+    applyTone("original");
+    updateCard();
+    saveDraft();
+    return;
+  }
+
+  // Show loading state on card
+  const cardText = document.getElementById("cardText");
+  const prevText = cardText.textContent;
+  cardText.textContent = "Rewriting...";
+  cardText.classList.add("mt");
+
+  try {
+    const sessionId = localStorage.getItem("wsSessionId") || "anon";
+    const res = await fetch("/api/rewrite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, tone, sessionId, isPro }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      if (res.status === 429) {
+        showToast("Daily rewrite limit reached");
+        applyTone("original");
+      } else {
+        showToast("Rewrite failed — showing original");
+        applyTone(tone);
+      }
+      cardText.textContent = prevText;
+      cardText.classList.remove("mt");
+      updateCard();
+      saveDraft();
+      return;
+    }
+
+    const data = await res.json();
+    // Store original text so we can restore it
+    window._originalText = text;
+    // Store the rewritten text as pending
+    window._pendingRewrite = data.text;
+    // Show rewritten text on card preview only
+    cardText.textContent = data.text;
+    cardText.classList.remove("mt");
+    applyTone(tone);
+    updateCard();
+    saveDraft();
+    // Show accept/cancel preview bar
+    showRewritePreview(text, data.text, tone);
+  } catch (err) {
+    console.error("[Rewrite] Error:", err);
+    showToast("Rewrite failed — showing original");
+    cardText.textContent = prevText;
+    cardText.classList.remove("mt");
+    applyTone(tone);
+    updateCard();
+    saveDraft();
+  }
 });
 document.getElementById("palRow").addEventListener("click", (e) => {
   const d = e.target.closest(".pd");
@@ -893,6 +1174,128 @@ function tryAutoDetectLang() {
 }
 tryAutoDetectLang();
 document.addEventListener("languagesReady", tryAutoDetectLang);
+
+// Check daily user cap on app load
+async function checkDailyCap() {
+  const sessionId = localStorage.getItem("wsSessionId");
+  if (!sessionId) {
+    const newId = "sess_" + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem("wsSessionId", newId);
+  }
+  const sid = localStorage.getItem("wsSessionId");
+
+  // Server-side Pro validation
+  let isPro = false;
+  const storedKey = sessionStorage.getItem("wsProKey");
+  if (storedKey) {
+    try {
+      const proRes = await fetch("/api/pro-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: storedKey }),
+      });
+      const proData = await proRes.json();
+      isPro = proData.isPro || false;
+    } catch (e) {
+      console.warn("[Cap] Pro check failed:", e.message);
+    }
+  }
+
+  try {
+    const res = await fetch("/api/usage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: sid, isPro }),
+    });
+    const data = await res.json();
+
+    if (!data.allowed) {
+      // Show capacity page
+      document.getElementById("capacityPage").classList.add("show");
+      document.body.style.overflow = "hidden";
+
+      // Update reset text with countdown
+      if (data.resetsAt) {
+        const resetTime = new Date(data.resetsAt);
+        const now = new Date();
+        const diffMs = resetTime - now;
+        if (diffMs > 0 && diffMs < 60 * 60 * 1000) {
+          const mins = Math.ceil(diffMs / 60000);
+          document.getElementById("capacityResetText").textContent =
+            `We'll be back in about ${mins} minute${mins !== 1 ? "s" : ""}.`;
+        }
+      }
+      return false;
+    }
+  } catch (e) {
+    console.warn("[Cap] Check failed, allowing access:", e.message);
+  }
+  return true;
+}
+
+// Run cap check on load
+checkDailyCap().then((allowed) => {
+  if (allowed) {
+    console.log("[Cap] Access granted");
+  }
+});
+
+// Re-validate Pro key on load
+async function revalidateProKey() {
+  const storedKey = sessionStorage.getItem("wsProKey");
+  if (!storedKey) return;
+
+  try {
+    const res = await fetch("/api/pro-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: storedKey }),
+    });
+    const data = await res.json();
+
+    if (data.isPro) {
+      localStorage.setItem("wsSupporter", "true");
+      updateSupporterBadge();
+    } else {
+      localStorage.removeItem("wsSupporter");
+      sessionStorage.removeItem("wsProKey");
+      updateSupporterBadge();
+    }
+  } catch (e) {
+    console.warn("[Pro] Re-validation failed:", e.message);
+  }
+}
+revalidateProKey();
+
+// Onboarding Banner — first-launch detection + help icon trigger
+function showOnboarding() {
+  document.getElementById("onboardingOverlay").classList.add("show");
+  document.body.classList.add("modal-open");
+}
+function hideOnboarding() {
+  const overlay = document.getElementById("onboardingOverlay");
+  overlay.classList.remove("show");
+  document.body.classList.remove("modal-open");
+  localStorage.setItem("wsOnboardingSeen", "true");
+}
+
+// Show onboarding on first launch
+if (!localStorage.getItem("wsOnboardingSeen")) {
+  // Delay slightly so page renders first
+  setTimeout(showOnboarding, 800);
+}
+
+// Help icon in nav — re-show onboarding
+document.getElementById("helpBtn")?.addEventListener("click", showOnboarding);
+
+// Dismiss buttons
+document.getElementById("onboardingClose")?.addEventListener("click", hideOnboarding);
+document.getElementById("onboardingGotIt")?.addEventListener("click", hideOnboarding);
+
+// Close on backdrop click
+document.getElementById("onboardingOverlay")?.addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) hideOnboarding();
+});
 
 // Update bar/pill display when crossing mobile breakpoint on resize
 var _prevMobile = window.innerWidth <= 720;
@@ -1521,4 +1924,29 @@ window.ensureHtml2canvas = (function () {
     if (!el) return;
     events.forEach((ev) => el.addEventListener(ev, arm, { once: true, passive: true }));
   });
+})();
+
+// Diagnostic: Check Web Speech API health on page load
+(function diagnoseSpeechAPI() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const isSecure = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const diag = [];
+  diag.push("[Diagnostic] Protocol: " + location.protocol + " (secure: " + isSecure + ")");
+  diag.push("[Diagnostic] SpeechRecognition available: " + !!SR);
+  if (SR) {
+    try {
+      const test = new SR();
+      diag.push("[Diagnostic] SpeechRecognition constructor: OK");
+      diag.push("[Diagnostic] User agent: " + navigator.userAgent.slice(0, 80));
+    } catch (e) {
+      diag.push("[Diagnostic] SpeechRecognition constructor failed: " + e.message);
+    }
+  }
+  if (!isSecure) {
+    diag.push("[Diagnostic] ⚠️ Web Speech API requires HTTPS or localhost");
+  }
+  if (!SR) {
+    diag.push("[Diagnostic] ⚠️ Web Speech API not supported — will use Deepgram fallback");
+  }
+  console.log(diag.join("\n"));
 })();

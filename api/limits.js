@@ -1,0 +1,105 @@
+export const config = { runtime: 'edge' };
+
+import { getRedis, KEYS, secondsUntilMidnightUTC } from '../../lib/redis.js';
+
+const FREE_MAX_RECORDINGS = 5;
+const PRO_MAX_RECORDINGS = 50;
+const FREE_MAX_SECONDS = 75;
+const PRO_MAX_SECONDS = 900;
+const FREE_MAX_LENGTH = 15;
+const PRO_MAX_LENGTH = 30;
+
+export default async function handler(req) {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  try {
+    const { sessionId, isPro, audioDuration } = await req.json();
+
+    const redis = getRedis();
+    const today = new Date().toISOString().slice(0, 10);
+    const ttl = secondsUntilMidnightUTC();
+
+    const recordingsKey = KEYS.userRecordings(sessionId, today);
+    const cumulativeKey = KEYS.userCumulative(sessionId, today);
+
+    const recordings = parseInt(await redis.get(recordingsKey) || '0', 10);
+    const cumulative = parseInt(await redis.get(cumulativeKey) || '0', 10);
+
+    const maxRecordings = isPro ? PRO_MAX_RECORDINGS : FREE_MAX_RECORDINGS;
+    const maxSeconds = isPro ? PRO_MAX_SECONDS : FREE_MAX_SECONDS;
+    const maxLength = isPro ? PRO_MAX_LENGTH : FREE_MAX_LENGTH;
+
+    // Check audio length
+    if (audioDuration > maxLength) {
+      return new Response(JSON.stringify({
+        allowed: false,
+        reason: 'too_long',
+        maxSeconds: maxLength,
+        actualSeconds: audioDuration,
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check recording count
+    if (recordings >= maxRecordings) {
+      return new Response(JSON.stringify({
+        allowed: false,
+        reason: 'too_many',
+        used: recordings,
+        max: maxRecordings,
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check cumulative seconds
+    if (cumulative + audioDuration > maxSeconds) {
+      return new Response(JSON.stringify({
+        allowed: false,
+        reason: 'cumulative_exceeded',
+        used: cumulative,
+        max: maxSeconds,
+        wouldBe: cumulative + audioDuration,
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // All checks passed — increment counters
+    const pipeline = redis.pipeline();
+    pipeline.incr(recordingsKey);
+    pipeline.expire(recordingsKey, ttl);
+    pipeline.incrby(cumulativeKey, audioDuration);
+    pipeline.expire(cumulativeKey, ttl);
+    await pipeline.exec();
+
+    return new Response(JSON.stringify({
+      allowed: true,
+      recordingsUsed: recordings + 1,
+      recordingsMax: maxRecordings,
+      cumulativeUsed: cumulative + audioDuration,
+      cumulativeMax: maxSeconds,
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (e) {
+    console.error('[Limits] Error:', e.message);
+    return new Response(JSON.stringify({
+      allowed: true,
+      error: 'Limits tracking unavailable',
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}

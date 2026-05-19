@@ -1,6 +1,70 @@
 /* WISPR STORIES - COMPONENT STYLES */
 /* Typography, form elements, cards, modals, and UI components */
 
+/* REWRITE PREVIEW BAR */
+.rewrite-preview-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--ink2);
+}
+.rewrite-preview-bar.show {
+  display: flex;
+  flex-wrap: wrap;
+}
+.rewrite-preview-label {
+  flex: 1;
+  font-weight: 600;
+  color: var(--ink);
+}
+.rewrite-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.rewrite-preview-btn:active {
+  transform: scale(0.97);
+}
+.rewrite-preview-accept {
+  background: var(--ink);
+  color: var(--cream);
+}
+.rewrite-preview-accept:hover {
+  background: #333;
+}
+.rewrite-preview-cancel {
+  background: transparent;
+  color: var(--ink2);
+  border: 1px solid var(--rule);
+}
+.rewrite-preview-cancel:hover {
+  background: var(--cream2);
+  color: var(--ink);
+}
+@media (max-width: 720px) {
+  .rewrite-preview-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .rewrite-preview-btn {
+    justify-content: center;
+  }
+}
+
 .nav-tag:focus-visible,
 .footer-wave:focus-visible {
   outline: 1px solid var(--ink3);

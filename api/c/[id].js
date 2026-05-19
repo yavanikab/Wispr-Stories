@@ -3,7 +3,10 @@
 // a landing page with branding + card image + "Create Your Own" for humans.
 //
 // GET /c/:id
-// Uses padded OG image for meta tags and original card for display.
+// og:image points to a JPEG copy of the card on Vercel Blob (direct CDN,
+// no proxy hop) so WhatsApp/Facebook crawlers fetch a ~30–60 KB hero
+// image instead of a 200 KB padded PNG. Original card PNG is used for
+// the landing-page display.
 
 const BLOB_HOST = 'jkzbaevzmimaelrr.public.blob.vercel-storage.com';
 
@@ -32,8 +35,9 @@ export default function handler(req, res) {
     return;
   }
 
-  // OG image - serve from our own domain via proxy (WhatsApp/crawlers block third-party blob URLs)
-  const ogUrl = `${origin}/api/og-image/${id}`;
+  // OG image — direct Blob CDN URL (no serverless hop). JPEG keeps it small
+  // enough for WhatsApp mobile to render as a large preview.
+  const ogUrl = `https://${BLOB_HOST}/og/${id}.jpg`;
   // Card image is original square version in cards/ directory
   const cardUrl = `https://${BLOB_HOST}/cards/${id}.png`;
   const shareUrl = `${origin}/c/${id}`;
@@ -54,9 +58,9 @@ export default function handler(req, res) {
 <meta property="og:title" content="A Wispr Story — Turn your voice into something beautiful">
 <meta property="og:description" content="Created with Wispr Stories. Tap to make your own.">
 <meta property="og:image" content="${safeOgUrl}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:type" content="image/png">
+<meta property="og:image:secure_url" content="${safeOgUrl}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="A Wispr Story card">
 <meta property="og:url" content="${safeShareUrl}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Wispr Stories">
