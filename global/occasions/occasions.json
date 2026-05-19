@@ -374,7 +374,7 @@
   },
   {
     "id": "valentines-day",
-    "img": "assets/occasions/Valentine's Day.webp",
+    "img": "assets/occasions/valentines-day.webp",
     "triggers": [
       "happy valentine's day",
       "happy valentines day",
@@ -424,7 +424,7 @@
   },
   {
     "id": "wedding-day",
-    "img": "assets/occasions/Wedding Day.webp",
+    "img": "assets/occasions/wedding-day.webp",
     "triggers": [
       "happy wedding day",
       "happy wedding",
@@ -483,7 +483,7 @@
   },
   {
     "id": "friendship-day",
-    "img": "assets/occasions/Friendship Day.webp",
+    "img": "assets/occasions/friendship-day.webp",
     "triggers": [
       "happy friendship day",
       "friendship day wishes",
