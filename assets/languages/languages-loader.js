@@ -1,5 +1,12 @@
 let allLanguages = [];
 
+// Languages that use Latin script (wave animation is safe)
+const LATIN_LANGS = ['en', 'es', 'fr', 'pt', 'id', 'de', 'tr', 'it', 'sv'];
+
+window.isLatinScript = function(code) {
+  return LATIN_LANGS.indexOf(code) !== -1;
+};
+
 async function loadLanguages() {
   try {
     const res = await fetch('assets/languages/languages.json');
@@ -9,13 +16,13 @@ async function loadLanguages() {
     return;
   }
 
-  const dropdown = document.getElementById('langDropdown');
-  const btn = document.getElementById('langBtn');
-  const input = document.getElementById('langSel');
+  var dropdown = document.getElementById('langDropdown');
+  var btn = document.getElementById('langBtn');
+  var input = document.getElementById('langSel');
 
   if (dropdown && btn && input) {
-    allLanguages.forEach(lang => {
-      const item = document.createElement('button');
+    allLanguages.forEach(function(lang) {
+      var item = document.createElement('button');
       item.className = 'lang-dropdown-item';
       item.type = 'button';
       item.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i><strong>' + lang.label + '</strong>';
@@ -23,13 +30,19 @@ async function loadLanguages() {
       dropdown.appendChild(item);
     });
 
-    var defaultLang = allLanguages.find(function(l) { return l.code === 'en'; }) || allLanguages[0];
+    // Restore saved language or default to English
+    var savedLang = localStorage.getItem('wsLang');
+    var defaultLang = savedLang ? allLanguages.find(function(l) { return l.code === savedLang; }) : null;
+    if (!defaultLang) defaultLang = allLanguages.find(function(l) { return l.code === 'en'; }) || allLanguages[0];
     setLanguage(defaultLang, btn, input);
   }
 
-  document.getElementById('resetBtn') && document.getElementById('resetBtn').addEventListener('click', function() {
-    setLanguageByCode('en');
-  });
+  var resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      setLanguageByCode('en');
+    });
+  }
   document.dispatchEvent(new Event('languagesReady'));
 }
 
@@ -40,9 +53,15 @@ function setLanguage(lang, btn, input) {
     if (btnText) btnText.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i><span>' + lang.label + '</span>';
   }
   if (input) input.dispatchEvent(new Event('change', { bubbles: true }));
+
+  // Persist language selection
+  localStorage.setItem('wsLang', lang.code);
+
+  // Apply i18n translations
   if (typeof window.applyI18n === 'function' && lang.i18nCode) {
     window.applyI18n(lang.i18nCode);
   }
+
   var dropdown = document.getElementById('langDropdown');
   if (dropdown) dropdown.classList.remove('open');
 }

@@ -48,7 +48,7 @@ function hasCardContent() {
   const card = document.getElementById("card");
   return card && !card.classList.contains("card-empty");
 }
-const RTL = ["ar", "ur"];
+const RTL = [];
 
 function getLanguageName(code) {
   if (typeof allLanguages === "undefined" || !allLanguages) return "";
@@ -59,7 +59,7 @@ function getLanguageName(code) {
 
 let curP = 0,
   curTone = "original",
-  curLang = "en-US",
+  curLang = localStorage.getItem("wsLang") || "en",
   isRTL = false,
   useRounded = true,
   inputSource = "story";
@@ -452,8 +452,7 @@ function updateCard() {
 
   cc.textContent = raw.length + " / 150";
   cc.classList.toggle("warn", raw.length >= 120);
-  panel.dir = RTL.includes(curLang) ? "rtl" : "ltr";
-  document.getElementById("sta").dir = RTL.includes(curLang) ? "rtl" : "ltr";
+  // No RTL — page layout stays LTR always
 
   cardReady = false;
   document.getElementById("btnS").disabled = true;
@@ -873,7 +872,7 @@ const langSelEl = document.getElementById("langSel");
 if (langSelEl) {
   langSelEl.addEventListener("change", (e) => {
     curLang = e.target.value;
-    isRTL = RTL.includes(curLang);
+    isRTL = false;
     updateCard();
     saveDraft();
   });
@@ -1312,9 +1311,12 @@ document.querySelector(".nav-brand")?.addEventListener("click", (e) => {
 const prefersReducedMotion =
   window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 function applyWaveText(textEl) {
   if (prefersReducedMotion) return;
   if (!textEl || textEl.dataset.waveInit) return;
+  // Disable wave animation for non-Latin scripts to prevent character splitting
+  if (typeof window.isLatinScript === 'function' && !window.isLatinScript(curLang)) return;
   const text = textEl.textContent;
   textEl.dataset.waveText = text;
   textEl.innerHTML = "";
@@ -1322,15 +1324,23 @@ function applyWaveText(textEl) {
   let charIdx = 0;
   for (let i = 0; i < text.length; i++) {
     if (text[i] === " ") {
-      textEl.appendChild(document.createTextNode(" "));
+      textEl.appendChild(document.createTextNode(" "));
     } else {
       const span = document.createElement("span");
       span.textContent = text[i];
       span.style.display = "inline-block";
-      span.style.animation = `wave-letter 0.7s ease-in-out ${charIdx * 0.05}s 1`;
+      span.style.animation = "wave-letter 0.7s ease-in-out " + (charIdx * 0.05) + "s 1";
       textEl.appendChild(span);
       charIdx++;
     }
+  }
+}
+function resetWaveText(textEl, fallback) {
+  if (textEl && textEl.dataset.waveInit) {
+    textEl.textContent = fallback || textEl.dataset.waveText || "";
+    delete textEl.dataset.waveInit;
+  }
+}
   }
 }
 function resetWaveText(textEl, fallback) {
