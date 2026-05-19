@@ -1,5 +1,18 @@
 # Version History
 
+## v0.8.0 — Silence Detection + Tone Rewriting Preview + i18n (23 Languages)
+- Silence detection: Web Audio API RMS check on Deepgram fallback recordings
+- RMS < 0.01 over 2s = silence; prevents silent audio from hitting API (~20% savings)
+- Proper analyser cleanup on recording stop
+- Tone rewriting preview: Accept/Cancel bar after rewrite
+- Original text preserved in textarea; rewritten text shown on card preview only
+- Responsive CSS for preview bar (stacks on mobile)
+- i18n system: `assets/i18n/i18n.js` loader with `data-i18n`, `data-i18n-placeholder`, `data-i18n-title`
+- 23 translation JSON files (en, zh, hi, es, ar, fr, pt, ru, ur, id, de, ja, pa, ko, te, ta, tr, it, th, gu, kn, ml, sv)
+- RTL support for Arabic/Urdu (auto-sets `dir="rtl"` on `<html>`)
+- Language selector wired to call `applyI18n()` on change
+- Card content excluded from translation (stays English)
+
 ## v0.7.0 — Mobile UI Refinements + Wave Animation Fix
 - Mobile bar: theme-aware backgrounds, stronger shadow, backdrop-filter blur, thicker border
 - Rewrite text: vertical stacking with .rewrite-count (18px/900/red) + .rewrite-label (9px/uppercase)

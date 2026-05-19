@@ -1,6 +1,21 @@
 # Changelog
 
-## [v0.8.0] — In Progress
+## [v0.8.0] — 2026-05-20
+
+### Completed
+- **Phase 5: Silence Detection** — Web Audio API RMS energy check on Deepgram fallback recordings. RMS < 0.01 over 2s = silence, prevents silent audio from hitting API (~20% savings). Toast: "We didn't catch that — try speaking louder". Proper analyser cleanup on recording stop.
+- **Phase 6: Tone Rewriting Preview** — Accept/Cancel preview bar after tone rewrite. Rewritten text shown on card preview only, original preserved in textarea. Accept applies rewrite, Cancel restores original and resets to Original tone. Responsive CSS (stacks on mobile).
+- **Phase 7: i18n (23 Languages)** — Created `assets/i18n/` with 23 translation JSON files (en, zh, hi, es, ar, fr, pt, ru, ur, id, de, ja, pa, ko, te, ta, tr, it, th, gu, kn, ml, sv). Built `i18n.js` loader with `data-i18n`, `data-i18n-placeholder`, `data-i18n-title` support. Added `data-i18n` attributes to all translatable HTML elements. RTL support for Arabic/Urdu (auto-sets `dir="rtl"` on `<html>`). Wired language selector to call `applyI18n()` on language change. Card content excluded from translation (stays English).
+
+### Documentation
+- Updated `PENDING.md` — Marked Phase 0, Phase 5, Phase 6, Phase 7 as complete.
+- Updated `AGENTS.md` — Updated "Deferred features," "Known bugs," "Key files" sections.
+- Updated `WISPR_STORIES_CANONICAL_BLUEPRINT.md` — Rewrote Section 8 (Technical Architecture) with full serverless route table, usage limits, cost safeguards; rewrote Section 15 (Open Questions) to reflect current state.
+- Updated `docs/INTERVIEW_GUIDE.md` — Added "Cost Awareness & Sustainable Scaling" section with 8 Q&A entries covering limits, Deepgram choice, abuse prevention, Pro tier, and scaling.
+
+---
+
+## [v0.8.0] — In Progress (pre-implementation)
 
 ### Planned
 - **STT provider migration** — Switch from OpenRouter Whisper-1 to Deepgram Nova-3 Multilingual (Batch). Deepgram outperforms Whisper on accuracy (5.26% vs 6.2% WER), has no hallucination problem, 90% faster latency (200-400ms vs 2-4s), and $200 free credit (~555 hrs) vs no free tier. Cost: $0.26/hr vs $0.36/hr.
