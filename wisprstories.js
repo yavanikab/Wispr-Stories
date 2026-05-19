@@ -1041,9 +1041,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   document.getElementById("sta").value = "";
   document.getElementById("nin").value = "";
   inputSource = "story";
-  curLang = "en-US";
-  isRTL = false;
-  window.setLanguageByCode("en-US");
+  // Do NOT reset language — keep user's selection
   cardReady = false;
   sessionStorage.removeItem("wisprDraft");
   document.getElementById("btnS").disabled = true;
@@ -1556,7 +1554,7 @@ let _shareBlob = null;
 document.getElementById("btnS").addEventListener("click", async () => {
   if (!cardReady) { document.getElementById("btnC").click(); return; }
   const btn = document.getElementById("btnS");
-  btn.textContent = "Generating\u2026";
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating\u2026';
   btn.disabled = true;
   try {
     await window.ensureHtml2canvas();

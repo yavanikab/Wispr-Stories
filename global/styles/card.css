@@ -155,12 +155,23 @@
   line-height: 1.5;
   color: var(--ink);
   word-break: break-word;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
   transition:
     font-family 0.2s,
     font-weight 0.2s,
     font-style 0.2s,
     letter-spacing 0.2s;
+}
+
+@media (max-width: 720px) {
+  .card-panel-text {
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
 }
 .card-panel-text.mt {
   color: #aaa;

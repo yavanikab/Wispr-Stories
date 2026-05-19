@@ -34,7 +34,8 @@
   background: var(--ink);
   color: var(--cream);
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.55;
+  letter-spacing: 0;
   font-weight: 400;
   padding: 10px 14px;
   border-radius: 8px;
@@ -68,5 +69,15 @@
 .iw:hover .tip,
 .tip.open {
   opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .tip {
+    max-width: 240px;
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    padding: 8px 12px;
+  }
 }
 
