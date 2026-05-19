@@ -1,5 +1,3 @@
-export const config = { runtime: 'edge' };
-
 import { getRedis, KEYS } from '../../lib/redis.js';
 
 // Occasion mapping from purchase message keywords

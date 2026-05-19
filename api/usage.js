@@ -1,5 +1,3 @@
-export const config = { runtime: 'edge' };
-
 import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 
 const DAILY_USER_CAP = 99;
