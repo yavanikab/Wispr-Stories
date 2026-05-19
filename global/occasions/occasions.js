@@ -1,103 +1,118 @@
-let OCCASION_TRIGGERS = [];
-let DATE_OCCASIONS = {};
-let COUNTRY_MAPPING = {};
+var OCCASION_TRIGGERS = [];
+var DATE_OCCASIONS = {};
+var COUNTRY_MAPPING = {};
 
-async function loadOccasions() {
-  try {
-    const [occRes, dateRes, countryRes] = await Promise.all([
-      fetch('global/occasions/occasions.json'),
-      fetch('global/occasions/date-occasions.json'),
-      fetch('global/occasions/country-mapping.json')
-    ]);
+function loadOccasions() {
+  Promise.all([
+    fetch('global/occasions/occasions.json'),
+    fetch('global/occasions/date-occasions.json'),
+    fetch('global/occasions/country-mapping.json')
+  ]).then(function(responses) {
+    var occRes = responses[0];
+    var dateRes = responses[1];
+    var countryRes = responses[2];
 
-    OCCASION_TRIGGERS = await occRes.json();
-    DATE_OCCASIONS = await dateRes.json();
-    COUNTRY_MAPPING = await countryRes.json();
-    if(typeof checkOccasions==='function')checkOccasions();
-  } catch (error) {
-    console.error('Error loading occasions:', error);
-  }
+    if (!occRes.ok || !dateRes.ok || !countryRes.ok) {
+      console.warn('[Occasions] One or more JSON files failed to load');
+      return;
+    }
+
+    return Promise.all([occRes.json(), dateRes.json(), countryRes.json()]);
+  }).then(function(data) {
+    if (!data) return;
+    OCCASION_TRIGGERS = data[0];
+    DATE_OCCASIONS = data[1];
+    COUNTRY_MAPPING = data[2];
+    if (typeof checkOccasions === 'function') checkOccasions();
+  }).catch(function(error) {
+    console.warn('[Occasions] Failed to load occasion data:', error.message);
+  });
 }
 
-document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', loadOccasions) : loadOccasions();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadOccasions);
+} else {
+  loadOccasions();
+}
 
 function sanitizeText(text) {
   if (!text) return '';
   text = text.replace(/[\p{Emoji}\p{Emoji_Component}]/gu, ' ');
   text = text.normalize('NFC');
-  text = text.replace(/[‎‏؜‪‫‬‭‮⁦⁧⁨⁩؛۝‌‍﻿]/g, ' ');
+  text = text.replace(/[\u200E\u200F\u061C\u202A-\u202E\u2066-\u2069\u061B\u06DD\u200C\u200D\uFEFF]/g, ' ');
   text = text.replace(/\s+/g, ' ');
-  text = text.replace(/[''ʼ＇՞׳′‵]/g, "'");
+  text = text.replace(/[''\u02BC\uFF07\u055E\u05F3\u2035\u2032]/g, "'");
   return text.toLowerCase().trim();
 }
 
 function isWordBoundary(text, idx, forward) {
-  const pos = forward ? idx : idx - 1;
+  var pos = forward ? idx : idx - 1;
   if (pos < 0 || pos >= text.length) return true;
-  const c = text[pos];
+  var c = text[pos];
   return /[\s\p{P}]/u.test(c);
 }
 
-function findOccasionMatch(text, triggers){
-  const sanitized = sanitizeText(text);
-  if(!sanitized) return -1;
-  let earliest = -1;
+function findOccasionMatch(text, triggers) {
+  var sanitized = sanitizeText(text);
+  if (!sanitized) return -1;
+  var earliest = -1;
 
-  for(const p of triggers){
+  for (var t = 0; t < triggers.length; t++) {
+    var p = triggers[t];
     // Check if trigger is a regex pattern (wrapped in forward slashes)
-    if(typeof p === 'string' && p.startsWith('/') && p.lastIndexOf('/') > 0){
+    if (typeof p === 'string' && p.charAt(0) === '/' && p.lastIndexOf('/') > 0) {
       // Extract regex pattern and flags
-      const lastSlashIdx = p.lastIndexOf('/');
-      const patternStr = p.substring(1, lastSlashIdx);
-      const flags = p.substring(lastSlashIdx + 1);
+      var lastSlashIdx = p.lastIndexOf('/');
+      var patternStr = p.substring(1, lastSlashIdx);
+      var flags = p.substring(lastSlashIdx + 1);
 
       try {
-        const regex = new RegExp(patternStr, flags || '');
-        const match = sanitized.match(regex);
+        var regex = new RegExp(patternStr, flags || '');
+        var match = sanitized.match(regex);
 
-        if(match && match.index !== undefined){
-          const idx = match.index;
-          if(idx === 0) return 0;
-
-          let pre = idx - 1;
-          while(pre >= 0 && /\s/.test(sanitized[pre])) pre--;
-
-          if(pre < 0){
-            if(earliest === -1 || idx < earliest) earliest = idx;
-          } else {
-            const c = sanitized[pre];
-            if(".!?\n—\"':;,¿¡。、，！？：；」』】》।آ،،：；".indexOf(c) !== -1){
-              if(earliest === -1 || idx < earliest) earliest = idx;
-            }
-          }
-        }
-      } catch(e) {
-        console.warn('Invalid regex pattern:', p, e);
-      }
-    } else {
-      // Standard string matching (existing logic)
-      const triggerLower = p.toLowerCase();
-      let idx = 0;
-      while ((idx = sanitized.indexOf(triggerLower, idx)) !== -1) {
-        const endIdx = idx + triggerLower.length;
-        const atStart = idx === 0 || isWordBoundary(sanitized, idx, false);
-        const atEnd = endIdx >= sanitized.length || isWordBoundary(sanitized, endIdx, true);
-
-        if (atStart && atEnd) {
+        if (match && match.index !== undefined) {
+          var idx = match.index;
           if (idx === 0) return 0;
-          let pre = idx - 1;
+
+          var pre = idx - 1;
           while (pre >= 0 && /\s/.test(sanitized[pre])) pre--;
 
           if (pre < 0) {
             if (earliest === -1 || idx < earliest) earliest = idx;
           } else {
-            const c = sanitized[pre];
+            var c = sanitized[pre];
             if (".!?\n—\"':;,¿¡。、，！？：；」』】》।آ،،：；".indexOf(c) !== -1) {
               if (earliest === -1 || idx < earliest) earliest = idx;
             }
           }
         }
-        idx++;
+      } catch (e) {
+        console.warn('Invalid regex pattern:', p, e);
+      }
+    } else {
+      // Standard string matching
+      var triggerLower = p.toLowerCase();
+      var idx2 = 0;
+      while ((idx2 = sanitized.indexOf(triggerLower, idx2)) !== -1) {
+        var endIdx = idx2 + triggerLower.length;
+        var atStart = idx2 === 0 || isWordBoundary(sanitized, idx2, false);
+        var atEnd = endIdx >= sanitized.length || isWordBoundary(sanitized, endIdx, true);
+
+        if (atStart && atEnd) {
+          if (idx2 === 0) return 0;
+          var pre2 = idx2 - 1;
+          while (pre2 >= 0 && /\s/.test(sanitized[pre2])) pre2--;
+
+          if (pre2 < 0) {
+            if (earliest === -1 || idx2 < earliest) earliest = idx2;
+          } else {
+            var c2 = sanitized[pre2];
+            if (".!?\n—\"':;,¿¡。、，！？：；」』】》।آ،،：；".indexOf(c2) !== -1) {
+              if (earliest === -1 || idx2 < earliest) earliest = idx2;
+            }
+          }
+        }
+        idx2++;
       }
     }
   }
@@ -105,88 +120,99 @@ function findOccasionMatch(text, triggers){
 }
 
 function getUserCountry() {
-  // Try to get from current language setting
-  const lang = (typeof curLang !== 'undefined' ? curLang : null) ||
-               (typeof navigator !== 'undefined' ? navigator.language : 'en-US');
-  const mapping = COUNTRY_MAPPING[lang] || COUNTRY_MAPPING['en-US'];
+  var lang = (typeof curLang !== 'undefined' ? curLang : null) ||
+             (typeof navigator !== 'undefined' ? navigator.language : 'en-US');
+  var mapping = COUNTRY_MAPPING[lang] || COUNTRY_MAPPING['en-US'];
   return mapping;
 }
 
 function isDateMatch(occasionId, userCountry) {
-  const dateOcc = DATE_OCCASIONS[occasionId];
+  var dateOcc = DATE_OCCASIONS[occasionId];
   if (!dateOcc || dateOcc.type !== "date-aware") return false;
 
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const todayMM_DD = month + '-' + day;
+  var today = new Date();
+  var month = String(today.getMonth() + 1).padStart(2, '0');
+  var day = String(today.getDate()).padStart(2, '0');
+  var todayMM_DD = month + '-' + day;
 
-  const targetDate = dateOcc.dateMap[userCountry.country] || dateOcc.dateMap["all"];
+  var targetDate = dateOcc.dateMap[userCountry.country] || dateOcc.dateMap["all"];
   return todayMM_DD === targetDate;
 }
 
 function getOccasionDisplay(occasion, userCountry) {
   if (occasion.type === "date-aware") {
     if (occasion.displayType === "country-flag") {
-      return `<i class="fi fi-${userCountry.flagCode}"></i>`;
+      return '<i class="fi fi-' + userCountry.flagCode + '"></i>';
     } else if (occasion.displayType === "generic-image" && occasion.img) {
-      return `<img src="${occasion.img}" />`;
+      return '<img src="' + occasion.img + '" />';
     }
   } else {
     if (occasion.img) {
-      return `<img src="${occasion.img}" />`;
+      return '<img src="' + occasion.img + '" />';
     }
   }
   return '';
 }
 
-function checkOccasions(){
-  const raw = document.getElementById('sta').value;
-  let earliestPos = -1;
-  let chosen = null;
-  const userCountry = getUserCountry();
+function checkOccasions() {
+  var el = document.getElementById('cardOccasion');
+  var panel = document.getElementById('cardPanel');
+  if (!el || !panel) return;
 
-  for(const oc of OCCASION_TRIGGERS){
-    const pos = findOccasionMatch(raw, oc.triggers);
-    if(pos !== -1 && (earliestPos === -1 || pos < earliestPos)){
+  var raw = document.getElementById('sta').value;
+  var earliestPos = -1;
+  var chosen = null;
+  var userCountry = getUserCountry();
+
+  for (var i = 0; i < OCCASION_TRIGGERS.length; i++) {
+    var oc = OCCASION_TRIGGERS[i];
+    var pos = findOccasionMatch(raw, oc.triggers);
+    if (pos !== -1 && (earliestPos === -1 || pos < earliestPos)) {
       earliestPos = pos;
       chosen = oc;
     }
   }
 
-  for(const occasionId in DATE_OCCASIONS){
-    const dateOcc = DATE_OCCASIONS[occasionId];
-    const pos = findOccasionMatch(raw, dateOcc.triggers);
-    if(pos !== -1 && (earliestPos === -1 || pos < earliestPos)){
-      if(isDateMatch(occasionId, userCountry)){
-        earliestPos = pos;
-        chosen = { ...dateOcc, userCountry };
+  for (var occasionId in DATE_OCCASIONS) {
+    var dateOcc = DATE_OCCASIONS[occasionId];
+    var pos2 = findOccasionMatch(raw, dateOcc.triggers);
+    if (pos2 !== -1 && (earliestPos === -1 || pos2 < earliestPos)) {
+      if (isDateMatch(occasionId, userCountry)) {
+        earliestPos = pos2;
+        chosen = Object.assign({}, dateOcc, { userCountry: userCountry });
       }
     }
   }
 
-  const el = document.getElementById('cardOccasion');
-  const panel = document.getElementById('cardPanel');
+  if (chosen) {
+    var displayHTML = getOccasionDisplay(chosen, userCountry || {});
 
-  if(chosen){
-    const displayHTML = getOccasionDisplay(chosen, userCountry || {});
-
-    if(displayHTML && chosen.displayType === "country-flag"){
+    if (displayHTML && chosen.displayType === "country-flag") {
       el.innerHTML = displayHTML;
       el.classList.add('show');
       panel.classList.add('occasion');
-    } else if(chosen.img){
-      el.querySelector('img').src = chosen.img;
+    } else if (chosen.img) {
+      var img = el.querySelector('img');
+      if (img) {
+        img.src = chosen.img;
+        img.onerror = function () {
+          console.warn('[Occasions] Failed to load image:', chosen.img);
+          el.classList.remove('show');
+          panel.classList.remove('occasion');
+        };
+      }
       el.classList.add('show');
       panel.classList.add('occasion');
     } else {
       el.classList.remove('show');
       panel.classList.remove('occasion');
-      el.querySelector('img').src = '';
+      var img2 = el.querySelector('img');
+      if (img2) img2.src = '';
     }
   } else {
     el.classList.remove('show');
     panel.classList.remove('occasion');
-    el.querySelector('img').src = '';
+    var img3 = el.querySelector('img');
+    if (img3) img3.src = '';
   }
 }

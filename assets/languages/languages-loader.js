@@ -65,20 +65,29 @@ window.setLanguageByCode = function(code) {
   if (lang) setLanguage(lang, document.getElementById('langBtn'), document.getElementById('langSel'));
 };
 
-document.getElementById('langBtn').addEventListener('click', function() {
-  var dropdown = document.getElementById('langDropdown');
-  if (dropdown) dropdown.classList.toggle('open');
-});
-
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.lang-wrap-sel')) {
-    var dropdown = document.getElementById('langDropdown');
-    if (dropdown) dropdown.classList.remove('open');
+function initLangDropdown() {
+  var btn = document.getElementById('langBtn');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var dropdown = document.getElementById('langDropdown');
+      if (dropdown) dropdown.classList.toggle('open');
+    });
   }
-});
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.lang-wrap-sel')) {
+      var dropdown = document.getElementById('langDropdown');
+      if (dropdown) dropdown.classList.remove('open');
+    }
+  });
+}
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadLanguages);
+  document.addEventListener('DOMContentLoaded', function() {
+    loadLanguages();
+    initLangDropdown();
+  });
 } else {
   loadLanguages();
+  initLangDropdown();
 }
