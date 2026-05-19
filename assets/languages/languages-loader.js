@@ -37,12 +37,6 @@ async function loadLanguages() {
     setLanguage(defaultLang, btn, input);
   }
 
-  var resetBtn = document.getElementById('resetBtn');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', function() {
-      setLanguageByCode('en');
-    });
-  }
   document.dispatchEvent(new Event('languagesReady'));
 }
 

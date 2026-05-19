@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "한 번 말하고, 영원히 공유하세요",
-    "subtitle": "<strong><em>Wispr Flow</em></strong>로 받아쓰기; 정성으로 스타일링; 사랑으로 공유하기.",
+    "subtitle": "<strong>Wispr Flow</strong>로 받아쓰기; 정성으로 스타일링; 사랑으로 공유하기.",
     "quote": "\"기억을 붙잡으세요; 기억이 당신을 붙잡아 줄 것입니다.\""
   },
   "sharedCta": "✨ <strong>Wispr Story를 받았습니다!</strong> <em>내 카드 만들기</em>를 탭하여 자신만의 카드를 만드세요.",
@@ -83,7 +83,7 @@
     "link": "Wispr Flow를 무료로 사용해 보세요 →"
   },
   "footer": {
-    "text": "Wispr Stories — <strong><em>Wispr Flow</em></strong>를 위해 만들어짐",
+    "text": "Wispr Stories — <strong>Wispr Flow</strong>를 위해 만들어짐",
     "independent": "독립 프로젝트 · Wispr Flow와 제휴하지 않음",
     "copyright": "© 2026"
   },

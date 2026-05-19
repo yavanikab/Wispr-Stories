@@ -1315,9 +1315,10 @@ const prefersReducedMotion =
 function applyWaveText(textEl) {
   if (prefersReducedMotion) return;
   if (!textEl || textEl.dataset.waveInit) return;
-  // Disable wave animation for non-Latin scripts to prevent character splitting
-  if (typeof window.isLatinScript === 'function' && !window.isLatinScript(curLang)) return;
   const text = textEl.textContent;
+  // Disable wave animation for text containing non-Latin characters
+  // to prevent consonant/vowel splitting in Indic, CJK, Arabic scripts
+  if (/[\u0080-\uFFFF]/.test(text)) return;
   textEl.dataset.waveText = text;
   textEl.innerHTML = "";
   textEl.dataset.waveInit = "true";
@@ -1333,14 +1334,6 @@ function applyWaveText(textEl) {
       textEl.appendChild(span);
       charIdx++;
     }
-  }
-}
-function resetWaveText(textEl, fallback) {
-  if (textEl && textEl.dataset.waveInit) {
-    textEl.textContent = fallback || textEl.dataset.waveText || "";
-    delete textEl.dataset.waveInit;
-  }
-}
   }
 }
 function resetWaveText(textEl, fallback) {
