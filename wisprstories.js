@@ -48,7 +48,7 @@ function hasCardContent() {
   const card = document.getElementById("card");
   return card && !card.classList.contains("card-empty");
 }
-const RTL = ["ar-SA", "he-IL", "fa-IR", "ur-PK", "ar", "ur", "fa", "he"];
+const RTL = ["ar", "ur"];
 
 function getLanguageName(code) {
   if (typeof allLanguages === "undefined" || !allLanguages) return "";
