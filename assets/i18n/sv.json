@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Säg det en gång, dela det för alltid",
-    "subtitle": "Diktera med <strong>Wispr Flow</strong>; styla med omsorg; dela med kärlek.",
+    "subtitle": "Diktera med <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; styla med omsorg; dela med kärlek.",
     "quote": "\"Håll fast vid minnen; de kommer att hålla fast vid dig.\""
   },
   "sharedCta": "✨ <strong>Du fick en Wispr Story!</strong> Tryck på <em>Skapa mitt kort</em> för att göra ditt eget.",
@@ -83,7 +83,7 @@
     "link": "Prova Wispr Flow gratis →"
   },
   "footer": {
-    "text": "Wispr Stories — skapat för <strong>Wispr Flow</strong>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Självständigt projekt · Inte anslutet till Wispr Flow",
     "copyright": "© 2026"
   },

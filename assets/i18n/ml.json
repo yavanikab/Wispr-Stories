@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "ഒരിക്കൽ പറയൂ, എന്നെന്നേക്കും പങ്കിടൂ",
-    "subtitle": "<strong>Wispr Flow</strong> ഉപയോഗിച്ച് പറയൂ; ശ്രദ്ധയോടെ രൂപകൽപ്പന ചെയ്യൂ; സ്നേഹത്തോടെ പങ്കിടൂ.",
+    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> ഉപയോഗിച്ച് പറയൂ; ശ്രദ്ധയോടെ രൂപകൽപ്പന ചെയ്യൂ; സ്നേഹത്തോടെ പങ്കിടൂ.",
     "quote": "\"ഓർമ്മകളെ പിടിച്ചുനിർത്തൂ; അവ നിങ്ങളെ പിടിച്ചുനിർത്തും.\""
   },
   "sharedCta": "✨ <strong>നിങ്ങൾക്ക് ഒരു Wispr Story ലഭിച്ചു!</strong> നിങ്ങളുടേത് ഉണ്ടാക്കാൻ <em>എന്റെ കാർഡ് സൃഷ്ടിക്കുക</em> ടാപ്പ് ചെയ്യുക.",
@@ -83,7 +83,7 @@
     "link": "Wispr Flow സൗജന്യമായി പരീക്ഷിക്കുക →"
   },
   "footer": {
-    "text": "Wispr Stories — <strong>Wispr Flow</strong> നായി നിർമ്മിച്ചത്",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "സ്വതന്ത്ര പ്രോജക്ട് · Wispr Flow-മായി ബന്ധപ്പെട്ടതല്ല",
     "copyright": "© 2026"
   },

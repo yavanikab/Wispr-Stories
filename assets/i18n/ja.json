@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "一度話して、永遠に共有",
-    "subtitle": "<strong>Wispr Flow</strong> で話す；丁寧にスタイリング；愛を込めて共有。",
+    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> で話す；丁寧にスタイリング；愛を込めて共有。",
     "quote": "\"思い出を大切にしよう；思い出もあなたを大切にしてくれる。\""
   },
   "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のも作りましょう。",
@@ -83,7 +83,7 @@
     "link": "Wispr Flowを無料で試す →"
   },
   "footer": {
-    "text": "Wispr Stories — <strong>Wispr Flow</strong> のために作られました",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "独立したプロジェクト · Wispr Flowとは提携していません",
     "copyright": "© 2026"
   },

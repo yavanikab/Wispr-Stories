@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Katakan sekali, bagikan selamanya",
-    "subtitle": "Dikte dengan <strong>Wispr Flow</strong>; gaya dengan hati; bagikan dengan cinta.",
+    "subtitle": "Dikte dengan <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; gaya dengan hati; bagikan dengan cinta.",
     "quote": "\"Pegang erat kenangan; mereka akan memegang erat Anda.\""
   },
   "sharedCta": "✨ <strong>Anda menerima Wispr Story!</strong> Ketuk <em>Buat kartu saya</em> untuk membuat milik Anda sendiri.",
@@ -83,7 +83,7 @@
     "link": "Coba Wispr Flow gratis →"
   },
   "footer": {
-    "text": "Wispr Stories — dibuat untuk <strong>Wispr Flow</strong>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Proyek independen · Tidak berafiliasi dengan Wispr Flow",
     "copyright": "© 2026"
   },

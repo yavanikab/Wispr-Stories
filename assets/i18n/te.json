@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "ఒకసారి చెప్పండి, ఎప్పటికీ పంచుకోండి",
-    "subtitle": "<strong>Wispr Flow</strong>తో డిక్టేట్ చేయండి; శ్రద్ధతో స్టైల్ చేయండి; ప్రేమతో పంచుకోండి.",
+    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>తో డిక్టేట్ చేయండి; శ్రద్ధతో స్టైల్ చేయండి; ప్రేమతో పంచుకోండి.",
     "quote": "\"జ్ఞాపకాలను పట్టుకోండి; అవి మిమ్మల్ని పట్టుకుంటాయి.\""
   },
   "sharedCta": "✨ <strong>మీకు Wispr Story వచ్చింది!</strong> మీ సొంతం చేసుకోవడానికి <em>నా కార్డ్ సృష్టించండి</em> ట్యాప్ చేయండి.",
@@ -83,7 +83,7 @@
     "link": "Wispr Flowను ఉచితంగా ప్రయత్నించండి →"
   },
   "footer": {
-    "text": "Wispr Stories — <strong>Wispr Flow</strong> కోసం తయారు చేయబడింది",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "స్వతంత్ర ప్రాజెక్ట్ · Wispr Flowతో అనుబంధం లేదు",
     "copyright": "© 2026"
   },

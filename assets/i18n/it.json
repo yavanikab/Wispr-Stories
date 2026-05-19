@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Dillo una volta, condividilo per sempre",
-    "subtitle": "Ditta con <strong>Wispr Flow</strong>; stilizza con cura; condividi con amore.",
+    "subtitle": "Ditta con <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; stilizza con cura; condividi con amore.",
     "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
   },
   "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
@@ -83,7 +83,7 @@
     "link": "Prova Wispr Flow gratis →"
   },
   "footer": {
-    "text": "Wispr Stories — creato per <strong>Wispr Flow</strong>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Progetto indipendente · Non affiliato con Wispr Flow",
     "copyright": "© 2026"
   },

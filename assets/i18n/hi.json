@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "एक बार बोलें, हमेशा साझा करें",
-    "subtitle": "<strong>Wispr Flow</strong> से बोलें; प्यार से स्टाइल करें; प्रेम से साझा करें।",
+    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> से बोलें; प्यार से स्टाइल करें; प्रेम से साझा करें।",
     "quote": "\"यादों को संजोकर रखें; वे आपको संजोकर रखेंगी।\""
   },
   "sharedCta": "✨ <strong>आपको एक Wispr Story मिली!</strong> अपनी खुद की बनाने के लिए <em>मेरा कार्ड बनाएं</em> टैप करें।",
@@ -83,7 +83,7 @@
     "link": "Wispr Flow मुफ्त आज़माएं →"
   },
   "footer": {
-    "text": "Wispr Stories — <strong>Wispr Flow</strong> के लिए बनाया गया",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "स्वतंत्र परियोजना · Wispr Flow से संबद्ध नहीं",
     "copyright": "© 2026"
   },
