@@ -1316,9 +1316,10 @@ function applyWaveText(textEl) {
   if (prefersReducedMotion) return;
   if (!textEl || textEl.dataset.waveInit) return;
   const text = textEl.textContent;
-  // Disable wave animation for text containing non-Latin characters
-  // to prevent consonant/vowel splitting in Indic, CJK, Arabic scripts
-  if (/[\u0080-\uFFFF]/.test(text)) return;
+  // Disable wave animation for scripts that have consonant/vowel splitting issues
+  // (Indic, CJK, Arabic, Hebrew, Thai, Myanmar, Korean, Japanese)
+  // Allow em dashes, accented Latin, and other common punctuation to animate
+  if (/[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0A80-\u0AFF\u0B00-\u0B7F\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0D00-\u0D7F\u0E00-\u0E7F\u0E80-\u0EFF\u0F00-\u0FFF\u1000-\u109F\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/.test(text)) return;
   textEl.dataset.waveText = text;
   textEl.innerHTML = "";
   textEl.dataset.waveInit = "true";
