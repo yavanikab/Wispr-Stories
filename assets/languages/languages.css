@@ -2,66 +2,62 @@
 
 .lang-wrap-sel {
   position: relative;
-  display: block;
+  display: inline-block;
 }
 
-.lang-sel {
-  display: flex;
+.lang-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  background: var(--cream2);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 9px 30px 9px 12px;
-  font-size: 13px;
-  color: var(--ink);
-  outline: none;
-  transition: border-color 0.18s;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--ink2);
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
 }
 
-.lang-sel:hover {
-  border-color: rgba(26, 26, 26, 0.15);
+.lang-btn:hover {
+  background: var(--cream2);
+  border-color: var(--rule);
 }
 
-.lang-sel:focus {
-  border-color: rgba(26, 26, 26, 0.25);
-}
-
-#langBtnText {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.lang-sel i {
-  width: 20px;
-  height: 14px;
-  display: flex;
+.lang-btn i.fi {
+  width: 18px;
+  height: 13px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
   flex-shrink: 0;
 }
 
+#langBtnText {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
 .lang-arr {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 14px;
+  display: inline-block;
+  font-size: 10px;
   color: var(--ink3);
   transition: transform 0.2s;
+}
+
+.lang-arr::after {
+  content: '\25BE';
 }
 
 .lang-dropdown {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
   right: 0;
+  width: 220px;
   background: var(--cream);
   border: 1px solid var(--rule);
   border-radius: 8px;
@@ -84,7 +80,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   background: transparent;
   border: none;
   text-align: left;
@@ -111,4 +107,29 @@
 .lang-item-text strong {
   font-weight: 600;
   font-size: 13px;
+}
+
+/* Legacy .lang-sel styles (for full-width dropdown mode) */
+.lang-sel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--cream2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 9px 30px 9px 12px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.18s;
+  cursor: pointer;
+}
+
+.lang-sel:hover {
+  border-color: rgba(26, 26, 26, 0.15);
+}
+
+.lang-sel:focus {
+  border-color: rgba(26, 26, 26, 0.25);
 }

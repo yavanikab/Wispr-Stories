@@ -48,7 +48,7 @@ function hasCardContent() {
   const card = document.getElementById("card");
   return card && !card.classList.contains("card-empty");
 }
-const RTL = ["ar-SA", "he-IL", "fa-IR", "ur-PK"];
+const RTL = ["ar-SA", "he-IL", "fa-IR", "ur-PK", "ar", "ur", "fa", "he"];
 
 function getLanguageName(code) {
   if (typeof allLanguages === "undefined" || !allLanguages) return "";
@@ -440,7 +440,6 @@ function hideRewritePreview() {
     bar.classList.remove("show");
     bar.innerHTML = "";
   }
-}
 }
 
 function updateCard() {

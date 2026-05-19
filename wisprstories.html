@@ -150,6 +150,15 @@
         <span class="nav-tag wave-on-hover" tabindex="0"
           ><span data-i18n="nav.tagline">Speak &middot; Create &middot; Share</span></span
         >
+        <div class="lang-wrap-sel" id="langWrapSel">
+          <button class="lang-btn" id="langBtn" type="button" aria-label="Select language">
+            <i class="fi fi-us" id="langFlag"></i>
+            <span id="langBtnText">English</span>
+            <span class="lang-arr"></span>
+          </button>
+          <div class="lang-dropdown" id="langDropdown"></div>
+          <input type="hidden" id="langSel" value="en-US" />
+        </div>
         <button
           class="nav-help-btn"
           id="helpBtn"
@@ -816,8 +825,8 @@
       </div>
     </div>
 
-    <script src="assets/languages/languages-loader.js"></script>
     <script src="assets/i18n/i18n.js"></script>
+    <script src="assets/languages/languages-loader.js"></script>
     <script src="global/occasions/examples-loader.js"></script>
     <script src="global/occasions/occasions.js"></script>
     <script src="fonts.js"></script>
