@@ -1,3 +1,5 @@
+export const config = { runtime: 'edge' };
+
 import { getRedis, KEYS } from '../lib/redis.js';
 
 export default async function handler(req) {

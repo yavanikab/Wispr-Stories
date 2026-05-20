@@ -1,3 +1,5 @@
+export const config = { runtime: 'edge' };
+
 import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 
 const FREE_MAX_REWRITES = 10;

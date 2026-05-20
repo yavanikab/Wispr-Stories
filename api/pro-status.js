@@ -1,3 +1,5 @@
+export const config = { runtime: 'edge' };
+
 import { getRedis, KEYS } from '../lib/redis.js';
 
 // Validate Pro status server-side
