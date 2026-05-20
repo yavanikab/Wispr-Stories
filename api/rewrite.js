@@ -110,7 +110,7 @@ export default async function handler(req) {
         'X-Title': 'Wispr Stories',
       },
       body: JSON.stringify({
-        model: 'liquid/lfm-2.5-1.2b-instruct:free',
+        model: 'qwen/qwen3-next-80b-a3b-instruct:free',
         messages: [
           {
             role: 'system',
