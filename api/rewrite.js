@@ -59,6 +59,7 @@ export default async function handler(req) {
 
     // Check rewrite limit for free users
     let redisFailed = false;
+    let newUsedCount = null; // populated after successful increment for free users
     if (!isPro && sessionId) {
       try {
         const redis = getRedis();
@@ -71,6 +72,7 @@ export default async function handler(req) {
             error: 'Daily rewrite limit reached',
             used: count,
             max: FREE_MAX_REWRITES,
+            remaining: 0,
           }), {
             status: 429,
             headers: { 'Content-Type': 'application/json' },
@@ -79,8 +81,9 @@ export default async function handler(req) {
 
         // Increment counter
         const ttl = secondsUntilMidnightUTC();
-        await redis.incr(key);
+        const incremented = await redis.incr(key);
         await redis.expire(key, ttl);
+        newUsedCount = typeof incremented === 'number' ? incremented : count + 1;
       } catch (redisErr) {
         console.warn('[Rewrite] Redis unavailable, allowing rewrite:', redisErr.message);
         redisFailed = true;
@@ -142,11 +145,22 @@ export default async function handler(req) {
     // Enforce 150-char limit with sentence-boundary truncation
     rewritten = truncateToSentenceBoundary(rewritten, 150);
 
-    return new Response(JSON.stringify({
+    // Compute remaining count for frontend UI sync.
+    // For Pro users, send max=infinity signal. For free users, send actual used/remaining.
+    const responsePayload = {
       text: rewritten,
       original: text,
       tone,
-    }), {
+    };
+    if (isPro) {
+      responsePayload.isPro = true;
+    } else if (newUsedCount !== null) {
+      responsePayload.used = newUsedCount;
+      responsePayload.max = FREE_MAX_REWRITES;
+      responsePayload.remaining = Math.max(0, FREE_MAX_REWRITES - newUsedCount);
+    }
+
+    return new Response(JSON.stringify(responsePayload), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -1073,6 +1073,13 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     if (!res.ok) {
       const err = await res.json();
       if (res.status === 429) {
+        // Sync local counter with server truth — used count is authoritative.
+        if (typeof err.used === "number") {
+          localStorage.setItem(
+            "wsCards",
+            JSON.stringify({ date: new Date().toDateString(), count: err.used })
+          );
+        }
         showToast("Daily rewrite limit reached");
         applyTone("original");
       } else {
@@ -1087,6 +1094,13 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     }
 
     const data = await res.json();
+    // Sync local counter with server truth before re-rendering badges.
+    if (typeof data.used === "number") {
+      localStorage.setItem(
+        "wsCards",
+        JSON.stringify({ date: new Date().toDateString(), count: data.used })
+      );
+    }
     // Store original text so we can restore it
     window._originalText = text;
     // Store the rewritten text as pending
