@@ -108,7 +108,7 @@ export default async function handler(req) {
         'X-Title': 'Wispr Stories',
       },
       body: JSON.stringify({
-        model: 'openrouter/owl-alpha',
+        model: 'liquid/lfm-2.5-1.2b-instruct:free',
         messages: [
           {
             role: 'system',
