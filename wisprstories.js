@@ -50,6 +50,30 @@ function hasCardContent() {
 }
 const RTL = [];
 
+// Map script codes (from fonts.js detectScript) to language codes (from languages.json)
+const SCRIPT_TO_LANG = {
+  deva: "hi", beng: null, guru: "pa", gujr: "gu",
+  taml: "ta", telu: "te", kann: "kn", mlym: "ml",
+  thai: "th", arab: null, zhs: "zh", zht: "zh",
+  jpn: "ja", kor: "ko", cyr: "ru", dev: "en",
+};
+
+function autoDetectLangFromText(text) {
+  if (!text || !text.trim()) return;
+  const script = typeof detectScript === "function" ? detectScript(text) : "dev";
+  const detectedCode = SCRIPT_TO_LANG[script];
+  if (!detectedCode || detectedCode === curLang) return;
+  // Check if detected language exists in allLanguages
+  if (typeof allLanguages !== "undefined" && allLanguages) {
+    const lang = allLanguages.find((l) => l.code === detectedCode);
+    if (lang) {
+      curLang = detectedCode;
+      localStorage.setItem("wsLang", detectedCode);
+      window.setLanguageByCode(detectedCode);
+    }
+  }
+}
+
 function getLanguageName(code) {
   if (typeof allLanguages === "undefined" || !allLanguages) return "";
   const lang = allLanguages.find((l) => l.code === code);
@@ -470,6 +494,8 @@ function updateCard() {
     tx.style.fontStyle = t.fi;
     tx.style.fontWeight = t.fw;
     tx.style.letterSpacing = t.ls;
+    // Auto-detect language from text content
+    autoDetectLangFromText(raw);
     const langName = getLanguageName(curLang);
     lbl.textContent = name ? name + " \u00b7 " + langName : langName;
   } else {

@@ -17,7 +17,6 @@ node_modules/
 .edge-headless-profile/
 backups/
 backup/
-footer-menu.js
 prototype-waveform-play.html
 prototype-voice-cards.html
 mockup-og-option-c.html
