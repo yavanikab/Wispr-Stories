@@ -1054,7 +1054,11 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   cardText.classList.add("mt");
 
   try {
-    const sessionId = localStorage.getItem("wsSessionId") || "anon";
+    let sessionId = localStorage.getItem("wsSessionId");
+    if (!sessionId) {
+      sessionId = "sess_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("wsSessionId", sessionId);
+    }
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
