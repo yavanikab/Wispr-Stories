@@ -105,7 +105,7 @@ export default async function handler(req) {
         'X-Title': 'Wispr Stories',
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-v4-flash:free',
+        model: 'deepseek/deepseek-v4-flash',
         messages: [
           {
             role: 'system',
