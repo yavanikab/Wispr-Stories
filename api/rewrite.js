@@ -2,7 +2,9 @@ export const config = { runtime: 'edge' };
 
 import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 
-const FREE_MAX_REWRITES = 10;
+// Free-tier quota is enforced per tone, per day.
+// Each tone has its own 5-rewrite daily budget (5 x 6 tones = 30 max/day).
+const FREE_MAX_PER_TONE = 5;
 
 // Tone-specific prompts for rewriting
 const TONE_PROMPTS = {
@@ -57,21 +59,23 @@ export default async function handler(req) {
       });
     }
 
-    // Check rewrite limit for free users
+    // Check per-tone rewrite limit for free users.
+    // Each tone has its own daily quota (FREE_MAX_PER_TONE).
     let redisFailed = false;
     let newUsedCount = null; // populated after successful increment for free users
     if (!isPro && sessionId) {
       try {
         const redis = getRedis();
         const today = new Date().toISOString().slice(0, 10);
-        const key = KEYS.userRewrites(sessionId, today);
+        const key = KEYS.userRewritesByTone(sessionId, tone, today);
         const count = parseInt(await redis.get(key) || '0', 10);
 
-        if (count >= FREE_MAX_REWRITES) {
+        if (count >= FREE_MAX_PER_TONE) {
           return new Response(JSON.stringify({
-            error: 'Daily rewrite limit reached',
+            error: 'Daily limit reached for this tone',
+            tone,
             used: count,
-            max: FREE_MAX_REWRITES,
+            max: FREE_MAX_PER_TONE,
             remaining: 0,
           }), {
             status: 429,
@@ -79,7 +83,7 @@ export default async function handler(req) {
           });
         }
 
-        // Increment counter
+        // Increment per-tone counter
         const ttl = secondsUntilMidnightUTC();
         const incremented = await redis.incr(key);
         await redis.expire(key, ttl);
@@ -146,7 +150,7 @@ export default async function handler(req) {
     rewritten = truncateToSentenceBoundary(rewritten, 150);
 
     // Compute remaining count for frontend UI sync.
-    // For Pro users, send max=infinity signal. For free users, send actual used/remaining.
+    // For Pro users, send isPro signal. For free users, send per-tone used/remaining.
     const responsePayload = {
       text: rewritten,
       original: text,
@@ -156,8 +160,8 @@ export default async function handler(req) {
       responsePayload.isPro = true;
     } else if (newUsedCount !== null) {
       responsePayload.used = newUsedCount;
-      responsePayload.max = FREE_MAX_REWRITES;
-      responsePayload.remaining = Math.max(0, FREE_MAX_REWRITES - newUsedCount);
+      responsePayload.max = FREE_MAX_PER_TONE;
+      responsePayload.remaining = Math.max(0, FREE_MAX_PER_TONE - newUsedCount);
     }
 
     return new Response(JSON.stringify(responsePayload), {

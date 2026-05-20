@@ -217,28 +217,56 @@ function applyPal(idx) {
   if (dm) dm.style.color = light ? "#555548" : "";
 }
 
+// Free-tier daily quota is enforced per tone (5 rewrites per tone per day).
+// Mirror of the server-side FREE_MAX_PER_TONE constant in api/rewrite.js.
+const FREE_MAX_PER_TONE = 5;
+const REWRITE_TONES = ["warm", "bold", "poetic", "playful", "reflective", "honest"];
+
+function getToneCounts() {
+  const today = new Date().toDateString();
+  const raw = localStorage.getItem("wsToneCounts");
+  if (!raw) return { date: today, counts: {} };
+  try {
+    const d = JSON.parse(raw);
+    if (!d || d.date !== today) return { date: today, counts: {} };
+    return { date: d.date, counts: d.counts || {} };
+  } catch (e) {
+    return { date: today, counts: {} };
+  }
+}
+
+function getRewritesLeftForTone(tone) {
+  if (!tone || tone === "original") return FREE_MAX_PER_TONE;
+  const used = getToneCounts().counts[tone] || 0;
+  return Math.max(0, FREE_MAX_PER_TONE - used);
+}
+
+function setToneUsed(tone, used) {
+  if (!tone || tone === "original") return;
+  const today = new Date().toDateString();
+  const d = getToneCounts();
+  if (d.date !== today) { d.date = today; d.counts = {}; }
+  d.counts[tone] = used;
+  localStorage.setItem("wsToneCounts", JSON.stringify(d));
+}
+
+function isAllTonesExhausted() {
+  return REWRITE_TONES.every((t) => getRewritesLeftForTone(t) === 0);
+}
+
+// Backwards-compatible shim: returns the remaining count for the currently selected tone.
+// Many callers use this as "remaining for what the user is doing right now".
 function getCardsLeft() {
-  const raw = localStorage.getItem("wsCards");
-  if (!raw) return 10;
-  const d = JSON.parse(raw);
-  if (d.date !== new Date().toDateString()) return 10;
-  return Math.max(0, 10 - d.count);
+  return getRewritesLeftForTone(curTone);
 }
 
 function countCard() {
   if (curTone === "original") return;
   const today = new Date().toDateString();
-  const raw = localStorage.getItem("wsCards");
-  if (!raw || JSON.parse(raw).date !== today) {
-    localStorage.setItem(
-      "wsCards",
-      JSON.stringify({ date: today, count: 1 })
-    );
-  } else {
-    const d = JSON.parse(raw);
-    d.count++;
-    localStorage.setItem("wsCards", JSON.stringify(d));
-  }
+  const d = getToneCounts();
+  if (d.date !== today) { d.date = today; d.counts = {}; }
+  d.counts[curTone] = (d.counts[curTone] || 0) + 1;
+  localStorage.setItem("wsToneCounts", JSON.stringify(d));
 }
 
 function isSupporter() {
@@ -342,10 +370,15 @@ function applyTone(tone) {
   const pill = document.getElementById("tonePill");
   const upgBtn = document.getElementById("upgradeBtn");
   const isMobile = window.innerWidth <= 720;
-  const limitReached = !isSupporter() && getCardsLeft() === 0;
+  // "limitReached" applies to the currently SELECTED tone, used for pill/UI text below.
+  // Per-tone limits are now independent \u2014 disabling is decided per-button in the loop.
+  const limitReached = !isSupporter() && getRewritesLeftForTone(tone) === 0;
   toneBtns.forEach((c) => {
     if (c.dataset.tone === "original") { c.disabled = false; return; }
-    c.disabled = limitReached;
+    const btnTone = c.dataset.tone;
+    const btnLeft = getRewritesLeftForTone(btnTone);
+    // Each tone button is disabled independently when its own quota is exhausted.
+    c.disabled = !isSupporter() && btnLeft === 0;
     // Update or create counter badge on non-original tones
     let badge = c.querySelector(".tone-badge-limited");
     if (isSupporter()) {
@@ -364,7 +397,7 @@ function applyTone(tone) {
         badge.setAttribute("aria-hidden", "true");
         c.appendChild(badge);
       }
-      badge.textContent = limitReached ? "0" : getCardsLeft();
+      badge.textContent = String(btnLeft);
     }
   });
 
@@ -373,12 +406,13 @@ function applyTone(tone) {
 
   if (tone === "original") {
     btn.textContent = typeof getI18nSync === "function" ? getI18nSync("actions.create") : "Create card";
-    if (limitReached) {
+    // Only show "0 rewrites remaining" pill when ALL tones are exhausted.
+    if (!isSupporter() && isAllTonesExhausted()) {
       if (isMobile) {
         hidePill();
       } else {
         showPill();
-        pill.textContent = "0 rewrites remaining \u2014 Original is unlimited";
+        pill.textContent = "All tone rewrites used today \u2014 Original is unlimited";
         pill.className = "tone-pill exhausted";
         upgBtn.style.display = "";
       }
@@ -395,16 +429,16 @@ function applyTone(tone) {
       pill.className = "tone-pill supporter";
       upgBtn.style.display = "none";
     } else {
-      const left = getCardsLeft();
+      const left = getRewritesLeftForTone(tone);
       if (isMobile) {
         hidePill();
       } else {
         showPill();
         if (left === 0) {
-          pill.textContent = "0 rewrites remaining \u2014 Original is unlimited";
+          pill.textContent = "0 " + toneLabel.toLowerCase() + " rewrites left today \u2014 try another tone";
           pill.className = "tone-pill exhausted";
         } else {
-          pill.textContent = left + " tone rewrite" + (left === 1 ? "" : "s") + " left today";
+          pill.textContent = left + " " + toneLabel.toLowerCase() + " rewrite" + (left === 1 ? "" : "s") + " left today";
           pill.className = "tone-pill";
         }
         upgBtn.style.display = "";
@@ -1038,8 +1072,9 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
 
   // Check if Pro user (skip limit check)
   const isPro = isSupporter();
-  if (!isPro && getCardsLeft() <= 0) {
-    showToast("Daily rewrites used — showing as Original");
+  if (!isPro && getRewritesLeftForTone(tone) <= 0) {
+    const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
+    showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
     applyTone("original");
     updateCard();
     saveDraft();
@@ -1073,14 +1108,13 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     if (!res.ok) {
       const err = await res.json();
       if (res.status === 429) {
-        // Sync local counter with server truth — used count is authoritative.
+        // Server tells us which tone is exhausted and the authoritative count.
+        const errTone = err.tone || tone;
         if (typeof err.used === "number") {
-          localStorage.setItem(
-            "wsCards",
-            JSON.stringify({ date: new Date().toDateString(), count: err.used })
-          );
+          setToneUsed(errTone, err.used);
         }
-        showToast("Daily rewrite limit reached");
+        const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + errTone) : errTone;
+        showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
         applyTone("original");
       } else {
         showToast("Rewrite failed — showing original");
@@ -1094,12 +1128,9 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     }
 
     const data = await res.json();
-    // Sync local counter with server truth before re-rendering badges.
+    // Sync the local per-tone counter from the server response.
     if (typeof data.used === "number") {
-      localStorage.setItem(
-        "wsCards",
-        JSON.stringify({ date: new Date().toDateString(), count: data.used })
-      );
+      setToneUsed(data.tone || tone, data.used);
     }
     // Store original text so we can restore it
     window._originalText = text;
@@ -1285,7 +1316,8 @@ function updateMobileBar() {
   var rewriteText = document.getElementById("mobileRewriteText");
   if (!rightGroup || !rewriteText) return;
 
-  var limitReached = !isSupporter() && getCardsLeft() === 0;
+  // Mobile bar reflects the currently selected tone's remaining count.
+  var limitReached = !isSupporter() && curTone !== "original" && getRewritesLeftForTone(curTone) === 0;
   var isStyled = curTone !== "original";
 
   if (isStyled || limitReached) {
@@ -1294,10 +1326,10 @@ function updateMobileBar() {
       rewriteText.innerHTML = '<span class="rewrite-count">\u221E</span><span class="rewrite-label">Unlimited</span>';
       rewriteText.className = "mobile-bar-rewrite-text";
     } else if (limitReached) {
-      rewriteText.innerHTML = '<span class="rewrite-count">0</span><span class="rewrite-label">Upgrade</span>';
+      rewriteText.innerHTML = '<span class="rewrite-count">0</span><span class="rewrite-label">try another tone</span>';
       rewriteText.className = "mobile-bar-rewrite-text exhausted";
     } else {
-      var left = getCardsLeft();
+      var left = getRewritesLeftForTone(curTone);
       rewriteText.innerHTML = '<span class="rewrite-count">' + left + '</span><span class="rewrite-label">rewrite' + (left === 1 ? "" : "s") + ' left</span>';
       rewriteText.className = "mobile-bar-rewrite-text";
     }
@@ -1609,9 +1641,10 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   document.getElementById("nin").value = (c.dataset.name || "").replace(/[^\p{L}]/gu, "").slice(0, 10);
   if (c.dataset.tone) {
     const tone = c.dataset.tone;
-    if (tone !== "original" && !isSupporter() && getCardsLeft() === 0) {
+    if (tone !== "original" && !isSupporter() && getRewritesLeftForTone(tone) === 0) {
       applyTone("original");
-      showToast("Daily rewrites used — showing as Original");
+      const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
+      showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
     } else {
       applyTone(tone);
     }
