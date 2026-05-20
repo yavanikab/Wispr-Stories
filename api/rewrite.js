@@ -96,6 +96,9 @@ export default async function handler(req) {
 
     const prompt = `${TONE_PROMPTS[tone]} Return ONLY the rewritten text, under 150 characters.`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -116,7 +119,9 @@ export default async function handler(req) {
         max_tokens: 100,
         temperature: 0.7,
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       const err = await res.text();
@@ -145,6 +150,12 @@ export default async function handler(req) {
     });
   } catch (e) {
     console.error('[Rewrite] Error:', e.message);
+    if (e.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: 'Rewrite timed out' }), {
+        status: 504,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
