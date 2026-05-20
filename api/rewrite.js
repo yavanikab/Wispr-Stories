@@ -56,27 +56,33 @@ export default async function handler(req) {
     }
 
     // Check rewrite limit for free users
+    let redisFailed = false;
     if (!isPro && sessionId) {
-      const redis = getRedis();
-      const today = new Date().toISOString().slice(0, 10);
-      const key = KEYS.userRewrites(sessionId, today);
-      const count = parseInt(await redis.get(key) || '0', 10);
+      try {
+        const redis = getRedis();
+        const today = new Date().toISOString().slice(0, 10);
+        const key = KEYS.userRewrites(sessionId, today);
+        const count = parseInt(await redis.get(key) || '0', 10);
 
-      if (count >= FREE_MAX_REWRITES) {
-        return new Response(JSON.stringify({
-          error: 'Daily rewrite limit reached',
-          used: count,
-          max: FREE_MAX_REWRITES,
-        }), {
-          status: 429,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        if (count >= FREE_MAX_REWRITES) {
+          return new Response(JSON.stringify({
+            error: 'Daily rewrite limit reached',
+            used: count,
+            max: FREE_MAX_REWRITES,
+          }), {
+            status: 429,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Increment counter
+        const ttl = secondsUntilMidnightUTC();
+        await redis.incr(key);
+        await redis.expire(key, ttl);
+      } catch (redisErr) {
+        console.warn('[Rewrite] Redis unavailable, allowing rewrite:', redisErr.message);
+        redisFailed = true;
       }
-
-      // Increment counter
-      const ttl = secondsUntilMidnightUTC();
-      await redis.incr(key);
-      await redis.expire(key, ttl);
     }
 
     // Call OpenRouter with DeepSeek V4 Flash Free
