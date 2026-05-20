@@ -85,7 +85,7 @@ export default async function handler(req) {
       }
     }
 
-    // Call OpenRouter with MiniMax M2.5 Free
+    // Call OpenRouter with Owl Alpha
     const openrouterKey = process.env.OPENROUTER_API_KEY;
     if (!openrouterKey) {
       return new Response(JSON.stringify({ error: 'Server not configured' }), {
@@ -105,7 +105,7 @@ export default async function handler(req) {
         'X-Title': 'Wispr Stories',
       },
       body: JSON.stringify({
-        model: 'minimax/minimax-m2.5:free',
+        model: 'openrouter/owl-alpha',
         messages: [
           {
             role: 'system',
