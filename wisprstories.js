@@ -63,15 +63,10 @@ function autoDetectLangFromText(text) {
   const script = typeof detectScript === "function" ? detectScript(text) : "dev";
   const detectedCode = SCRIPT_TO_LANG[script];
   if (!detectedCode || detectedCode === curLang) return;
-  // Check if detected language exists in allLanguages
-  if (typeof allLanguages !== "undefined" && allLanguages) {
-    const lang = allLanguages.find((l) => l.code === detectedCode);
-    if (lang) {
-      curLang = detectedCode;
-      localStorage.setItem("wsLang", detectedCode);
-      window.setLanguageByCode(detectedCode);
-    }
-  }
+  // Only update curLang for the card label — DO NOT change page UI language
+  // setLanguageByCode() triggers applyI18n() which overwrites card text
+  curLang = detectedCode;
+  localStorage.setItem("wsLang", detectedCode);
 }
 
 function getLanguageName(code) {
@@ -502,7 +497,8 @@ function updateCard() {
     card.classList.add("card-empty");
     document.querySelector('.shell')?.classList.remove('has-card');
     document.getElementById("cardGhost").innerHTML = '\u201C';
-    tx.textContent = "";
+    const placeholder = typeof getI18nSync === "function" ? getI18nSync("cardPlaceholder") : "Your story appears here as you speak or type.";
+    tx.textContent = placeholder;
     tx.classList.add("mt");
     tx.style.fontFamily = "";
     tx.style.fontStyle = "";
@@ -1050,7 +1046,11 @@ let _dc;
 document.getElementById("sta").addEventListener("input", () => {
   inputSource = "story";
   clearTimeout(_dc);
-  _dc = setTimeout(function() { updateCard(); saveDraft(); }, 100);
+  _dc = setTimeout(function() { updateCard(); saveDraft(); }, 50);
+});
+document.getElementById("sta").addEventListener("paste", () => {
+  inputSource = "story";
+  setTimeout(function() { updateCard(); saveDraft(); }, 50);
 });
 document.getElementById("nin").addEventListener("input", function() {
   const cleaned = this.value.replace(/[^\p{L}]/gu, "").slice(0, 10);
