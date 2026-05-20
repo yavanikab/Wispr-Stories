@@ -90,13 +90,19 @@ let cardReady = false,
 let recogTimeout = null,
   recogRestartCount = 0;
 const RECOG_MAX_RESTARTS = 5;
+const FREE_MAX_RECORDING_SEC = 15;
+const PRO_MAX_RECORDING_SEC = 30;
+let recStartTime = null,
+  recMaxDuration = FREE_MAX_RECORDING_SEC,
+  recDurationTimer = null;
 const isSafari =
   navigator.vendor === "Apple Computer, Inc." &&
   !navigator.userAgent.includes("CriOS");
 
 let usingWhisper = false,
   mediaRec = null,
-  audioChunks = [];
+  audioChunks = [],
+  whisperStartTime = null;
 
 const isFF = navigator.userAgent.toLowerCase().includes("firefox");
 if (isFF) {
@@ -540,6 +546,8 @@ async function startWhisperFallback() {
       : "audio/webm";
     mediaRec = new MediaRecorder(stream, { mimeType: mt });
     audioChunks = [];
+    whisperStartTime = Date.now();
+    recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     mediaRec.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.push(e.data);
     };
@@ -567,6 +575,22 @@ async function startWhisperFallback() {
     } catch (e) {
       console.warn("[Silence] Analyser setup failed:", e.message);
     }
+
+    // Max duration timer for Whisper fallback
+    recDurationTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - whisperStartTime) / 1000);
+      const remaining = recMaxDuration - elapsed;
+      if (remaining <= 0) {
+        clearInterval(recDurationTimer);
+        recDurationTimer = null;
+        showToast("Max recording time reached (" + recMaxDuration + "s)");
+        if (mediaRec && mediaRec.state !== "inactive") {
+          mediaRec.stop();
+        }
+        return;
+      }
+      document.getElementById("recSub").textContent = remaining + "s remaining";
+    }, 1000);
 
     mediaRec.start(250);
     return true;
@@ -600,12 +624,24 @@ function stopWhisperFallback() {
   return new Promise((resolve) => {
     if (!mediaRec || mediaRec.state === "inactive") {
       cleanupSilenceDetection();
-      resolve("");
+      if (recDurationTimer) {
+        clearInterval(recDurationTimer);
+        recDurationTimer = null;
+      }
+      const duration = whisperStartTime ? Math.floor((Date.now() - whisperStartTime) / 1000) : 0;
+      whisperStartTime = null;
+      resolve({ text: "", duration });
       return;
     }
     mediaRec.onstop = () => {
       mediaRec.stream.getTracks().forEach((t) => t.stop());
       cleanupSilenceDetection();
+      if (recDurationTimer) {
+        clearInterval(recDurationTimer);
+        recDurationTimer = null;
+      }
+      const duration = whisperStartTime ? Math.floor((Date.now() - whisperStartTime) / 1000) : 0;
+      whisperStartTime = null;
       const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
       audioChunks = [];
 
@@ -613,7 +649,7 @@ function stopWhisperFallback() {
       if (isSilentRecording()) {
         console.log("[Silence] Recording detected as silent — skipping STT");
         showToast("We didn't catch that \u2014 try speaking louder");
-        resolve("");
+        resolve({ text: "", duration });
         return;
       }
 
@@ -632,7 +668,7 @@ function stopWhisperFallback() {
             showToast(
               "Transcription failed \u2014 need to run 'vercel dev' or deploy"
             );
-            resolve("");
+            resolve({ text: "", duration });
             return;
           }
           const data = await res.json();
@@ -640,10 +676,10 @@ function stopWhisperFallback() {
             console.log("[STT] Mock transcription returned (no API key set)");
             showToast("Recording works! Add Deepgram key for real transcription");
           }
-          resolve(data.text || "");
+          resolve({ text: data.text || "", duration });
         } catch (e) {
           console.error("[Whisper] Error:", e);
-          resolve("");
+          resolve({ text: "", duration });
         }
       };
       reader.readAsDataURL(blob);
@@ -703,12 +739,27 @@ function startRec() {
   }
   recog.onstart = () => {
     isRec = true;
+    recStartTime = Date.now();
+    recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     document.getElementById("recBtn").classList.add("on");
     document.getElementById("recSt").textContent = "Listening\u2026";
     document.getElementById("recSub").textContent = "Tap again to stop";
     document.getElementById("recSub").classList.add("live");
     document.getElementById("liveBox").classList.add("show");
-    console.log("[Speech] Started, lang=" + recog.lang);
+    console.log("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
+    recDurationTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+      const remaining = recMaxDuration - elapsed;
+      if (remaining <= 0) {
+        clearInterval(recDurationTimer);
+        recDurationTimer = null;
+        showToast("Max recording time reached (" + recMaxDuration + "s)");
+        isRec = false;
+        recog.stop();
+        return;
+      }
+      document.getElementById("recSub").textContent = remaining + "s remaining";
+    }, 1000);
     recogTimeout = setTimeout(() => {
       console.warn("[Speech] Timeout \u2014 no results after 8s");
       showToast(
@@ -819,6 +870,12 @@ function startRec() {
 }
 
 function finishRec() {
+  if (recDurationTimer) {
+    clearInterval(recDurationTimer);
+    recDurationTimer = null;
+  }
+  const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
+  recStartTime = null;
   usingWhisper = false;
   document.getElementById("recBtn").classList.remove("on");
   document.getElementById("recSt").textContent = "Tap to speak";
@@ -836,17 +893,22 @@ function finishRec() {
     saveDraft();
     showToast("Done \u2014 review your words then tap Create");
     fullTx = "";
-    // Server-side limit already incremented in recBtn click handler
   }
+  return actualDuration;
 }
 
 document.getElementById("recBtn").addEventListener("click", async () => {
   if (isRec) {
     isRec = false;
+    if (recDurationTimer) {
+      clearInterval(recDurationTimer);
+      recDurationTimer = null;
+    }
     if (usingWhisper) {
-      const text = await stopWhisperFallback();
-      fullTx = text ? text.trim().slice(0, 150) : "";
-      finishRec();
+      const result = await stopWhisperFallback();
+      fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+      const actualDuration = finishRec();
+      await reportRecordingDuration(actualDuration || result.duration);
       return;
     }
     if (recogTimeout) {
@@ -854,22 +916,25 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       recogTimeout = null;
     }
     if (recog) recog.stop();
+    const actualDuration = finishRec();
+    await reportRecordingDuration(actualDuration);
     return;
   }
 
-  // Server-side limit check before starting recording
+  // Server-side limit check before starting recording (check only, don't increment)
   const sessionId = localStorage.getItem("wsSessionId");
   if (!sessionId) {
     const newId = "sess_" + Math.random().toString(36).slice(2, 10);
     localStorage.setItem("wsSessionId", newId);
   }
   const isPro = isSupporter();
+  const maxDuration = isPro ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
 
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: 15 }),
+      body: JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: maxDuration, checkOnly: true }),
     });
     const data = await res.json();
 
@@ -885,12 +950,50 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       }
       return;
     }
+    // Update counter with current usage
+    updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
   } catch (e) {
     console.warn("[Limits] Check failed, allowing:", e.message);
   }
 
   startRec();
 });
+
+async function reportRecordingDuration(actualDuration) {
+  if (!actualDuration || actualDuration <= 0) return;
+  const sessionId = localStorage.getItem("wsSessionId");
+  const isPro = isSupporter();
+  try {
+    const res = await fetch("/api/limits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, isPro, audioDuration: actualDuration, checkOnly: false }),
+    });
+    const data = await res.json();
+    if (data.allowed) {
+      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
+    }
+  } catch (e) {
+    console.warn("[Limits] Report failed:", e.message);
+  }
+}
+
+function updateRecCounter(used, max, cumulativeUsed, cumulativeMax) {
+  const el = document.getElementById("recCounter");
+  if (!el) return;
+  const remaining = max - used;
+  const cumRemaining = Math.max(0, cumulativeMax - cumulativeUsed);
+  if (remaining <= 0) {
+    el.textContent = "No recordings left today";
+    el.className = "rec-counter exhausted";
+  } else if (remaining <= 2) {
+    el.textContent = remaining + " recording" + (remaining === 1 ? "" : "s") + " left · " + cumRemaining + "s audio";
+    el.className = "rec-counter warn";
+  } else {
+    el.textContent = remaining + "/" + max + " recordings · " + cumRemaining + "s audio left";
+    el.className = "rec-counter";
+  }
+}
 const langSelEl = document.getElementById("langSel");
 if (langSelEl) {
   langSelEl.addEventListener("change", (e) => {
@@ -1887,9 +1990,10 @@ document.addEventListener("keydown", (e) => {
   if (isRec) {
     isRec = false;
     if (usingWhisper) {
-      stopWhisperFallback().then((text) => {
-        fullTx = text ? text.trim().slice(0, 150) : "";
-        finishRec();
+      stopWhisperFallback().then((result) => {
+        fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+        const actualDuration = finishRec();
+        reportRecordingDuration(actualDuration || result.duration);
       });
       return;
     }

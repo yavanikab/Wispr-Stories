@@ -16,7 +16,7 @@ export default async function handler(req) {
   }
 
   try {
-    const { sessionId, isPro, audioDuration } = await req.json();
+    const { sessionId, isPro, audioDuration, checkOnly } = await req.json();
 
     const redis = getRedis();
     const today = new Date().toISOString().slice(0, 10);
@@ -72,19 +72,21 @@ export default async function handler(req) {
       });
     }
 
-    // All checks passed — increment counters
-    const pipeline = redis.pipeline();
-    pipeline.incr(recordingsKey);
-    pipeline.expire(recordingsKey, ttl);
-    pipeline.incrby(cumulativeKey, audioDuration);
-    pipeline.expire(cumulativeKey, ttl);
-    await pipeline.exec();
+    // Increment counters only if not check-only
+    if (!checkOnly) {
+      const pipeline = redis.pipeline();
+      pipeline.incr(recordingsKey);
+      pipeline.expire(recordingsKey, ttl);
+      pipeline.incrby(cumulativeKey, audioDuration);
+      pipeline.expire(cumulativeKey, ttl);
+      await pipeline.exec();
+    }
 
     return new Response(JSON.stringify({
       allowed: true,
-      recordingsUsed: recordings + 1,
+      recordingsUsed: checkOnly ? recordings : recordings + 1,
       recordingsMax: maxRecordings,
-      cumulativeUsed: cumulative + audioDuration,
+      cumulativeUsed: checkOnly ? cumulative : cumulative + audioDuration,
       cumulativeMax: maxSeconds,
     }), {
       status: 200,

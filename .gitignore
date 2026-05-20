@@ -1,5 +1,3 @@
-.env
-.env.example
 SHAREABLE_PLATFORMS.md
 AGENTS.md
 .claude/
@@ -21,3 +19,5 @@ prototype-waveform-play.html
 prototype-voice-cards.html
 mockup-og-option-c.html
 .vercel
+
+.env*.local

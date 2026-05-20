@@ -111,7 +111,28 @@ function handleUsage(req, res) {
 }
 
 function handleLimits(req, res) {
-  mockJson(res, { allowed: true, recordingsUsed: 1, recordingsMax: 5, cumulativeUsed: 5, cumulativeMax: 75 });
+  if (req.method !== 'POST') {
+    res.writeHead(405, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+  let body = '';
+  req.on('data', chunk => { body += chunk; });
+  req.on('end', () => {
+    try {
+      const { checkOnly } = JSON.parse(body);
+      // Mock: always allow, return sample counts
+      mockJson(res, {
+        allowed: true,
+        recordingsUsed: checkOnly ? 1 : 2,
+        recordingsMax: 5,
+        cumulativeUsed: checkOnly ? 5 : 10,
+        cumulativeMax: 75,
+      });
+    } catch (e) {
+      mockJson(res, { allowed: true, recordingsUsed: 1, recordingsMax: 5, cumulativeUsed: 5, cumulativeMax: 75 });
+    }
+  });
 }
 
 function handleRewrite(req, res) {

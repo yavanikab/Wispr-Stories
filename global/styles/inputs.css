@@ -62,6 +62,18 @@
 .rec-sub.live {
   color: #dc2626;
 }
+.rec-counter {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 4px;
+  font-weight: 500;
+}
+.rec-counter.warn {
+  color: #d97706;
+}
+.rec-counter.exhausted {
+  color: #dc2626;
+}
 .live-box {
   margin-top: 10px;
   background: var(--cream2);
