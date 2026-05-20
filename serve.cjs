@@ -100,14 +100,82 @@ function handleStt(req, res) {
   });
 }
 
+// Mock handlers for local development (no Redis, no LLM, no upload)
+function mockJson(res, data) {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(data));
+}
+
+function handleUsage(req, res) {
+  mockJson(res, { allowed: true, used: 0, max: 99 });
+}
+
+function handleLimits(req, res) {
+  mockJson(res, { allowed: true, recordingsUsed: 1, recordingsMax: 5, cumulativeUsed: 5, cumulativeMax: 75 });
+}
+
+function handleRewrite(req, res) {
+  if (req.method !== 'POST') {
+    res.writeHead(405, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+  let body = '';
+  req.on('data', chunk => { body += chunk; });
+  req.on('end', () => {
+    try {
+      const { text, tone } = JSON.parse(body);
+      const TONE_REWRITES = {
+        warm: 'Your words carry warmth and kindness — a gentle reminder of what truly matters.',
+        bold: 'This is your moment. Speak it loud. Let it echo.',
+        poetic: 'Like whispers on the wind, these words drift softly into eternity.',
+        playful: 'Hey there! Just dropping a little sunshine your way — because you deserve it!',
+        reflective: 'In the quiet spaces between moments, we find what truly endures.',
+        honest: "Here's the truth, plain and simple — no sugarcoating, just real.",
+      };
+      const rewritten = TONE_REWRITES[tone] || text;
+      console.log('[Rewrite] Mock:', tone, '→', rewritten.slice(0, 50));
+      mockJson(res, { text: rewritten, original: text, tone });
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+  });
+}
+
+function handleProStatus(req, res) {
+  mockJson(res, { isPro: false });
+}
+
+function handleUpload(req, res) {
+  mockJson(res, { url: 'https://example.com/mock-card.png', shortId: 'mock123' });
+}
+
+function handleValidateKey(req, res) {
+  mockJson(res, { valid: false, error: 'Local server — no key validation' });
+}
+
+function handleApi(req, res) {
+  if (req.method !== 'POST') {
+    res.writeHead(405, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+  mockJson(res, { allowed: true });
+}
+
 http.createServer((req, res) => {
   const urlPath = req.url.split('?')[0];
 
   // Route API requests
-  if (urlPath === '/api/stt') {
-    handleStt(req, res);
-    return;
-  }
+  if (urlPath === '/api/stt') { handleStt(req, res); return; }
+  if (urlPath === '/api/usage') { handleUsage(req, res); return; }
+  if (urlPath === '/api/limits') { handleLimits(req, res); return; }
+  if (urlPath === '/api/rewrite') { handleRewrite(req, res); return; }
+  if (urlPath === '/api/pro-status') { handleProStatus(req, res); return; }
+  if (urlPath === '/api/upload') { handleUpload(req, res); return; }
+  if (urlPath === '/api/validate-key') { handleValidateKey(req, res); return; }
+  if (urlPath.startsWith('/api/')) { handleApi(req, res); return; }
 
   // Serve static files
   let filePath = path.join(ROOT, urlPath === '/' ? 'wisprstories.html' : urlPath);
@@ -127,6 +195,6 @@ http.createServer((req, res) => {
   console.log(`  http://localhost:${PORT}`);
   console.log(`\n  On your phone (via port forwarding):`);
   console.log(`  http://localhost:${PORT}`);
-  console.log(`\n  API routes handled locally: /api/stt (Deepgram Nova-3)`);
+  console.log(`\n  API routes handled locally: /api/stt (Deepgram), all others mocked`);
   console.log(`\n  Press Ctrl+C to stop.\n`);
 });
