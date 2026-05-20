@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>
+      Wispr Stories &mdash; Turn your voice into beautiful, shareable cards
+    </title>
+    <meta
+      name="description"
+      content="Turn your voice into beautiful, shareable cards. Speak naturally in 42 languages and get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://wisprstories.vercel.app" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://wisprstories.vercel.app" />
+    <meta
+      property="og:title"
+      content="Wispr Stories &mdash; Turn your voice into beautiful, shareable cards"
+    />
+    <meta
+      property="og:description"
+      content="Speak naturally in 42 languages. Get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
+    />
+    <meta property="og:site_name" content="Wispr Stories" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="https://wisprstories.vercel.app/assets/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta
+      property="og:image:alt"
+      content="Wispr Stories &mdash; voice-to-card app preview"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Wispr Stories &mdash; Turn your voice into beautiful, shareable cards"
+    />
+    <meta
+      name="twitter:description"
+      content="Speak naturally in 42 languages. Get a stunning card to share. No account needed."
+    />
+    <meta
+      name="twitter:image"
+      content="https://wisprstories.vercel.app/assets/og-image.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Wispr Stories &mdash; voice-to-card app preview"
+    />
+    <meta name="theme-color" content="#ffffeb" />
+    <meta name="color-scheme" content="light" />
+    <meta name="application-name" content="Wispr Stories" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Wispr Stories" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="icon" type="image/png" href="assets/ws-logo-blwbg.png" />
+    <link rel="apple-touch-icon" href="assets/ws-logo-blwbg.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <script>
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!localStorage.getItem("theme") &&
+          matchMedia("(prefers-color-scheme:dark)").matches)
+      )
+        document.documentElement.classList.add("dark");
+      // Prevent flash of wrong language: hide body until i18n loads
+      document.documentElement.style.visibility = 'hidden';
+      document.documentElement.style.opacity = '0';
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Tone fonts (Latin + catch-all) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Karla:wght@400&family=Stack+Sans+Headline:wght@400&family=EB+Garamond:ital,wght@0,400;1,400&family=Fredoka:wght@400&family=Merriweather:ital,wght@0,400;1,400&family=Atkinson+Hyperlegible:wght@400;700&family=Noto+Sans:wght@400;700&family=Noto+Serif:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Indian scripts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Serif+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Serif+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Serif+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Serif+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Serif+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Serif+Malayalam:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&family=Noto+Serif+Gurmukhi:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Serif+Gujarati:wght@400;700&family=Noto+Sans+Oriya:wght@400;700&family=Noto+Serif+Oriya:wght@400;700&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Serif+Sinhala:wght@400;700&family=Anek+Devanagari:wght@400&family=Alkatra:wght@400&family=Baloo+Chettan+2:wght@400&family=Rajdhani:wght@400&family=Anek+Tamil:wght@400&family=Karla+Tamil+Inclined:wght@400&family=Catamaran:wght@400&family=Meera+Inimai&family=Anek+Telugu:wght@400&family=Akaya+Telivigala&family=Sirivennela&family=Anek+Kannada:wght@400&family=Tiro+Kannada&family=Hubballi&family=Anek+Malayalam:wght@400&family=Chilanka&family=Manjari:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Middle East -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Cairo:wght@400&family=Harmattan:wght@400&family=IBM+Plex+Sans+Arabic:wght@400&family=Reem+Kufi:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Eastern languages (Thai, Japanese, Korean, Chinese) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Itim&family=K2D:wght@400&family=Kanit:wght@400&family=Kodchasan:wght@400&family=Noto+Sans+Thai+Looped:wght@400&family=Playpen+Sans+Thai:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Hachi+Maru+Pop&family=Kosugi+Maru&family=M+PLUS+Rounded+1c&family=Zen+Maru+Gothic&family=WDXL+Lubrifont+JP+N&family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Gowun+Dodum&family=Jua&family=Yeon+Sung&family=Hahmlet:wght@400&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=Zhi+Mang+Xing&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Sans+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=LXGW+WenKai+TC&family=Chiron+GoRound+TC:wght@400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="assets/fontawesome/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
+    <link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
+    <link
+      rel="stylesheet"
+      href="global/styles/main.css?v=20260519-v0.7.0"
+    />
+    <link rel="stylesheet" href="global/occasions/occasions.css" />
+    <link rel="stylesheet" href="assets/flag-icons/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="assets/languages/languages.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Wispr Stories",
+        "url": "https://wisprstories.vercel.app",
+        "description": "Turn your voice into beautiful, shareable cards in 42 languages.",
+        "applicationCategory": "Multimedia",
+        "operatingSystem": "All",
+        "browserRequirements": "Chrome or Safari for voice recording",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "Wispr Stories"
+        }
+      }
+    </script>
+  </head>
+  <body id="top">
+    <nav class="nav">
+      <a href="#top" class="nav-brand">
+        <img
+          src="assets/ws-logo-bl.png"
+          alt="Wispr Stories"
+          class="nav-logo"
+        /><span class="nav-brand-text">Wispr Stories</span>
+        <span id="proBadge" class="pro-badge" style="display: none"
+          ><i class="fa-solid fa-crown"></i> Pro</span
+        >
+      </a>
+      <div class="nav-right">
+        <span class="nav-tag" tabindex="0"
+          ><span data-i18n="nav.tagline">Speak &middot; Create &middot; Share</span></span
+        >
+        <div class="lang-wrap-sel" id="langWrapSel">
+          <button class="lang-btn" id="langBtn" type="button" aria-label="Select language">
+            <span id="langBtnText"></span>
+            <span class="lang-arr"></span>
+          </button>
+          <div class="lang-dropdown" id="langDropdown"></div>
+          <input type="hidden" id="langSel" value="en" />
+        </div>
+        <button
+          class="nav-help-btn"
+          id="helpBtn"
+          aria-label="How to use Wispr Stories"
+          title="How to use"
+        >
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          aria-label="Toggle dark mode"
+        >
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </nav>
+
+    <div class="shell">
+      <!-- LEFT -->
+      <div class="left">
+        <div>
+          <h1 class="hl-h1" data-i18n="hero.title">Say it once, share it forever</h1>
+          <p class="hl-h2" data-i18n="hero.subtitle">Dictate with <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="wispr-flow-link"><strong><em>Wispr Flow</em></strong></a>; style with care; share with love.</p>
+          <p class="hl-emotion" data-i18n="hero.quote">&ldquo;Hold onto memories; they will hold onto you.&rdquo;</p>
+        </div>
+
+        <div class="shared-cta" id="sharedCta" data-i18n="sharedCta">
+          &#10024; <strong>You received a Wispr Story!</strong> Tap
+          <em>Create my card</em> to make your own.
+        </div>
+
+        <div class="ff-notice" id="ffNotice" data-i18n="ffNotice">
+          &#127990; Voice recording is not supported in Firefox. Use Chrome or
+          Safari &mdash; or paste your text below.
+        </div>
+
+        <!-- HERO INPUT ZONE: Record + OR + Textarea -->
+        <div class="input-hero">
+          <!-- 1. RECORD -->
+          <div>
+            <div class="lbl">
+              <span data-i18n="record.label">1 &middot; Tap to speak</span>
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip" data-i18n="record.tip"
+                  >Press record and speak naturally. Your words appear live. Tap
+                  again to stop &mdash; your words move into the text box ready
+                  for the card.</span
+                ></span
+              >
+            </div>
+            <div class="rec-row">
+              <button class="rec-btn" id="recBtn" aria-label="Record">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <rect
+                    x="7"
+                    y="1"
+                    width="6"
+                    height="11"
+                    rx="3"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M3 9a7 7 0 0014 0"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    fill="none"
+                  />
+                  <line
+                    x1="10"
+                    y1="16"
+                    x2="10"
+                    y2="19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="7"
+                    y1="19"
+                    x2="13"
+                    y2="19"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+              <div>
+                <div class="rec-st" id="recSt" data-i18n="record.status">Tap to speak</div>
+                <div class="rec-sub" id="recSub" data-i18n="record.sub">
+                  Your words appear as you speak
+                </div>
+              </div>
+            </div>
+            <div class="live-box" id="liveBox"></div>
+          </div>
+
+          <div class="or">
+            <div class="orl"></div>
+            <span class="ort" data-i18n="orText">or type or paste your words</span>
+            <div class="orl"></div>
+          </div>
+
+          <!-- 2. TEXT -->
+          <div>
+            <label class="lbl" for="sta"
+              ><span data-i18n="textarea.label">2 &middot; Your words</span>
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip" data-i18n="textarea.tip"
+                  >Speak first using Record above &mdash; words land here
+                  automatically. Or type directly. Or paste from Wispr Flow. Any
+                  language works here.</span
+                ></span
+              >
+            </label>
+            <textarea
+              class="sta"
+              id="sta"
+              maxlength="150"
+              aria-label="Your words"
+              data-i18n-placeholder="textarea.placeholder"
+              placeholder="Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
+            ></textarea>
+            <div class="char-r">
+              <span class="char-c" id="charC">0 / 150</span
+              ><button class="reset-btn" id="resetBtn" data-i18n="resetBtn">Reset all</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPACT NAME ROW (right after input, before examples) -->
+        <div class="name-row">
+          <span class="name-label" data-i18n="nameRow.label">From</span>
+          <input
+            class="nin"
+            id="nin"
+            aria-label="Your name"
+            data-i18n-placeholder="nameRow.placeholder"
+            placeholder="e.g. Mom, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+            maxlength="10"
+            inputmode="text"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <!-- EXAMPLES (safety net after input + name) -->
+        <div class="ex-section-wrap">
+          <div class="ex-lbl" data-i18n="examples.label">Need inspiration? Click an example</div>
+          <div class="ex-grid" id="exGrid"></div>
+        </div>
+
+        <!-- MAKE IT YOURS (collapsible, open by default) -->
+        <details class="customize" open>
+          <summary class="customize-summary">
+            <span class="customize-summary-label" data-i18n="customize.summary">Make it yours</span>
+            <span class="customize-summary-hint" data-i18n="customize.hint"
+              >Tone &middot; color &middot; shape</span
+            >
+            <i
+              class="fa-solid fa-chevron-right customize-chevron"
+              aria-hidden="true"
+            ></i>
+          </summary>
+
+          <!-- 3. TONE -->
+          <div>
+            <div class="lbl">
+              <span data-i18n="tone.label">3 &middot; Tone</span>
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip" data-i18n="tone.tip"
+                  >Changes how your words feel on the card. Warm is gentle. Bold
+                  is direct. Poetic flows with rhythm. Playful is light.
+                  Reflective is slow. Honest is raw. Changes letter-spacing and
+                  slant only &mdash; not size or weight.</span
+                ></span
+              >
+            </div>
+            <div
+              class="tone-row"
+              id="toneRow"
+              role="radiogroup"
+              aria-label="Card tone"
+            >
+              <button
+                class="tc on"
+                data-tone="original"
+                aria-label="Tone: Original (unlimited)"
+              >
+                <i class="fas fa-pen" aria-hidden="true"></i> <span data-i18n="tone.original">Original</span>
+                <span class="tone-badge tone-badge-unlimited" aria-hidden="true">∞</span>
+              </button>
+              <button class="tc" data-tone="warm" aria-label="Tone: Warm">
+                <i class="fas fa-heart" aria-hidden="true"></i> <span data-i18n="tone.warm">Warm</span>
+              </button>
+              <button class="tc" data-tone="bold" aria-label="Tone: Bold">
+                <i class="fas fa-bolt" aria-hidden="true"></i> <span data-i18n="tone.bold">Bold</span>
+              </button>
+              <button class="tc" data-tone="poetic" aria-label="Tone: Poetic">
+                <i class="fas fa-feather" aria-hidden="true"></i> <span data-i18n="tone.poetic">Poetic</span>
+              </button>
+              <button class="tc" data-tone="playful" aria-label="Tone: Playful">
+                <i class="fas fa-face-smile" aria-hidden="true"></i> <span data-i18n="tone.playful">Playful</span>
+              </button>
+              <button
+                class="tc"
+                data-tone="reflective"
+                aria-label="Tone: Reflective"
+              >
+                <i class="fas fa-moon" aria-hidden="true"></i> <span data-i18n="tone.reflective">Reflective</span>
+              </button>
+              <button class="tc" data-tone="honest" aria-label="Tone: Honest">
+                <i class="fas fa-handshake" aria-hidden="true"></i> <span data-i18n="tone.honest">Honest</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- REWRITE PREVIEW BAR -->
+          <div class="rewrite-preview-bar" id="rewritePreviewBar"></div>
+
+          <!-- 4. COLOUR -->
+          <div>
+            <div class="lbl">
+              <span data-i18n="color.label">4 &middot; Card color</span>
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip" data-i18n="color.tip"
+                  >Sets the card background. The live preview updates
+                  instantly.</span
+                ></span
+              >
+            </div>
+            <div
+              class="pal-row"
+              id="palRow"
+              role="radiogroup"
+              aria-label="Card color"
+            >
+              <div
+                class="pd on"
+                data-p="0"
+                style="background: #7c3aed"
+                data-i18n-title="color.violet"
+                title="Violet"
+                aria-label="Violet"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="1"
+                style="background: #f59e0b"
+                data-i18n-title="color.amber"
+                title="Amber"
+                aria-label="Amber"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="2"
+                style="background: #dc2626"
+                data-i18n-title="color.crimson"
+                title="Crimson"
+                aria-label="Crimson"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="3"
+                style="background: #059669"
+                data-i18n-title="color.emerald"
+                title="Emerald"
+                aria-label="Emerald"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="4"
+                style="background: #0284c7"
+                data-i18n-title="color.ocean"
+                title="Ocean"
+                aria-label="Ocean"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="5"
+                style="background: #db2777"
+                data-i18n-title="color.rose"
+                title="Rose"
+                aria-label="Rose"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="6"
+                style="background: #ea580c"
+                data-i18n-title="color.orange"
+                title="Orange"
+                aria-label="Orange"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="7"
+                style="background: #0d9488"
+                data-i18n-title="color.teal"
+                title="Teal"
+                aria-label="Teal"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="8"
+                style="background: #c026d3"
+                data-i18n-title="color.fuchsia"
+                title="Fuchsia"
+                aria-label="Fuchsia"
+                role="button"
+                tabindex="0"
+              ></div>
+              <div
+                class="pd"
+                data-p="9"
+                style="background: #4f46e5"
+                data-i18n-title="color.indigo"
+                title="Indigo"
+                aria-label="Indigo"
+                role="button"
+                tabindex="0"
+              ></div>
+            </div>
+          </div>
+
+          <!-- 5. SHAPE -->
+          <div>
+            <div class="lbl">
+              <span data-i18n="shape.label">5 &middot; Shape</span>
+              <span class="iw"
+                ><span class="ii" tabindex="0"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></span>
+                <span class="tip" data-i18n="shape.tip"
+                  >Sharp edges work best for WhatsApp. Rounded corners suit
+                  galleries and web.</span
+                ></span
+              >
+            </div>
+            <div
+              class="sz-row"
+              id="roundnessRow"
+              role="radiogroup"
+              aria-label="Shape"
+            >
+              <button class="sz" data-rounded="false" aria-label="Sharp corners" data-i18n="shape.sharp">
+                Sharp corners
+              </button>
+              <button
+                class="sz on"
+                data-rounded="true"
+                aria-label="Rounded corners"
+                data-i18n="shape.rounded"
+              >
+                Rounded corners
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <!-- ACTIONS (full-width buttons) -->
+        <div class="actions">
+          <button class="btn-c" id="btnC">
+            <i class="fas fa-wand-sparkles"></i
+            ><span class="btn-c-text" id="btnCTxt" data-i18n="actions.create">Create&nbsp;card</span>
+          </button>
+          <button class="btn-s" id="btnS" disabled>
+            <i class="fas fa-share-nodes"></i> <span data-i18n="actions.share">Share card</span>
+          </button>
+        </div>
+
+        <div class="left-closing">
+          <span class="left-closing-text wave-on-hover" tabindex="0" data-i18n="closing">Your voice, beautifully shared</span>
+        </div>
+      </div>
+      <!-- /left -->
+
+      <!-- RIGHT -->
+      <div class="right">
+        <div class="pvw-lbl" data-i18n="preview.label">Live preview</div>
+        <div id="tonePillWrap" class="tone-pill-wrap" style="display: none">
+          <span id="tonePill" class="tone-pill"></span>
+          <button id="upgradeBtn" class="tone-upgrade-link">Upgrade</button>
+        </div>
+        <div class="card-wrap">
+          <button class="dl-btn" id="dlBtn" style="display: none">
+            <i class="fas fa-download"></i> <span data-i18n="download">Download card</span>
+          </button>
+          <div class="card card-empty" id="card">
+            <div class="card-bg" id="cardBg"></div>
+            <div class="card-ghost" id="cardGhost">“</div>
+            <div class="card-empty-state">
+              <span data-i18n="cardEmpty">Fill the details &mdash;<br />your card appears here</span>
+            </div>
+            <div class="card-content">
+              <div class="card-label" id="cardLabel"></div>
+              <div class="card-panel" id="cardPanel">
+                <div class="card-panel-text mt" id="cardText">
+                  Your story appears here as you speak or type.
+                </div>
+                <div class="card-wv" id="cardWv"></div>
+                <div class="card-occasion" id="cardOccasion">
+                  <img src="" alt="" />
+                </div>
+                <div class="card-voice-label" id="voiceLabel">
+                  &#128395;&#65039; Story Original
+                </div>
+              </div>
+              <div class="card-foot">
+                <div class="card-logo">
+                  <img
+                    src="assets/ws-logo-wh.png"
+                    alt="Wispr Stories"
+                    class="card-logo-img"
+                  />
+                  <span class="card-logo-text">Wispr Stories</span>
+                </div>
+                <span class="card-domain">wisprflow.ai</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wcta" id="wcta">
+          <p data-i18n="wcta.text">
+            Use your voice anywhere you type &mdash; WhatsApp, Gmail, Slack, any
+            app.
+          </p>
+          <a
+            href="https://wisprflow.ai?ref=wispr-stories"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-i18n="wcta.link"
+            >Try Wispr Flow free &rarr;</a
+          >
+        </div>
+      </div>
+
+      <div class="bg-ghost-decoration">
+        <img
+          src="assets/bg-ghost.png"
+          alt="Wispr Stories illustration"
+          class="bg-ghost-img"
+        />
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <p data-i18n="footer.text">
+          <a href="#top" class="footer-wave wave-on-hover">Wispr Stories</a>
+          &mdash; made for
+          <a
+            href="https://wisprflow.ai?ref=wispr-stories"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-wave wave-on-hover"
+            >Wispr Flow</a
+          >
+        </p>
+        <span data-i18n="footer.independent">Independent project &middot; Not affiliated with Wispr Flow</span>
+        <span class="footer-copyright">&copy; 2026 <span class="footer-sep" aria-hidden="true">|</span><script src="footer-menu.js"></script></span>
+        
+      </footer>
+    </div>
+    <!-- /shell -->
+
+    <div class="share-modal" id="shareModal">
+      <div class="share-modal-backdrop" id="shareBackdrop"></div>
+      <div class="share-modal-content">
+        <button class="share-modal-close" id="shareClose">&times;</button>
+        <div class="share-modal-title" data-i18n="shareModal.title">Share your card</div>
+        <p class="share-modal-sub" data-i18n="shareModal.sub">
+          Post the image directly, or share the app link so others can make
+          their own cards.
+        </p>
+        <div class="share-modal-preview" id="sharePreview"></div>
+        <div class="share-modal-actions">
+          <button
+            class="share-modal-btn"
+            id="shareNative"
+            style="display: none"
+          >
+            <i class="fas fa-share-nodes"></i> <span data-i18n="shareModal.native">Share to apps</span>
+          </button>
+          <button class="share-modal-btn" id="shareDownload">
+            <i class="fas fa-download"></i> <span data-i18n="shareModal.download">Download card image</span>
+          </button>
+          <button class="share-modal-btn" id="shareCopyLink">
+            <i class="fas fa-link"></i> <span data-i18n="shareModal.copyLink">Copy image link</span>
+          </button>
+          <button class="share-modal-btn" id="shareCopyImage">
+            <i class="fas fa-copy"></i> <span data-i18n="shareModal.copyImage">Copy image</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- UPGRADE MODAL -->
+    <div class="upgrade-modal" id="upgradeModal">
+      <div class="upgrade-modal-backdrop" id="upgradeBackdrop"></div>
+      <div class="upgrade-modal-content">
+        <button class="upgrade-modal-close" id="upgradeClose">&#10005;</button>
+        <div class="upgrade-modal-icon">&#10024;</div>
+        <div class="upgrade-modal-title" data-i18n="upgradeModal.title">Upgrade to Pro</div>
+        <p class="upgrade-modal-sub" data-i18n="upgradeModal.sub">
+          Unlimited tone rewrites. No more daily limits.
+        </p>
+        <a
+          class="upgrade-modal-btn upgrade-modal-btn-primary"
+          href="https://buymeacoffee.com"
+          target="_blank"
+          rel="noopener"
+          data-i18n="upgradeModal.buyCoffee"
+          >&#9749; Buy me a coffee</a
+        >
+        <div class="upgrade-modal-divider" data-i18n="upgradeModal.or">&#8212; or &#8212;</div>
+        <p class="upgrade-modal-label" data-i18n="upgradeModal.haveKey">Already have a supporter key?</p>
+        <div class="upgrade-modal-row">
+          <input
+            class="upgrade-modal-input"
+            id="upgradeKeyInput"
+            aria-label="Supporter key"
+            data-i18n-placeholder="upgradeModal.keyPlaceholder"
+            placeholder="Paste your key..."
+          />
+          <button class="upgrade-modal-btn" id="upgradeKeyGo" data-i18n="upgradeModal.go">Go</button>
+        </div>
+        <div id="upgradeKeyMsg" class="upgrade-modal-msg"></div>
+        <p class="upgrade-modal-label lost-key" data-i18n="upgradeModal.lostKey">Lost your key?</p>
+        <div class="upgrade-modal-row">
+          <input
+            class="upgrade-modal-input"
+            id="upgradeEmailInput"
+            type="email"
+            aria-label="Email to recover your key"
+            data-i18n-placeholder="upgradeModal.emailPlaceholder"
+            placeholder="Enter your email"
+          />
+          <button
+            class="upgrade-modal-btn"
+            id="upgradeEmailGo"
+            aria-label="Send recovery email"
+            data-i18n="upgradeModal.emailSend"
+          >
+            &#8599;
+          </button>
+        </div>
+        <div id="upgradeEmailMsg" class="upgrade-modal-msg"></div>
+        <p class="upgrade-modal-disclaimer" data-i18n="upgradeModal.disclaimer">Wispr Stories &mdash; made for Wispr Flow</p>
+      </div>
+    </div>
+
+    <!-- CAPACITY PAGE -->
+    <div class="capacity-page" id="capacityPage">
+      <div class="capacity-page-content">
+        <div class="capacity-page-icon">&#10084;</div>
+        <h1 class="capacity-page-title" data-i18n="capacity.title">We're overwhelmed with love!</h1>
+        <p class="capacity-page-text" data-i18n="capacity.text">
+          Thank you for the incredible response. We've reached our daily capacity and need to give our servers a little rest.
+        </p>
+        <p class="capacity-page-reset" id="capacityResetText" data-i18n="capacity.reset">
+          We'll be back at midnight UTC.
+        </p>
+        <div class="capacity-page-actions">
+          <button class="capacity-page-btn" id="capacityNotifyBtn" onclick="window.location.reload()" data-i18n="capacity.btn">
+            Check if we're back
+          </button>
+        </div>
+        <p class="capacity-page-footer">
+          Wispr Stories &mdash; made for <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener"><strong><em>Wispr Flow</em></strong></a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ONBOARDING BANNER -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+      <div class="onboarding-banner" id="onboardingBanner">
+        <button class="onboarding-close" id="onboardingClose" aria-label="Dismiss">&#10005;</button>
+        <div class="onboarding-header">
+          <div class="onboarding-icon">&#127908;</div>
+          <h2 class="onboarding-title" data-i18n="onboarding.title">Welcome to Wispr Stories</h2>
+        </div>
+        <div class="onboarding-steps">
+          <div class="onboarding-step">
+            <span class="onboarding-step-num">1</span>
+            <div class="onboarding-step-text" data-i18n="onboarding.step1">
+              <strong>Speak or type</strong> your message. Tap the microphone or paste text.
+            </div>
+          </div>
+          <div class="onboarding-step">
+            <span class="onboarding-step-num">2</span>
+            <div class="onboarding-step-text" data-i18n="onboarding.step2">
+              <strong>Customize</strong> your card — choose a tone, color, and corner style.
+            </div>
+          </div>
+          <div class="onboarding-step">
+            <span class="onboarding-step-num">3</span>
+            <div class="onboarding-step-text" data-i18n="onboarding.step3">
+              <strong>Create &amp; share</strong> — download as PNG or share directly on social platforms.
+            </div>
+          </div>
+        </div>
+        <div class="onboarding-footer">
+          <button class="onboarding-btn onboarding-btn-primary" id="onboardingGotIt" data-i18n="onboarding.gotIt">
+            Got it — let's go!
+          </button>
+          <p class="onboarding-hint" data-i18n="onboarding.hint">
+            Need help later? Tap the <i class="fa-solid fa-circle-question"></i> icon in the top bar.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="export-progress" id="exportProgress">
+      <div class="export-progress-bar"></div>
+      <span class="export-progress-text">Generating card&hellip;</span>
+    </div>
+
+    <div class="mobile-bar" id="mobileBar" aria-label="Card actions">
+      <div class="mobile-bar-left">
+        <button class="mobile-bar-btn mobile-bar-btn-create" id="mobileBtnC">
+          <i class="fas fa-wand-sparkles"></i>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.create">Create</span>
+        </button>
+        <button class="mobile-bar-btn mobile-bar-btn-share" id="mobileBtnS" disabled>
+          <i class="fas fa-share-nodes"></i>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.share">Share</span>
+        </button>
+      </div>
+      <div class="mobile-bar-right" id="mobileBarRight" style="display: none">
+        <span class="mobile-bar-rewrite-text" id="mobileRewriteText"></span>
+        <button class="mobile-bar-btn mobile-bar-btn-upgrade" id="mobileBtnUpgrade">
+          <i class="fas fa-mug-hot"></i>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.upgrade">Upgrade</span>
+        </button>
+      </div>
+    </div>
+
+    <script src="assets/i18n/i18n.js"></script>
+    <script src="assets/languages/languages-loader.js"></script>
+    <script src="global/occasions/examples-loader.js"></script>
+    <script src="global/occasions/occasions.js"></script>
+    <script src="fonts.js"></script>
+    <script src="wisprstories.js?v=20260519-v0.7.0"></script>
+    <script src="global/demo.js"></script>
+  </body>
+</html>

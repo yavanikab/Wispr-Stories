@@ -94,7 +94,7 @@ export default async function handler(req) {
       });
     }
 
-    const prompt = `${TONE_PROMPTS[tone]} Return ONLY the rewritten text, under 150 characters.`;
+    const prompt = `${TONE_PROMPTS[tone]} Keep it under 150 characters. Return ONLY the rewritten text, no quotes or commentary.\n\nOriginal message: "${text}"`;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
