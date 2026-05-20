@@ -15,7 +15,8 @@
     "label": "1 · Appuyez pour parler",
     "tip": "Appuyez sur enregistrer et parlez naturellement. Vos mots apparaissent en direct. Appuyez à nouveau pour arrêter — vos mots passent dans la zone de texte prêts pour la carte.",
     "status": "Appuyez pour parler",
-    "sub": "Vos mots apparaissent pendant que vous parlez"
+    "sub": "Vos mots apparaissent pendant que vous parlez",
+    "generating": "Generating…"
   },
   "orText": "ou tapez ou collez vos mots",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Ton",
-    "tip": "Change la façon dont vos mots se ressentent sur la carte. Chaleureux est doux. Audacieux est direct. Poétique coule avec rythme. Ludique est léger. Réfléchi est lent. Honnête est brut. Change uniquement l'espacement et l'inclinaison — pas la taille ni le poids.",
+    "tip": "Original: your exact words, unlimited. Change la façon dont vos mots se ressentent sur la carte. Chaleureux est doux. Audacieux est direct. Poétique coule avec rythme. Ludique est léger. Réfléchi est lent. Honnête est brut. Change uniquement l'espacement et l'inclinaison — pas la taille ni le poids.",
     "original": "Original",
     "warm": "Chaleureux",
     "bold": "Audacieux",
     "poetic": "Poétique",
     "playful": "Ludique",
     "reflective": "Réfléchi",
-    "honest": "Honnête"
+    "honest": "Honnête",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Couleur de la carte",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Créer la carte",
-    "share": "Partager la carte"
+    "share": "Partager la carte",
+    "createTone": "Create {tone} card"
   },
   "closing": "Votre voix, magnifiquement partagée",
   "preview": {

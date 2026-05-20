@@ -15,7 +15,8 @@
     "label": "1 · Tryck för att tala",
     "tip": "Tryck på spela in och tala naturligt. Dina ord visas live. Tryck igen för att stoppa — dina ord flyttas till textrutan redo för kortet.",
     "status": "Tryck för att tala",
-    "sub": "Dina ord visas medan du talar"
+    "sub": "Dina ord visas medan du talar",
+    "generating": "Generating…"
   },
   "orText": "eller skriv eller klistra in dina ord",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Ton",
-    "tip": "Ändrar hur dina ord känns på kortet. Varm är mjuk. Djärv är direkt. Poetisk flyter med rytm. Lekfull är lätt. Reflekterande är långsam. Ärlig är rå. Ändrar endast teckenavstånd och lutning — inte storlek eller vikt.",
+    "tip": "Original: your exact words, unlimited. Ändrar hur dina ord känns på kortet. Varm är mjuk. Djärv är direkt. Poetisk flyter med rytm. Lekfull är lätt. Reflekterande är långsam. Ärlig är rå. Ändrar endast teckenavstånd och lutning — inte storlek eller vikt.",
     "original": "Original",
     "warm": "Varm",
     "bold": "Djärv",
     "poetic": "Poetisk",
     "playful": "Lekfull",
     "reflective": "Reflekterande",
-    "honest": "Ärlig"
+    "honest": "Ärlig",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Kortfärg",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Skapa kort",
-    "share": "Dela kort"
+    "share": "Dela kort",
+    "createTone": "Create {tone} card"
   },
   "closing": "Din röst, vackert delad",
   "preview": {

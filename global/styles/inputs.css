@@ -342,19 +342,23 @@
   color: #fbbf24;
 }
 .tone-upgrade-link {
-  font-size: 11px;
-  color: var(--ink2);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  white-space: nowrap;
-  cursor: pointer;
-  background: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: #f59e0b;
   border: none;
-  padding: 0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.1s;
 }
 .tone-upgrade-link:hover {
-  color: var(--ink);
+  background: #e69500;
+}
+.tone-upgrade-link:active {
+  transform: scale(0.96);
 }
 
 /* PALETTE */

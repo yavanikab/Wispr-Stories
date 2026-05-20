@@ -15,7 +15,8 @@
     "label": "1 · Konuşmak için dokunun",
     "tip": "Kaydet'e basın ve doğal bir şekilde konuşun. Kelimeleriniz canlı olarak görünür. Durdurmak için tekrar dokunun — kelimeleriniz kart için hazır metin kutusuna taşınır.",
     "status": "Konuşmak için dokunun",
-    "sub": "Konuşurken kelimeleriniz görünür"
+    "sub": "Konuşurken kelimeleriniz görünür",
+    "generating": "Generating…"
   },
   "orText": "veya kelimelerinizi yazın veya yapıştırın",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Ton",
-    "tip": "Kelimelerinizin kartta nasıl hissettirdiğini değiştirir. Sıcak naziktir. Cesur doğrudandır. Şiirsel ritimle akar. Oyuncu hafiftir. Düşünceli yavaştır. Dürüst hamdır. Yalnızca harf aralığını ve eğimi değiştirir — boyut veya kalınlık değil.",
+    "tip": "Original: your exact words, unlimited. Kelimelerinizin kartta nasıl hissettirdiğini değiştirir. Sıcak naziktir. Cesur doğrudandır. Şiirsel ritimle akar. Oyuncu hafiftir. Düşünceli yavaştır. Dürüst hamdır. Yalnızca harf aralığını ve eğimi değiştirir — boyut veya kalınlık değil.",
     "original": "Orijinal",
     "warm": "Sıcak",
     "bold": "Cesur",
     "poetic": "Şiirsel",
     "playful": "Oyuncu",
     "reflective": "Düşünceli",
-    "honest": "Dürüst"
+    "honest": "Dürüst",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Kart rengi",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Kart oluştur",
-    "share": "Kart paylaş"
+    "share": "Kart paylaş",
+    "createTone": "Create {tone} card"
   },
   "closing": "Sesiniz, güzelce paylaşıldı",
   "preview": {

@@ -132,7 +132,11 @@ function renderRandomExamples() {
     btn.setAttribute('data-name', 'Yourname');
     btn.setAttribute('data-tone', tone);
     btn.setAttribute('data-p', palette);
-    btn.setAttribute('data-lang', item.lang.lang_code);
+    // Convert locale code (e.g., "fr-FR") to short code (e.g., "fr")
+    // to match allLanguages[].code in assets/languages/languages.json
+    const shortCode = item.lang.lang_code.split('-')[0];
+
+    btn.setAttribute('data-lang', shortCode);
 
     const flagHtml = `<i class="fi fi-${item.lang.flag_code}" aria-hidden="true"></i>`;
     const isOccasion = item.type === 'occasion';

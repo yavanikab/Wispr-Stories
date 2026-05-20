@@ -15,7 +15,8 @@
     "label": "1 · 点击说话",
     "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止 — 你的文字将移入文本框准备制作卡片。",
     "status": "点击说话",
-    "sub": "你说话时文字会出现"
+    "sub": "你说话时文字会出现",
+    "generating": "Generating…"
   },
   "orText": "或输入或粘贴你的文字",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · 语气",
-    "tip": "改变你的文字在卡片上的感觉。温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是质朴的。只改变字间距和倾斜度 — 不改变大小或粗细。",
+    "tip": "Original: your exact words, unlimited. 改变你的文字在卡片上的感觉。温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是质朴的。只改变字间距和倾斜度 — 不改变大小或粗细。",
     "original": "原始",
     "warm": "温暖",
     "bold": "大胆",
     "poetic": "诗意",
     "playful": "活泼",
     "reflective": "反思",
-    "honest": "诚实"
+    "honest": "诚实",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · 卡片颜色",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "创建卡片",
-    "share": "分享卡片"
+    "share": "分享卡片",
+    "createTone": "Create {tone} card"
   },
   "closing": "你的声音，美好地分享",
   "preview": {

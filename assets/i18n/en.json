@@ -15,7 +15,8 @@
     "label": "1 · Tap to speak",
     "tip": "Press record and speak naturally. Your words appear live. Tap again to stop — your words move into the text box ready for the card.",
     "status": "Tap to speak",
-    "sub": "Your words appear as you speak"
+    "sub": "Your words appear as you speak",
+    "generating": "Generating…"
   },
   "orText": "or type or paste your words",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Tone",
-    "tip": "Changes how your words feel on the card. Warm is gentle. Bold is direct. Poetic flows with rhythm. Playful is light. Reflective is slow. Honest is raw. Changes letter-spacing and slant only — not size or weight.",
+    "tip": "Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: Warm is gentle, Bold is direct, Poetic flows with rhythm, Playful is light, Reflective is slow, Honest is raw. Changes letter-spacing and slant only — not size or weight.",
     "original": "Original",
     "warm": "Warm",
     "bold": "Bold",
     "poetic": "Poetic",
     "playful": "Playful",
     "reflective": "Reflective",
-    "honest": "Honest"
+    "honest": "Honest",
+    "rewriting": "Rewriting…"
   },
   "color": {
     "label": "4 · Card color",
@@ -63,12 +65,13 @@
   "shape": {
     "label": "5 · Shape",
     "tip": "Sharp edges work best for WhatsApp. Rounded corners suit galleries and web.",
-    "sharp": "Sharp edges",
+    "sharp": "Sharp corners",
     "rounded": "Rounded corners"
   },
   "actions": {
     "create": "Create card",
-    "share": "Share card"
+    "share": "Share card",
+    "createTone": "Create {tone} card"
   },
   "closing": "Your voice, beautifully shared",
   "preview": {

@@ -15,7 +15,8 @@
     "label": "1 · Ketuk untuk berbicara",
     "tip": "Tekan rekam dan berbicaralah secara alami. Kata-kata Anda muncul secara langsung. Ketuk lagi untuk berhenti — kata-kata Anda pindah ke kotak teks siap untuk kartu.",
     "status": "Ketuk untuk berbicara",
-    "sub": "Kata-kata Anda muncul saat Anda berbicara"
+    "sub": "Kata-kata Anda muncul saat Anda berbicara",
+    "generating": "Generating…"
   },
   "orText": "atau ketik atau tempel kata-kata Anda",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Nada",
-    "tip": "Mengubah bagaimana kata-kata Anda terasa di kartu. Hangat itu lembut. Berani itu langsung. Puitis mengalir dengan irama. Ceria itu ringan. Reflektif itu lambat. Jujur itu mentah. Mengubah hanya jarak huruf dan kemiringan — bukan ukuran atau berat.",
+    "tip": "Original: your exact words, unlimited. Mengubah bagaimana kata-kata Anda terasa di kartu. Hangat itu lembut. Berani itu langsung. Puitis mengalir dengan irama. Ceria itu ringan. Reflektif itu lambat. Jujur itu mentah. Mengubah hanya jarak huruf dan kemiringan — bukan ukuran atau berat.",
     "original": "Asli",
     "warm": "Hangat",
     "bold": "Berani",
     "poetic": "Puitis",
     "playful": "Ceria",
     "reflective": "Reflektif",
-    "honest": "Jujur"
+    "honest": "Jujur",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Warna kartu",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Buat kartu",
-    "share": "Bagikan kartu"
+    "share": "Bagikan kartu",
+    "createTone": "Create {tone} card"
   },
   "closing": "Suara Anda, dibagikan dengan indah",
   "preview": {

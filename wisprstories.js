@@ -347,7 +347,7 @@ function applyTone(tone) {
   function hidePill() { wrap.style.display = "none"; }
 
   if (tone === "original") {
-    btn.textContent = "Create card";
+    btn.textContent = typeof getI18nSync === "function" ? getI18nSync("actions.create") : "Create card";
     if (limitReached) {
       if (isMobile) {
         hidePill();
@@ -361,8 +361,9 @@ function applyTone(tone) {
       hidePill();
     }
   } else {
-    const label = tone.charAt(0).toUpperCase() + tone.slice(1);
-    btn.textContent = "Create " + label + " card";
+    const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone.charAt(0).toUpperCase() + tone.slice(1);
+    const createToneTpl = typeof getI18nSync === "function" ? getI18nSync("actions.createTone") : "Create {tone} card";
+    btn.textContent = createToneTpl.replace("{tone}", toneLabel);
     if (isSupporter()) {
       showPill();
       pill.textContent = "\u221E Unlimited \u2014 no daily cap";
@@ -923,16 +924,22 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   // Show loading state on card
   const cardText = document.getElementById("cardText");
   const prevText = cardText.textContent;
-  cardText.textContent = "Rewriting...";
+  const rewritingLabel = typeof getI18nSync === "function" ? getI18nSync("tone.rewriting") : "Rewriting...";
+  cardText.textContent = rewritingLabel;
   cardText.classList.add("mt");
 
   try {
     const sessionId = localStorage.getItem("wsSessionId") || "anon";
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     const res = await fetch("/api/rewrite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, tone, sessionId, isPro }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       const err = await res.json();
@@ -965,7 +972,11 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     showRewritePreview(text, data.text, tone);
   } catch (err) {
     console.error("[Rewrite] Error:", err);
-    showToast("Rewrite failed — showing original");
+    if (err.name === "AbortError") {
+      showToast("Rewrite timed out — showing original");
+    } else {
+      showToast("Rewrite failed — showing original");
+    }
     cardText.textContent = prevText;
     cardText.classList.remove("mt");
     applyTone(tone);
@@ -1558,7 +1569,8 @@ let _shareBlob = null;
 document.getElementById("btnS").addEventListener("click", async () => {
   if (!cardReady) { document.getElementById("btnC").click(); return; }
   const btn = document.getElementById("btnS");
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating\u2026';
+  const generatingLabel = typeof getI18nSync === "function" ? getI18nSync("shareModal.generating") : "Generating\u2026";
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + generatingLabel;
   btn.disabled = true;
   try {
     await window.ensureHtml2canvas();

@@ -15,7 +15,8 @@
     "label": "1 · Toque para falar",
     "tip": "Pressione gravar e fale naturalmente. Suas palavras aparecem ao vivo. Toque novamente para parar — suas palavras vão para a caixa de texto prontas para o cartão.",
     "status": "Toque para falar",
-    "sub": "Suas palavras aparecem enquanto você fala"
+    "sub": "Suas palavras aparecem enquanto você fala",
+    "generating": "Generating…"
   },
   "orText": "ou digite ou cole suas palavras",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Tom",
-    "tip": "Muda como suas palavras se sentem no cartão. Quente é suave. Ousado é direto. Poético flui com ritmo. Divertido é leve. Reflexivo é lento. Honesto é cru. Muda apenas o espaçamento e a inclinação — não o tamanho ou peso.",
+    "tip": "Original: your exact words, unlimited. Muda como suas palavras se sentem no cartão. Quente é suave. Ousado é direto. Poético flui com ritmo. Divertido é leve. Reflexivo é lento. Honesto é cru. Muda apenas o espaçamento e a inclinação — não o tamanho ou peso.",
     "original": "Original",
     "warm": "Quente",
     "bold": "Ousado",
     "poetic": "Poético",
     "playful": "Divertido",
     "reflective": "Reflexivo",
-    "honest": "Honesto"
+    "honest": "Honesto",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Cor do cartão",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Criar cartão",
-    "share": "Compartilhar cartão"
+    "share": "Compartilhar cartão",
+    "createTone": "Create {tone} card"
   },
   "closing": "Sua voz, lindamente compartilhada",
   "preview": {

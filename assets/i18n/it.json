@@ -15,7 +15,8 @@
     "label": "1 · Tocca per parlare",
     "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare — le tue parole si spostano nella casella di testo pronte per la card.",
     "status": "Tocca per parlare",
-    "sub": "Le tue parole appaiono mentre parli"
+    "sub": "Le tue parole appaiono mentre parli",
+    "generating": "Generating…"
   },
   "orText": "o digita o incolla le tue parole",
   "textarea": {
@@ -37,14 +38,15 @@
   },
   "tone": {
     "label": "3 · Tono",
-    "tip": "Cambia come le tue parole si sentono sulla card. Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
+    "tip": "Original: your exact words, unlimited. Cambia come le tue parole si sentono sulla card. Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
     "original": "Originale",
     "warm": "Caldo",
     "bold": "Audace",
     "poetic": "Poetico",
     "playful": "Giocoso",
     "reflective": "Riflessivo",
-    "honest": "Onesto"
+    "honest": "Onesto",
+    "rewriting": "Rewriting..."
   },
   "color": {
     "label": "4 · Colore della card",
@@ -68,7 +70,8 @@
   },
   "actions": {
     "create": "Crea card",
-    "share": "Condividi card"
+    "share": "Condividi card",
+    "createTone": "Create {tone} card"
   },
   "closing": "La tua voce, magnificamente condivisa",
   "preview": {
