@@ -49,9 +49,9 @@
 - [x] Create `api/limits.js` — server-side limit enforcement
 - [x] Wire client-side limit checks before recording (calls /api/limits)
 - [x] Enforce 5 rec/day free, 50 rec/day Pro (server-side via Redis)
-- [ ] Enforce 15s max recording length (client + server)
-- [ ] Pro tier: 50 recordings/day, 30s max, 15 min cumulative
-- [ ] Show remaining recordings counter on UI
+- [x] Enforce 15s max recording length (client + server)
+- [x] Pro tier: 50 recordings/day, 30s max, 15 min cumulative
+- [x] Show remaining recordings counter on UI
 
 ## Phase 5: Silence Detection
 
