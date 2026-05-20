@@ -1,6 +1,6 @@
 export const config = { runtime: 'edge' };
 
-import { getRedis, KEYS, secondsUntilMidnightUTC } from '../../lib/redis.js';
+import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 
 const FREE_MAX_RECORDINGS = 5;
 const PRO_MAX_RECORDINGS = 50;
