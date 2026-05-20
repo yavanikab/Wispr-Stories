@@ -85,7 +85,7 @@ export default async function handler(req) {
       }
     }
 
-    // Call OpenRouter with DeepSeek V4 Flash Free
+    // Call OpenRouter with MiniMax M2.5 Free
     const openrouterKey = process.env.OPENROUTER_API_KEY;
     if (!openrouterKey) {
       return new Response(JSON.stringify({ error: 'Server not configured' }), {
@@ -94,7 +94,7 @@ export default async function handler(req) {
       });
     }
 
-    const prompt = `${TONE_PROMPTS[tone]} Keep it under 150 characters. Original: "${text}"`;
+    const prompt = `${TONE_PROMPTS[tone]} Return ONLY the rewritten text, under 150 characters.`;
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -105,11 +105,11 @@ export default async function handler(req) {
         'X-Title': 'Wispr Stories',
       },
       body: JSON.stringify({
-        model: 'deepseek/deepseek-v4-flash',
+        model: 'minimax/minimax-m2.5:free',
         messages: [
           {
             role: 'system',
-            content: 'You are a tone rewriter for voice greeting cards. Rewrite the given text in the specified tone. Keep it under 150 characters. Return ONLY the rewritten text, nothing else.',
+            content: 'You rewrite short voice messages into greeting cards with specific tones. Return ONLY the rewritten text.',
           },
           { role: 'user', content: prompt },
         ],
