@@ -29,9 +29,9 @@
 
 ## Phase 2: Upstash Redis Setup
 
-- [ ] Create Upstash Redis database (Vercel integration)
-- [ ] Add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to Vercel env vars
-- [ ] Install `@upstash/redis` package
+- [x] Create Upstash Redis database (Vercel integration)
+- [x] Add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to Vercel env vars
+- [x] Install `@upstash/redis` package
 - [x] Create `lib/redis.js` — shared Redis client
 
 ## Phase 3: Daily User Cap (99 Users)

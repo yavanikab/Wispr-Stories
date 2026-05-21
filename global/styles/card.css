@@ -68,15 +68,17 @@
   position: absolute;
   inset: 0;
   z-index: 3;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 18px;
   padding: 24px;
   pointer-events: none;
 }
 .card-empty .card-empty-state {
   display: flex;
 }
-.card-empty-state span {
+.card-empty-state .card-empty-prompt {
   font-family: var(--serif);
   font-size: clamp(16px, 2.2vw, 22px);
   font-style: italic;
@@ -84,6 +86,29 @@
   text-align: center;
   line-height: 1.6;
   max-width: 260px;
+}
+.card-empty-state .card-empty-quote {
+  font-family: var(--serif);
+  font-size: clamp(12px, 1.1vw, 14px);
+  font-style: italic;
+  color: var(--ink3);
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.55;
+  max-width: 240px;
+  letter-spacing: 0.01em;
+  position: relative;
+  padding-top: 14px;
+}
+.card-empty-state .card-empty-quote::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 1px;
+  background: var(--rule);
 }
 
 
