@@ -1,5 +1,42 @@
 # Version History
 
+## [Unreleased] — i18n cleanup + UI refinements + Remotion demo
+
+### 2026-05-22 — i18n English-leak cleanup + UI refinements
+- Removed English leaks (`tone.tip` prefix, `tone.rewriting`, `actions.createTone`, `record.generating`) in all 20 non-English locales: `de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh`
+- Brought `tone.tip` in sync with new English wording ("Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: ...")
+- Added `assets/i18n/NATIVE-REVIEW.md` — per-locale review checklist with confidence levels and per-string questions for native speakers
+- Decision: Arabic (`ar.json`) and Urdu (`ur.json`) intentionally excluded; total UI locales = 20 (older docs claiming 23 are stale)
+- Surfaced (not fixed): `shareModal.generating` vs `record.generating` key mismatch at `wisprstories.js:1845` causes silent English fallback on share-button spinner in all locales
+
+### 2026-05-21 — UI refinements + i18n loader sync helper
+- Added `getI18nSync()` in `i18n.js` for synchronous translation lookups outside the `data-i18n` flow
+- Removed page-hide-during-translation-load (3-second reveal timeout); English renders on first paint and swaps in when translations load
+- Unified notice system: one DOM slot, priority firefox > shared, per-type localStorage dismissal, re-localized on language change
+- Style chip summary in collapsed Style accordion header (live tone/color/shape display, re-localized on language change)
+- Name input: regex allows spaces / hyphens / underscores; max length raised 10 → 18 ("Lola Maria", "Mary-Anne" now valid)
+- Theme toggle: added `aria-pressed` for screen-reader state announcement
+- Record button labels (`recSt`, `recSub`) now read from i18n via `getI18nSync()` instead of hardcoded English
+- ~700 lines of CSS added across 11 style modules (largest: `inputs.css` +253, `card.css` +181) supporting the above
+
+### 2026-05-21 — Remotion promo demo
+- Isolated `remotion-demo/` React/Remotion project with `WisprStoriesPromo` composition (24s, 1080×1080)
+- Two audio-led variants: `WisprStoriesPromoSocial` (19.5s, `electronic-bass.mp3`) and `WisprStoriesPromoWarm` (26s, `warm-vinyl.mp3`); default `WisprStoriesPromo` points at warm
+- Editable variant config at `remotion-demo/src/demoVariants.js` (durations, scene timing, audio start trims, fade-outs, background glow intensity, brand display rules, final CTA copy)
+- Final exports at `remotion-demo/out/wispr-stories-promo-social.mp4` (4.0 MB) and `wispr-stories-promo-warm.mp4` (4.7 MB), both H.264/AAC 1080×1080
+- Visual direction: compact card-forward concept with Wispr Stories cream/ink/amber palette, real logo, logo-first intro, final CTA screen
+- Verified with 11 passing tests (`node --test test/storyPlan.test.mjs`) and visual stills checked at key frames
+
+## v0.9.3 — Rewrite language fidelity + UI-language decoupling (2026-05-22)
+- Rewrite API (`api/rewrite.js`) now classifies the input script (`detectScript()` returns one of `Japanese`, `Korean`, `Chinese`, `Devanagari (Hindi/Marathi)`, `Bengali`, `Gurmukhi (Punjabi)`, `Gujarati`, `Oriya`, `Tamil`, `Telugu`, `Kannada`, `Malayalam`, `Thai`, `Arabic`, `Cyrillic`, `Greek`, or `Latin`) and embeds the name into a positive `LANGUAGE RULE` so Tamil/Telugu/etc. inputs stay in their native script and English inputs stay in English. System message hardened with "ALWAYS respond in the exact same language and script as the input. You never translate or transliterate."
+- Replaced the legacy `hasNonLatinScript()` one-sided guard ("don't convert Hinglish to Devanagari") that gave the LLM no positive instruction when input was already in a native script. Japanese is checked before Chinese so pure-Kanji Japanese isn't misclassified.
+- Redis cache key now includes `PROMPT_VERSION = 'v2'` (`wispr:rewrites:cache:v2:${tone}:${hash}`). Any future prompt change just bumps the constant; orphaned old entries expire on their own 24h TTL with no manual flush.
+- Client abort timeout in `wisprstories.js` raised 15s → 25s so the server's own 20s OpenRouter response (success or error) always reaches the client. Eliminates `AbortError: signal is aborted without reason` for slow free-model responses.
+- Decoupled card-display language from page-UI language. `autoDetectLangFromText()` no longer writes `localStorage.wsLang`, and `loadDraft()` no longer calls `setLanguageByCode(draft.lang)`. Picking a Telugu/Tamil/etc. example sentence updates the card font + label but no longer flips the entire page UI on reload. `wsLang` is now exclusively owned by the language dropdown / `loadLanguages` initial read.
+- `tryAutoDetectLang` draft early-return at `wisprstories.js:1454` intentionally preserved — removing it would resurrect a pre-existing dormant bug where `navigator.language` clobbers the user's manual dropdown choice.
+- Script cache-buster in `wisprstories.html` bumped `v=20260521-v0.9.2` → `v=20260522-v0.9.3`.
+- Paid fallback model (`inclusionai/ling-2.6-flash`) remains commented at `api/rewrite.js:175` per existing "uncomment before Vercel deploy" convention.
+
 ## v0.8.0 — Silence Detection + Tone Rewriting Preview + i18n (23 Languages)
 - Silence detection: Web Audio API RMS check on Deepgram fallback recordings
 - RMS < 0.01 over 2s = silence; prevents silent audio from hitting API (~20% savings)

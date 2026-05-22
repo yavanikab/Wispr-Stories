@@ -217,18 +217,11 @@
     "normal_example": "Ang mga salitang mula sa puso ay lumilikha ng walang malilimutang alaala."
   },
   {
-    "id": "hi-Latn",
-    "lang_code": "hi-Latn",
-    "lang_name": "Hinglish",
-    "flag_code": "in",
-    "normal_example": "Dil se bole gaye shabd sabse sundar yaadein banate hain."
-  },
-  {
     "id": "hi-IN-mixed",
     "lang_code": "hi-IN",
-    "lang_name": "Mixed Script",
+    "lang_name": "Hinglish",
     "flag_code": "in",
-    "normal_example": "दिल से बोले गए शब्द create lasting memories that never fade."
+    "normal_example": "dil se bole gaye shabd create lasting memories that never fade."
   },
   {
     "id": "ta-IN",

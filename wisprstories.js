@@ -64,9 +64,10 @@ function autoDetectLangFromText(text) {
   const detectedCode = SCRIPT_TO_LANG[script];
   if (!detectedCode || detectedCode === curLang) return;
   // Only update curLang for the card label — DO NOT change page UI language
-  // setLanguageByCode() triggers applyI18n() which overwrites card text
+  // and DO NOT persist to wsLang. wsLang is owned by the language dropdown;
+  // writing here would cause the UI to flip to the example's language on the
+  // next page load.
   curLang = detectedCode;
-  localStorage.setItem("wsLang", detectedCode);
 }
 
 function getLanguageName(code) {
@@ -106,11 +107,59 @@ let usingWhisper = false,
 
 const isFF = navigator.userAgent.toLowerCase().includes("firefox");
 if (isFF) {
-  document.getElementById("ffNotice").classList.add("show");
   const rb = document.getElementById("recBtn");
   rb.style.opacity = ".35";
   rb.style.pointerEvents = "none";
 }
+
+// Unified notice system — one slot, one message at a time, dismissable.
+// Priority: Firefox warning beats shared-link CTA (the functional/blocking
+// notice wins over the informational one). Dismissal persists per-type
+// in localStorage so users don't see the same banner twice.
+function showNotice(type) {
+  if (localStorage.getItem("noticeDismissed:" + type) === "1") return;
+  const el = document.getElementById("notice");
+  const txt = document.getElementById("noticeText");
+  if (!el || !txt) return;
+  const tr = (key) => (typeof getI18nSync === "function" ? getI18nSync(key) : null);
+  let html = "";
+  if (type === "firefox") {
+    html = tr("ffNotice") ||
+      "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.";
+  } else if (type === "shared") {
+    html = tr("sharedCta") ||
+      "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.";
+  } else {
+    return;
+  }
+  txt.innerHTML = html;
+  el.dataset.noticeType = type;
+  el.hidden = false;
+}
+function dismissNotice() {
+  const el = document.getElementById("notice");
+  const type = el?.dataset.noticeType;
+  if (type) localStorage.setItem("noticeDismissed:" + type, "1");
+  if (el) el.hidden = true;
+}
+document.getElementById("noticeDismiss")?.addEventListener("click", dismissNotice);
+
+// Pick the highest-priority notice for this session.
+if (isFF) {
+  showNotice("firefox");
+} else if (location.hash && location.hash.length > 1) {
+  try {
+    const params = new URLSearchParams(location.hash.slice(1));
+    if (params.get("text")) showNotice("shared");
+  } catch (e) {
+    /* malformed hash — no notice */
+  }
+}
+// Re-localize notice text when the user changes language.
+document.addEventListener("languagesReady", function () {
+  const el = document.getElementById("notice");
+  if (el && !el.hidden && el.dataset.noticeType) showNotice(el.dataset.noticeType);
+});
 
 function saveDraft() {
   try {
@@ -135,14 +184,17 @@ function loadDraft() {
     if (!raw) return false;
     const draft = JSON.parse(raw);
     if (draft.text) document.getElementById("sta").value = draft.text;
-    if (draft.name) document.getElementById("nin").value = String(draft.name).replace(/[^\p{L}]/gu, "").slice(0, 10);
+    if (draft.name) document.getElementById("nin").value = String(draft.name).replace(/[^\p{L} _-]/gu, "").slice(0, 18);
     inputSource = draft.inputSource === "voice" ? "voice" : "story";
     if (draft.tone) applyTone(draft.tone);
     if (draft.palette != null) applyPal(draft.palette);
     if (draft.lang) {
+      // Restore card-display language only. Do NOT call setLanguageByCode —
+      // that runs applyI18n() and would flip the entire page UI to the
+      // language of whatever example sentence the user last clicked.
+      // Page UI language is owned by the dropdown / loadLanguages init.
       curLang = draft.lang;
       isRTL = draft.isRTL || false;
-      window.setLanguageByCode(draft.lang);
     }
     if (draft.rounded != null) {
       useRounded = draft.rounded;
@@ -190,6 +242,36 @@ function wave(text) {
   }
 }
 
+// Update the live chip summary in the Style accordion's collapsed header.
+// Reflects the user's current tone / color / shape selections so the
+// collapsed state never feels like state-loss. Reversible: remove this
+// function (and its three call sites in applyTone, applyPal, and the
+// roundness click handler) to restore the prior static "Tone · color ·
+// shape" hint.
+function updateStyleChipSummary() {
+  try {
+    const tr = (key, fallback) => {
+      if (typeof getI18nSync === 'function') {
+        const v = getI18nSync(key);
+        if (v) return v;
+      }
+      return fallback;
+    };
+    const tEl = document.getElementById('czChipTone');
+    const swEl = document.getElementById('czChipSwatch');
+    const cNameEl = document.getElementById('czChipColorName');
+    const shEl = document.getElementById('czChipShape');
+    if (tEl) tEl.textContent = tr('tone.' + curTone, curTone);
+    if (swEl && PALS[curP]) swEl.style.background = PALS[curP];
+    if (cNameEl && PAL_NAMES[curP]) {
+      cNameEl.textContent = tr('color.' + PAL_NAMES[curP], PAL_NAMES[curP]);
+    }
+    if (shEl) shEl.textContent = tr(useRounded ? 'shape.rounded' : 'shape.sharp', useRounded ? 'Rounded' : 'Sharp');
+  } catch (e) {
+    /* silent — chip summary is cosmetic, must not break the form */
+  }
+}
+
 function applyPal(idx) {
   if (isNaN(idx) || idx < 0 || idx >= PALS.length) return;
   curP = idx;
@@ -215,12 +297,16 @@ function applyPal(idx) {
   if (lt) lt.style.color = light ? "#1a1a1a" : "";
   const dm = document.querySelector(".card-domain");
   if (dm) dm.style.color = light ? "#555548" : "";
+  updateStyleChipSummary();
 }
 
 // Free-tier daily quota is enforced per tone (5 rewrites per tone per day).
 // Mirror of the server-side FREE_MAX_PER_TONE constant in api/rewrite.js.
 const FREE_MAX_PER_TONE = 5;
 const REWRITE_TONES = ["warm", "bold", "poetic", "playful", "reflective", "honest"];
+// In-memory cache of per-tone rewrite results to avoid redundant API calls.
+// Keyed by tone; entry: { text, original }. Cleared when source text changes.
+let rewriteCache = {};
 
 function getToneCounts() {
   const today = new Date().toDateString();
@@ -405,7 +491,7 @@ function applyTone(tone) {
   function hidePill() { wrap.style.display = "none"; }
 
   if (tone === "original") {
-    btn.textContent = typeof getI18nSync === "function" ? getI18nSync("actions.create") : "Create card";
+    btn.textContent = typeof getI18nSync === "function" ? getI18nSync("actions.create") || "Create card" : "Create card";
     // Only show "0 rewrites remaining" pill when ALL tones are exhausted.
     if (!isSupporter() && isAllTonesExhausted()) {
       if (isMobile) {
@@ -420,8 +506,8 @@ function applyTone(tone) {
       hidePill();
     }
   } else {
-    const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone.charAt(0).toUpperCase() + tone.slice(1);
-    const createToneTpl = typeof getI18nSync === "function" ? getI18nSync("actions.createTone") : "Create {tone} card";
+    const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) || tone.charAt(0).toUpperCase() + tone.slice(1) : tone.charAt(0).toUpperCase() + tone.slice(1);
+    const createToneTpl = typeof getI18nSync === "function" ? getI18nSync("actions.createTone") || "Create {tone} card" : "Create {tone} card";
     btn.textContent = createToneTpl.replace("{tone}", toneLabel);
     if (isSupporter()) {
       showPill();
@@ -447,6 +533,7 @@ function applyTone(tone) {
   }
   updateMobileBar();
   updateSourceLabel();
+  updateStyleChipSummary();
 }
 
 function updateSourceLabel() {
@@ -457,9 +544,9 @@ function updateSourceLabel() {
   const voiceIcon = "\u{1F399}\uFE0F";
   const storyIcon = "\u{1F58B}\uFE0F";
   if (isVoice) {
-    vl.textContent = voiceIcon + (isStyled ? " Voice Styles" : " Voice Original");
+    vl.textContent = voiceIcon + (isStyled ? " Voice Styled" : " Voice Original");
   } else {
-    vl.textContent = storyIcon + (isStyled ? " Story Styles" : " Story Original");
+    vl.textContent = storyIcon + (isStyled ? " Story Styled" : " Story Original");
   }
 }
 
@@ -502,7 +589,7 @@ function hideRewritePreview() {
   }
 }
 
-function updateCard() {
+function updateCard(preserveText) {
   const raw = document.getElementById("sta").value;
   const name = document.getElementById("nin").value.trim();
   const tx = document.getElementById("cardText");
@@ -525,7 +612,9 @@ function updateCard() {
     const t = TONES[curTone];
     const displayText = raw.length > 150 ? raw.slice(0, 150) + "..." : raw;
     tx.classList.remove("mt");
-    applyScriptFonts(tx, curTone, displayText);
+    if (!preserveText) {
+      applyScriptFonts(tx, curTone, displayText);
+    }
     tx.style.fontStyle = t.fi;
     tx.style.fontWeight = t.fw;
     tx.style.letterSpacing = t.ls;
@@ -912,9 +1001,10 @@ function finishRec() {
   recStartTime = null;
   usingWhisper = false;
   document.getElementById("recBtn").classList.remove("on");
-  document.getElementById("recSt").textContent = "Tap to speak";
+  document.getElementById("recSt").textContent =
+    (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
   document.getElementById("recSub").textContent =
-    "Your words appear live as you talk";
+    (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
   document.getElementById("recSub").classList.remove("live");
   if (fullTx.trim()) {
     document.getElementById("sta").value = fullTx.trim().slice(0, 150);
@@ -1035,6 +1125,8 @@ if (langSelEl) {
     isRTL = false;
     updateCard();
     saveDraft();
+    // Re-localize the Style chip summary to the new page language.
+    setTimeout(updateStyleChipSummary, 100);
   });
 }
 document.getElementById("toneRow").addEventListener("click", async (e) => {
@@ -1069,6 +1161,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   // Non-original tone — call rewrite API
   const text = document.getElementById("sta").value.trim();
   if (!text) return;
+  const cardText = document.getElementById("cardText");
 
   // Check if Pro user (skip limit check)
   const isPro = isSupporter();
@@ -1081,8 +1174,20 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     return;
   }
 
+  // Return cached result if available for this tone with matching source text
+  const cached = rewriteCache[tone];
+  if (cached && cached.original === text) {
+    cardText.textContent = cached.text;
+    cardText.classList.remove("mt");
+    applyTone(tone);
+    updateCard(true);
+    window._originalText = text;
+    window._pendingRewrite = cached.text;
+    showRewritePreview(text, cached.text, tone);
+    return;
+  }
+
   // Show loading state on card
-  const cardText = document.getElementById("cardText");
   const prevText = cardText.textContent;
   const rewritingLabel = typeof getI18nSync === "function" ? getI18nSync("tone.rewriting") : "Rewriting...";
   cardText.textContent = rewritingLabel;
@@ -1095,7 +1200,9 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
       localStorage.setItem("wsSessionId", sessionId);
     }
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    // Client timeout must exceed the server's 20s OpenRouter timeout so the
+    // server's own success/error response always reaches us before we abort.
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
     const res = await fetch("/api/rewrite", {
       method: "POST",
@@ -1140,10 +1247,12 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     cardText.textContent = data.text;
     cardText.classList.remove("mt");
     applyTone(tone);
-    updateCard();
+    updateCard(true);
     saveDraft();
     // Show accept/cancel preview bar
     showRewritePreview(text, data.text, tone);
+    // Cache the result so returning to this tone skips the API
+    rewriteCache[tone] = { text: data.text, original: text };
   } catch (err) {
     console.error("[Rewrite] Error:", err);
     if (err.name === "AbortError") {
@@ -1196,16 +1305,21 @@ document.getElementById("roundnessRow").addEventListener("click", (e) => {
 });
 let _dc;
 document.getElementById("sta").addEventListener("input", () => {
+  rewriteCache = {};
   inputSource = "story";
   clearTimeout(_dc);
   _dc = setTimeout(function() { updateCard(); saveDraft(); }, 50);
 });
 document.getElementById("sta").addEventListener("paste", () => {
+  rewriteCache = {};
   inputSource = "story";
   setTimeout(function() { updateCard(); saveDraft(); }, 50);
 });
 document.getElementById("nin").addEventListener("input", function() {
-  const cleaned = this.value.replace(/[^\p{L}]/gu, "").slice(0, 10);
+  // Allow letters, spaces, hyphens, and underscores so names like
+  // "Lola Maria", "Mary-Anne", and "lola_maria" pass through. Any other
+  // character (digits, punctuation, symbols) is stripped on input.
+  const cleaned = this.value.replace(/[^\p{L} _-]/gu, "").slice(0, 18);
   if (cleaned !== this.value) {
     const pos = this.selectionStart;
     this.value = cleaned;
@@ -1215,14 +1329,16 @@ document.getElementById("nin").addEventListener("input", function() {
   saveDraft();
 });
 document.getElementById("resetBtn").addEventListener("click", () => {
+  rewriteCache = {};
   if (isRec) {
     recog.stop();
     isRec = false;
     fullTx = "";
     document.getElementById("recBtn").classList.remove("on");
-    document.getElementById("recSt").textContent = "Tap to speak";
+    document.getElementById("recSt").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
     document.getElementById("recSub").textContent =
-      "Your words appear live as you talk";
+      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
     document.getElementById("recSub").classList.remove("live");
     document.getElementById("liveBox").classList.remove("show");
   }
@@ -1258,7 +1374,7 @@ if (location.hash && location.hash.length > 1) {
   var hP = params.get("p");
   inputSource = "story";
   if (hText) document.getElementById("sta").value = hText;
-  if (hName) document.getElementById("nin").value = hName.replace(/[^\p{L}]/gu, "").slice(0, 10);
+  if (hName) document.getElementById("nin").value = hName.replace(/[^\p{L} _-]/gu, "").slice(0, 18);
   if (hTone) applyTone(hTone);
   if (hP != null) applyPal(parseInt(hP));
   if (hText) { updateCard(); cardReady = true; document.getElementById("btnS").disabled = false; document.getElementById("wcta").classList.add("show"); document.getElementById("dlBtn").style.display = "block"; restored = true; }
@@ -1593,8 +1709,12 @@ window.addEventListener("resize", () => {
 // Theme toggle
 function setTheme(dark, animate) {
   const html = document.documentElement;
-  const icon = document.getElementById('themeToggle').querySelector('i');
+  const toggle = document.getElementById('themeToggle');
+  const icon = toggle.querySelector('i');
   icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  // Keep screen-reader pressed-state in sync with the visual toggle so
+  // assistive tech announces "pressed" (dark on) or "not pressed" (light).
+  toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
   document.querySelector('meta[name="theme-color"]').content = dark ? '#1a1a1a' : '#ffffeb';
   document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light';
   const logo = document.querySelector('.nav-logo');
@@ -1638,7 +1758,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   if (!c) return;
   inputSource = "story";
   document.getElementById("sta").value = (c.dataset.text || "").slice(0, 150);
-  document.getElementById("nin").value = (c.dataset.name || "").replace(/[^\p{L}]/gu, "").slice(0, 10);
+  document.getElementById("nin").value = (c.dataset.name || "").replace(/[^\p{L} _-]/gu, "").slice(0, 18);
   if (c.dataset.tone) {
     const tone = c.dataset.tone;
     if (tone !== "original" && !isSupporter() && getRewritesLeftForTone(tone) === 0) {
@@ -1651,9 +1771,11 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   }
   if (c.dataset.p != null) applyPal(parseInt(c.dataset.p));
   if (c.dataset.lang) {
+    // Set the CARD's content language (affects font selection and card label)
+    // without touching the page UI language. The page language stays on the
+    // user's chosen locale; only the card display language follows the example.
     curLang = c.dataset.lang;
     isRTL = RTL.includes(curLang);
-    window.setLanguageByCode(c.dataset.lang);
   }
   updateCard();
   cardReady = true;
@@ -2144,3 +2266,10 @@ window.ensureHtml2canvas = (function () {
   }
   console.log(diag.join("\n"));
 })();
+
+// Re-localize the Style accordion's chip summary after i18n is ready, so
+// the initial "Original · Violet · Rounded" chips show in the user's
+// language on first paint. Reversible: remove this listener.
+document.addEventListener('languagesReady', function () {
+  if (typeof updateStyleChipSummary === 'function') updateStyleChipSummary();
+});

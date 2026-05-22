@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "Speak · Create · Share",
+    "tagline": "Speak · Style · Share",
     "help": "How to use",
     "theme": "Toggle dark mode"
   },
@@ -12,32 +12,32 @@
   "sharedCta": "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.",
   "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.",
   "record": {
-    "label": "1 · Tap to speak",
-    "tip": "Press record and speak naturally. Your words appear live. Tap again to stop — your words move into the text box ready for the card.",
+    "label": "Your voice",
+    "tip": "Press record and speak naturally. When you tap stop, your words appear in the text box below — ready for the card.",
     "status": "Tap to speak",
-    "sub": "Your words appear as you speak",
+    "sub": "Words appear when you stop",
     "generating": "Generating…"
   },
   "orText": "or type or paste your words",
   "textarea": {
-    "label": "2 · Your words",
+    "label": "Your words",
     "tip": "Speak first using Record above — words land here automatically. Or type directly. Or paste from Wispr Flow. Any language works here.",
     "placeholder": "Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
   },
-  "resetBtn": "Reset all",
+  "resetBtn": "Start over",
   "nameRow": {
     "label": "From",
-    "placeholder": "e.g. Mom, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "e.g. Mom, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Need inspiration? Click an example"
   },
   "customize": {
-    "summary": "Make it yours",
+    "summary": "Style",
     "hint": "Tone · color · shape"
   },
   "tone": {
-    "label": "3 · Tone",
+    "label": "Tone",
     "tip": "Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: Warm is gentle, Bold is direct, Poetic flows with rhythm, Playful is light, Reflective is slow, Honest is raw. Changes letter-spacing and slant only — not size or weight.",
     "original": "Original",
     "warm": "Warm",
@@ -49,7 +49,7 @@
     "rewriting": "Rewriting…"
   },
   "color": {
-    "label": "4 · Card color",
+    "label": "Card color",
     "tip": "Sets the card background. The live preview updates instantly.",
     "violet": "Violet",
     "amber": "Amber",
@@ -63,7 +63,7 @@
     "indigo": "Indigo"
   },
   "shape": {
-    "label": "5 · Shape",
+    "label": "Shape",
     "tip": "Sharp edges work best for WhatsApp. Rounded corners suit galleries and web.",
     "sharp": "Sharp corners",
     "rounded": "Rounded corners"
@@ -108,7 +108,7 @@
     "go": "Go",
     "lostKey": "Lost your key?",
     "emailPlaceholder": "Enter your email",
-    "emailSend": "Send recovery email",
+    "emailSend": "Send",
     "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {

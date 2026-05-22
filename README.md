@@ -15,7 +15,7 @@
 <p align="center">
   A zero-friction, browser-based app that turns your voice into beautiful, shareable cards.
   <br>
-  No account · No install · 42 languages
+  No account · No install · 20 UI languages · voice transcription in any browser-supported language
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Vanilla-HTML%2FCSS%2FJS-blue?style=flat-square" alt="Vanilla HTML/CSS/JS">
   <img src="https://img.shields.io/badge/Deployed-Vercel-000?style=flat-square&logo=vercel" alt="Vercel">
-  <img src="https://img.shields.io/badge/42-Languages-orange?style=flat-square" alt="42 Languages">
+  <img src="https://img.shields.io/badge/20-UI%20locales-orange?style=flat-square" alt="20 UI locales">
   <img src="https://img.shields.io/badge/Zero-Backend-green?style=flat-square" alt="Zero Backend">
 </p>
 
@@ -55,12 +55,12 @@ Every shared card carries "Wispr Stories — made for Wispr Flow" and links to [
 
 ## Features
 
-- 🎙️ **Voice recording** — Web Speech API with live transcription in 42 languages
+- 🎙️ **Voice recording** — Web Speech API live transcription (browser-native, supports every language the user's Chrome/Edge/Safari does), with Deepgram Nova-3 Multilingual as fallback for unsupported browsers
 - 🎨 **6 card palettes** — Violet, Amber, Crimson, Emerald, Ocean, Rose
 - ✍️ **6 tones** — Warm, Bold, Poetic, Playful, Reflective, Honest (changes font style + glyph)
 - 📐 **4 aspect ratios** — 4:5 Instagram, 16:9 widescreen, 3:4 universal, 9:16 Stories
-- 🌍 **42 languages** — English, Hindi, Hinglish, Spanish, French, Arabic, Mandarin, Japanese, Korean, Tamil, Telugu, Bengali, and more
-- 🔤 **RTL support** — Arabic, Hebrew, Farsi, and Urdu render right-to-left automatically
+- 🌍 **20 UI languages** — English, German, Spanish, French, Gujarati, Hindi, Indonesian, Italian, Japanese, Kannada, Korean, Malayalam, Punjabi, Portuguese, Russian, Swedish, Tamil, Telugu, Thai, Turkish, Mandarin Chinese. Card content stays in the user's original language.
+- 🔤 **RTL infrastructure** — `dir="rtl"` and script-specific CSS render right-to-left correctly; ready for Arabic, Hebrew, Farsi, Urdu locale files when added (none ship today)
 - 📱 **Mobile-first** — responsive design with 44px tap targets, fluid typography
 - 📤 **Native sharing** — Web Share API sends PNG + app link together on iOS/Android
 - 🖼️ **OG image generation** — Vercel Edge function for rich link previews
@@ -91,7 +91,7 @@ No build step. Open `wisprstories.html` in any browser, or run `node serve.js` f
 wispr-stories/
 ├── wisprstories.html          # Main HTML entry point
 ├── wisprstories.js            # App logic
-├── fonts.js                   # Script-detection font mapping
+├── global/fonts.js              # Script-detection font mapping
 ├── serve.js                   # Zero-dependency Node dev server
 ├── vercel.json                # Vercel deployment + security headers
 ├── package.json               # Minimal: only @vercel/og

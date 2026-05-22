@@ -4,6 +4,45 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* Sticky CTA — once the textarea has content (.shell.has-card), pin the
+   Create/Share buttons to the bottom of the .left scroll column. Mirrors
+   the .mobile-bar behavior so the primary action is always reachable.
+   Mobile (<=720px) already hides .actions in favor of .mobile-bar, so this
+   only activates on desktop/tablet. */
+@media (min-width: 721px) {
+  /* Shrink the left column's bottom padding once content exists so the sticky
+     CTA can sit flush with the bottom of the visible scrollport (matching
+     .mobile-bar's bottom-anchored placement). Without this, sticky pins to
+     the inner edge of padding-bottom and leaves an awkward gap below the bar. */
+  .shell.has-card .left {
+    padding-bottom: 0;
+  }
+  .shell.has-card .actions {
+    position: sticky;
+    bottom: 0;
+    /* Must exceed .iw's z-index: 500 (see tooltips.css) so info-icon
+       wrappers scrolling behind the sticky bar don't poke through on top
+       of the CTA buttons. Tooltips themselves (.tip, z-index 9999) still
+       render above the bar on hover, which is the correct behavior. */
+    z-index: 600;
+    background: var(--cream);
+    padding: 14px 0 18px;
+    border-top: 1px solid var(--rule);
+  }
+  /* Soft fade hint above the sticky bar so content scrolling beneath it
+     doesn't look abruptly cut off. Sits flush against the top border. */
+  .shell.has-card .actions::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 24px;
+    background: linear-gradient(to bottom, transparent, var(--cream));
+    pointer-events: none;
+  }
+}
 .btn-c {
   width: 100%;
   background: #f59e0b;
@@ -75,7 +114,7 @@
 
 /* EXAMPLES */
 .ex-section-wrap {
-  margin-bottom: 24px;
+  /* Bottom spacing owned by .left's gap (28px). */
 }
 .ex-lbl {
   font-size: 11px;
@@ -90,7 +129,9 @@
 .ec {
   background: var(--cream2);
   border: 1px solid var(--rule);
-  border-radius: 9px;
+  /* Soft rect (8px) — action-button tier. Matches Create/Share/Start over
+     and the upgrade buttons for one consistent radius across actions. */
+  border-radius: 8px;
   padding: 9px 10px;
   text-align: left;
   transition: all 0.2s;
@@ -138,7 +179,7 @@
 .ec-skeleton {
   background: var(--cream2);
   border: 1px solid var(--rule);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 9px 10px;
   min-height: 52px;
   display: flex;
@@ -169,8 +210,10 @@
 
 .left-closing {
   text-align: center;
-  margin-top: 20px;
-  padding-top: 16px;
+  margin-top: 28px;
+  margin-bottom: 16px;
+  padding-top: 20px;
+  padding-bottom: 32px;
   border-top: 1px solid var(--rule);
 }
 .left-closing-text {

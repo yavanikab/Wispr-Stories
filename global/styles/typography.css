@@ -63,37 +63,73 @@
   margin-top: 16px;
 }
 
-/* SHARED CTA */
-.shared-cta {
+/* UNIFIED NOTICE SLOT — replaces the old .shared-cta and .ff-notice
+   stacks. Shows one banner at a time (priority handled in JS), with a ×
+   dismiss button. Hidden by default via the `hidden` attribute; JS toggles
+   it on. Dismissal persists in localStorage per notice type. */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   font-size: 13px;
   color: var(--ink2);
   background: var(--cream2);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 10px 12px 10px 14px;
   line-height: 1.5;
+}
+.notice[hidden] {
   display: none;
 }
-.shared-cta.show {
-  display: block;
+.notice-text {
+  flex: 1;
+  min-width: 0;
 }
-.shared-cta strong {
+.notice-text strong {
   color: var(--ink);
   font-weight: 600;
 }
-.shared-cta em {
+.notice-text em {
   font-style: normal;
   color: var(--ink);
   font-weight: 500;
 }
-
-/* STEP LABEL */
-.lbl {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.notice-dismiss {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
   color: var(--ink3);
-  margin-bottom: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, background 0.15s;
+}
+.notice-dismiss:hover {
+  color: var(--ink);
+  background: rgba(26, 26, 26, 0.06);
+}
+:root.dark .notice-dismiss:hover {
+  background: rgba(255, 255, 235, 0.08);
+}
+
+/* SECTION LABEL — sentence-case, readable at every age. Replaces the prior
+   11px tracked-uppercase treatment so labels read as natural headings rather
+   than legal fine-print. Reversible: revert this block to restore the
+   uppercase tracking. */
+.lbl {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 0;

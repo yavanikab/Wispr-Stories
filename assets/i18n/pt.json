@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "Fale · Crie · Compartilhe",
+    "tagline": "Fale · Estilize · Compartilhe",
     "help": "Como usar",
     "theme": "Alternar modo escuro"
   },
@@ -12,22 +12,22 @@
   "sharedCta": "✨ <strong>Você recebeu uma Wispr Story!</strong> Toque em <em>Criar meu cartão</em> para fazer o seu.",
   "ffNotice": "🌐 A gravação de voz não é suportada no Firefox. Use Chrome ou Safari — ou cole seu texto abaixo.",
   "record": {
-    "label": "1 · Toque para falar",
+    "label": "Toque para falar",
     "tip": "Pressione gravar e fale naturalmente. Suas palavras aparecem ao vivo. Toque novamente para parar — suas palavras vão para a caixa de texto prontas para o cartão.",
     "status": "Toque para falar",
-    "sub": "Suas palavras aparecem enquanto você fala",
-    "generating": "Generating…"
+    "sub": "Suas palavras aparecem quando você para",
+    "generating": "Gerando…"
   },
   "orText": "ou digite ou cole suas palavras",
   "textarea": {
-    "label": "2 · Suas palavras",
+    "label": "Suas palavras",
     "tip": "Fale primeiro usando Gravar acima — as palavras chegam aqui automaticamente. Ou digite diretamente. Ou cole do Wispr Flow. Qualquer idioma funciona aqui.",
     "placeholder": "Grave sua voz ou digite qualquer coisa: um desejo de aniversário, memória, receita, carta de amor, gratidão, conselho..."
   },
   "resetBtn": "Redefinir tudo",
   "nameRow": {
     "label": "De",
-    "placeholder": "Ex: Mamãe, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "Ex: Mamãe, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Precisa de inspiração? Clique em um exemplo"
@@ -37,19 +37,19 @@
     "hint": "Tom · cor · forma"
   },
   "tone": {
-    "label": "3 · Tom",
-    "tip": "Original: your exact words, unlimited. Muda como suas palavras se sentem no cartão. Quente é suave. Ousado é direto. Poético flui com ritmo. Divertido é leve. Reflexivo é lento. Honesto é cru. Muda apenas o espaçamento e a inclinação — não o tamanho ou peso.",
+    "label": "Tom",
+    "tip": "Original mantém suas palavras exatas — ilimitado, sem limite diário. Outros tons são reescritos por IA: Acolhedor é suave. Ousado é direto. Poético flui com ritmo. Brincalhão é leve. Reflexivo é lento. Honesto é cru. Muda apenas o espaçamento e a inclinação — não o tamanho ou peso.",
     "original": "Original",
-    "warm": "Quente",
+    "warm": "Acolhedor",
     "bold": "Ousado",
     "poetic": "Poético",
     "playful": "Divertido",
     "reflective": "Reflexivo",
     "honest": "Honesto",
-    "rewriting": "Rewriting..."
+    "rewriting": "Reescrevendo..."
   },
   "color": {
-    "label": "4 · Cor do cartão",
+    "label": "Cor do cartão",
     "tip": "Define o fundo do cartão. A pré-visualização ao vivo atualiza instantaneamente.",
     "violet": "Violeta",
     "amber": "Âmbar",
@@ -63,7 +63,7 @@
     "indigo": "Índigo"
   },
   "shape": {
-    "label": "5 · Forma",
+    "label": "Forma",
     "tip": "Bordas afiadas funcionam melhor para WhatsApp. Cantos arredondados são ideais para galerias e web.",
     "sharp": "Bordas afiadas",
     "rounded": "Cantos arredondados"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "Criar cartão",
     "share": "Compartilhar cartão",
-    "createTone": "Create {tone} card"
+    "createTone": "Criar cartão {tone}"
   },
   "closing": "Sua voz, lindamente compartilhada",
   "preview": {

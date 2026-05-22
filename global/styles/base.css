@@ -38,6 +38,11 @@
   --sc-thumb: rgba(0, 0, 0, 0.14);
   --sc-track: rgba(0, 0, 0, 0.12);
   --focus-border: rgba(26, 26, 26, 0.3);
+  /* Calm ink-based halo for the live-transcription box while recording.
+     Replaces the prior red "alarm" treatment. Two stops so the breathing
+     animation can fade between them. */
+  --live-glow: rgba(26, 26, 26, 0.06);
+  --live-glow-strong: rgba(26, 26, 26, 0.13);
   --card-panel-bg: #fff;
   /* Complete font stacks with all script support (see fonts.css for full definition) */
   --sans: "Inter","Noto Sans Devanagari","Noto Sans Bengali","Noto Sans Tamil","Noto Sans Telugu","Noto Sans Kannada","Noto Sans Malayalam","Noto Sans Gurmukhi","Noto Sans Gujarati","Noto Sans Oriya","Noto Sans Sinhala","Noto Sans Arabic","Noto Sans Thai","Noto Sans JP","Noto Sans KR","Noto Sans SC","Noto Sans TC","Noto Sans","Nirmala UI",system-ui,sans-serif;
@@ -56,6 +61,8 @@
   --sc-thumb: rgba(255, 255, 235, 0.35);
   --sc-track: rgba(255, 255, 235, 0.15);
   --focus-border: rgba(255, 255, 235, 0.3);
+  --live-glow: rgba(255, 255, 235, 0.08);
+  --live-glow-strong: rgba(255, 255, 235, 0.16);
   --card-panel-bg: #fff;
 }
 

@@ -13,7 +13,10 @@
   width: 100%;
   max-width: 360px;
   position: relative;
-  padding-block-end: 60px;
+  /* Just enough room below the card for the bottom half of the
+     sticker-style overlap download button (which sits at bottom: -24px,
+     half on / half off the card). */
+  padding-block-end: 32px;
 }
 
 /* THE CARD */
@@ -263,7 +266,10 @@
 .wcta {
   width: 100%;
   max-width: 320px;
-  margin-top: 14px;
+  /* Extra top margin so the gold "Download card" sticker button (which
+     hangs ~26px below the card edge) has clear breathing room before
+     this CTA box starts. Same value works on desktop and mobile. */
+  margin-top: 32px;
   background: var(--cream2);
   border: 1px solid var(--rule);
   border-radius: 14px;
@@ -328,35 +334,103 @@
   display: block;
 }
 
-/* DOWNLOAD BUTTON OVERLAY */
+/* DOWNLOAD BUTTON — "sticker" overlap pattern. The button sits at
+   bottom: -26px relative to the card-wrap, meaning roughly half of it
+   sits on the card and half hangs below. This breaks the card's
+   rectangular frame and draws the eye — without competing with the gold
+   primary CTAs. A slow "halo" pulse animates outward to gently catch
+   peripheral vision. Works in light and dark modes; mobile rules below
+   override to the existing top-sticky pattern. */
 .dl-btn {
   position: absolute;
-  bottom: 20px;
+  /* `bottom: 6px` inside a card-wrap with padding-block-end: 32px puts
+     the button's center exactly at the card's bottom edge — so half of
+     the 52px button sits on the card and half hangs into the padding
+     below (the "sticker" overlap). */
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  border: none;
+  /* Frosted-glass white pill — high contrast against EVERY card color
+     in the palette (violet, amber, crimson, emerald, ocean, rose,
+     orange, teal, fuchsia, indigo). Backdrop blur creates depth so the
+     button reads as floating above the card, not pasted on. */
+  background: #f59e0b;
+  color: #1a1a1a;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  padding: 10px 22px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 0 26px;
+  min-height: 52px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.005em;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
+  max-width: calc(100% - 16px);
+  /* Clean Wispr-Flow-style drop shadow — soft gold ambient lift +
+     subtle dark drop. No thick rings. */
+  box-shadow:
+    0 8px 24px rgba(245, 158, 11, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.15);
   transition:
-    opacity 0.3s,
-    background 0.2s;
+    background 0.2s,
+    transform 0.18s ease,
+    box-shadow 0.2s;
   pointer-events: auto;
+  isolation: isolate;
+}
+.dl-btn::before {
+  /* Animated halo — a glowing ring that pulses outward, catching
+     peripheral vision against any card background. Uses box-shadow
+     (not scale) so the glow expands beyond the button without needing
+     overflow tricks. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  animation: dl-halo 2.2s ease-out infinite;
+}
+/* Single soft gold halo pulse — calm, peripheral catch. No rings. */
+@keyframes dl-halo {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(245, 158, 11, 0);
+  }
 }
 .dl-btn:hover {
-  background: rgba(0, 0, 0, 0.9);
+  background: #f59e0b;
+  border-color: rgba(0, 0, 0, 0.12);
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow:
+    0 12px 32px rgba(245, 158, 11, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+}
+.dl-btn:active {
+  transform: translateX(-50%) translateY(-1px);
+  box-shadow:
+    0 6px 16px rgba(245, 158, 11, 0.5),
+    0 3px 10px rgba(0, 0, 0, 0.18);
 }
 .dl-btn .fa-download {
+  font-size: 16px;
+  color: #1a1a1a;
   animation: dl-bounce 1s ease infinite;
+}
+/* Respect users who've asked the OS for reduced motion — halo pause +
+   bounce pause. Button still works, just static. */
+@media (prefers-reduced-motion: reduce) {
+  .dl-btn::before,
+  .dl-btn .fa-download {
+    animation: none;
+  }
 }
 @keyframes dl-bounce {
   0%,
@@ -374,48 +448,71 @@
   animation: none;
 }
 
+/* Dark mode: same clean drop shadow approach, just deeper to compensate
+   for the darker chrome behind it. Gold halo pulse stays gold (no
+   ring/border effect). */
 :root.dark .dl-btn {
-  background: #fff;
-  color: #000;
+  box-shadow:
+    0 8px 24px rgba(245, 158, 11, 0.45),
+    0 4px 14px rgba(0, 0, 0, 0.5);
 }
 :root.dark .dl-btn:hover {
-  background: #fff;
-  color: #000;
-  opacity: 0.92;
+  box-shadow:
+    0 12px 32px rgba(245, 158, 11, 0.55),
+    0 6px 18px rgba(0, 0, 0, 0.55);
 }
 
 @media (max-width: 720px) {
+  /* Mobile: same overlap pattern as desktop — button straddles card's
+     bottom edge, centered. Hover/active transforms disabled so taps
+     don't shift the button sideways. Smaller, calmer shadow than
+     desktop to avoid the "big ring" effect on narrow viewports. */
   .card-wrap {
-    padding-block-end: 0;
+    padding-block-end: 32px;
   }
   .dl-btn {
-    position: sticky;
-    top: 8px;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    transform: none;
-    margin: 0 auto 12px;
-    width: 100%;
-    max-width: 320px;
-    border-radius: 999px;
-    background: #1a1a1a;
-    color: #fff;
-    backdrop-filter: none;
-    padding: 12px 20px;
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: calc(100% - 24px);
+    padding: 0 22px;
+    min-height: 48px;
     font-size: 14px;
-    font-weight: 700;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    background: #f59e0b;
+    color: #1a1a1a;
+    border: 0.5px solid rgba(0, 0, 0, 0.08);
+    /* Tighter, less spread shadow than desktop. */
+    box-shadow:
+      0 4px 12px rgba(245, 158, 11, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.18);
     z-index: 50;
     justify-content: center;
   }
+  /* Touch devices: keep button anchored on tap — no translateY shift.
+     Preserve translateX(-50%) so it stays centered. */
   .dl-btn:hover {
-    background: #1a1a1a;
+    background: #f59e0b;
+    transform: translateX(-50%);
+    box-shadow:
+      0 4px 12px rgba(245, 158, 11, 0.45),
+      0 2px 6px rgba(0, 0, 0, 0.18);
+  }
+  .dl-btn:active {
+    transform: translateX(-50%);
+    box-shadow:
+      0 2px 8px rgba(245, 158, 11, 0.4),
+      0 1px 4px rgba(0, 0, 0, 0.18);
   }
   :root.dark .dl-btn,
-  :root.dark .dl-btn:hover {
-    background: #fff;
-    color: #000;
+  :root.dark .dl-btn:hover,
+  :root.dark .dl-btn:active {
+    background: #f59e0b;
+    color: #1a1a1a;
+    box-shadow:
+      0 4px 12px rgba(245, 158, 11, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.45);
   }
 }
 .btn-s .fa-spinner {

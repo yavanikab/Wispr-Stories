@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "Parlez · Créez · Partagez",
+    "tagline": "Parlez · Stylisez · Partagez",
     "help": "Comment utiliser",
     "theme": "Basculer le mode sombre"
   },
@@ -12,22 +12,22 @@
   "sharedCta": "✨ <strong>Vous avez reçu une Wispr Story !</strong> Appuyez sur <em>Créer ma carte</em> pour faire la vôtre.",
   "ffNotice": "🌐 L'enregistrement vocal n'est pas pris en charge sur Firefox. Utilisez Chrome ou Safari — ou collez votre texte ci-dessous.",
   "record": {
-    "label": "1 · Appuyez pour parler",
+    "label": "Appuyez pour parler",
     "tip": "Appuyez sur enregistrer et parlez naturellement. Vos mots apparaissent en direct. Appuyez à nouveau pour arrêter — vos mots passent dans la zone de texte prêts pour la carte.",
     "status": "Appuyez pour parler",
-    "sub": "Vos mots apparaissent pendant que vous parlez",
-    "generating": "Generating…"
+    "sub": "Vos mots apparaissent quand vous arrêtez",
+    "generating": "Génération…"
   },
   "orText": "ou tapez ou collez vos mots",
   "textarea": {
-    "label": "2 · Vos mots",
+    "label": "Vos mots",
     "tip": "Parlez d'abord en utilisant Enregistrer ci-dessus — les mots arrivent ici automatiquement. Ou tapez directement. Ou collez depuis Wispr Flow. Toute langue fonctionne ici.",
     "placeholder": "Enregistrez votre voix ou tapez n'importe quoi : un vœu d'anniversaire, un souvenir, une recette, une lettre d'amour, de la gratitude, un conseil..."
   },
   "resetBtn": "Réinitialiser tout",
   "nameRow": {
     "label": "De",
-    "placeholder": "Ex : Maman, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "Ex : Maman, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Besoin d'inspiration ? Cliquez sur un exemple"
@@ -37,8 +37,8 @@
     "hint": "Ton · couleur · forme"
   },
   "tone": {
-    "label": "3 · Ton",
-    "tip": "Original: your exact words, unlimited. Change la façon dont vos mots se ressentent sur la carte. Chaleureux est doux. Audacieux est direct. Poétique coule avec rythme. Ludique est léger. Réfléchi est lent. Honnête est brut. Change uniquement l'espacement et l'inclinaison — pas la taille ni le poids.",
+    "label": "Ton",
+    "tip": "Original conserve vos mots exacts — illimité, pas de limite quotidienne. Les autres tons sont réécrits par IA : Chaleureux est doux. Audacieux est direct. Poétique coule avec rythme. Ludique est léger. Réfléchi est lent. Honnête est brut. Change uniquement l'espacement et l'inclinaison — pas la taille ni le poids.",
     "original": "Original",
     "warm": "Chaleureux",
     "bold": "Audacieux",
@@ -46,10 +46,10 @@
     "playful": "Ludique",
     "reflective": "Réfléchi",
     "honest": "Honnête",
-    "rewriting": "Rewriting..."
+    "rewriting": "Réécriture..."
   },
   "color": {
-    "label": "4 · Couleur de la carte",
+    "label": "Couleur de la carte",
     "tip": "Définit l'arrière-plan de la carte. L'aperçu en direct se met à jour instantanément.",
     "violet": "Violet",
     "amber": "Ambre",
@@ -58,12 +58,12 @@
     "ocean": "Océan",
     "rose": "Rose",
     "orange": "Orange",
-    "teal": "Sarcelle",
+    "teal": "Bleu canard",
     "fuchsia": "Fuchsia",
     "indigo": "Indigo"
   },
   "shape": {
-    "label": "5 · Forme",
+    "label": "Forme",
     "tip": "Les bords nets fonctionnent mieux pour WhatsApp. Les coins arrondis conviennent aux galeries et au web.",
     "sharp": "Bords nets",
     "rounded": "Coins arrondis"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "Créer la carte",
     "share": "Partager la carte",
-    "createTone": "Create {tone} card"
+    "createTone": "Créer une carte {tone}"
   },
   "closing": "Votre voix, magnifiquement partagée",
   "preview": {

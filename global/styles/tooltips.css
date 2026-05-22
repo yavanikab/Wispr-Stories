@@ -24,6 +24,14 @@
   cursor: help;
   user-select: none;
   flex-shrink: 0;
+  /* Button reset — these triggers are now <button> elements for proper
+     keyboard/screen-reader semantics. Override default button padding/font
+     so they retain the original tight inline appearance. */
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .tip {
   position: absolute;

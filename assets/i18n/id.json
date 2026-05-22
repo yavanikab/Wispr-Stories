@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "Bicara · Buat · Bagikan",
+    "tagline": "Bicara · Gaya · Bagikan",
     "help": "Cara menggunakan",
     "theme": "Alihkan mode gelap"
   },
@@ -12,22 +12,22 @@
   "sharedCta": "✨ <strong>Anda menerima Wispr Story!</strong> Ketuk <em>Buat kartu saya</em> untuk membuat milik Anda sendiri.",
   "ffNotice": "🌐 Perekaman suara tidak didukung di Firefox. Gunakan Chrome atau Safari — atau tempel teks Anda di bawah.",
   "record": {
-    "label": "1 · Ketuk untuk berbicara",
+    "label": "Ketuk untuk berbicara",
     "tip": "Tekan rekam dan berbicaralah secara alami. Kata-kata Anda muncul secara langsung. Ketuk lagi untuk berhenti — kata-kata Anda pindah ke kotak teks siap untuk kartu.",
     "status": "Ketuk untuk berbicara",
-    "sub": "Kata-kata Anda muncul saat Anda berbicara",
-    "generating": "Generating…"
+    "sub": "Kata-kata Anda muncul saat Anda berhenti",
+    "generating": "Membuat…"
   },
   "orText": "atau ketik atau tempel kata-kata Anda",
   "textarea": {
-    "label": "2 · Kata-kata Anda",
+    "label": "Kata-kata Anda",
     "tip": "Berbicara dulu menggunakan Rekam di atas — kata-kata mendarat di sini secara otomatis. Atau ketik langsung. Atau tempel dari Wispr Flow. Bahasa apa pun berfungsi di sini.",
     "placeholder": "Rekam suara Anda atau ketik apa saja: ucapan ulang tahun, kenangan, resep, surat cinta, rasa syukur, nasihat..."
   },
   "resetBtn": "Reset semua",
   "nameRow": {
     "label": "Dari",
-    "placeholder": "Mis: Ibu, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "Mis: Ibu, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Butuh inspirasi? Klik contoh"
@@ -37,8 +37,8 @@
     "hint": "Nada · warna · bentuk"
   },
   "tone": {
-    "label": "3 · Nada",
-    "tip": "Original: your exact words, unlimited. Mengubah bagaimana kata-kata Anda terasa di kartu. Hangat itu lembut. Berani itu langsung. Puitis mengalir dengan irama. Ceria itu ringan. Reflektif itu lambat. Jujur itu mentah. Mengubah hanya jarak huruf dan kemiringan — bukan ukuran atau berat.",
+    "label": "Nada",
+    "tip": "Original mempertahankan kata-kata persis Anda — tanpa batas, tanpa batas harian. Nada lain ditulis ulang dengan AI: Hangat itu lembut. Berani itu langsung. Puitis mengalir dengan irama. Ceria itu ringan. Reflektif itu lambat. Jujur itu mentah. Mengubah hanya jarak huruf dan kemiringan — bukan ukuran atau berat.",
     "original": "Asli",
     "warm": "Hangat",
     "bold": "Berani",
@@ -46,10 +46,10 @@
     "playful": "Ceria",
     "reflective": "Reflektif",
     "honest": "Jujur",
-    "rewriting": "Rewriting..."
+    "rewriting": "Menulis ulang..."
   },
   "color": {
-    "label": "4 · Warna kartu",
+    "label": "Warna kartu",
     "tip": "Mengatur latar belakang kartu. Pratinjau langsung diperbarui secara instan.",
     "violet": "Ungu",
     "amber": "Amber",
@@ -63,7 +63,7 @@
     "indigo": "Nila"
   },
   "shape": {
-    "label": "5 · Bentuk",
+    "label": "Bentuk",
     "tip": "Tepi tajam paling cocok untuk WhatsApp. Sudut bulat cocok untuk galeri dan web.",
     "sharp": "Tepi tajam",
     "rounded": "Sudut bulat"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "Buat kartu",
     "share": "Bagikan kartu",
-    "createTone": "Create {tone} card"
+    "createTone": "Buat kartu {tone}"
   },
   "closing": "Suara Anda, dibagikan dengan indah",
   "preview": {

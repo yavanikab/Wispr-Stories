@@ -1,4 +1,9 @@
-/* SHELL: sticky 2-col */
+/* SHELL — dual-scroll 2-col grid.
+   The shell is fixed at viewport height (minus the 52px nav). Each column
+   (.left form, .right preview) gets its own internal scroll context. This
+   keeps the right preview pane visually fixed while the user scrolls the
+   form on the left, and ensures the preview is always reachable on short
+   screens (where the right column would otherwise overflow behind the nav). */
 .shell {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -11,7 +16,11 @@
   padding-right: 24px;
 }
 
-/* LEFT */
+/* LEFT — form column with its own vertical scroll.
+   `gap: 28px` is the single source of truth for vertical rhythm between
+   sections. Child blocks (.input-hero, .name-row, .ex-section-wrap,
+   .customize) intentionally have NO margin-bottom — see spacing-rhythm
+   pass in inputs.css / actions.css. */
 .left {
   grid-column: 1;
   grid-row: 1;
@@ -19,7 +28,7 @@
   padding: 35px 32px 80px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
   overflow-y: auto;
   overflow-x: visible;
   min-height: 0;
@@ -27,7 +36,10 @@
   scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
 }
 
-/* RIGHT */
+/* RIGHT — preview column. Flex spacers (::before/::after) push the card
+   into vertical center on tall screens; on short screens they collapse to
+   zero (min-height: 0) and the column scrolls internally so the label and
+   card are never hidden behind the nav. */
 .right {
   grid-column: 2;
   grid-row: 1;
@@ -55,9 +67,7 @@
 
 /* Stack the card preview and CTA above the fixed ghost decoration so the
    ghost reads as a background flourish and never obscures interactive
-   content. Each gets its own stacking context via position + z-index. The
-   right column itself stays exactly where it is — no shifting when the CTA
-   appears or when the user switches card size. */
+   content. Each gets its own stacking context via position + z-index. */
 .card-wrap,
 .wcta {
   position: relative;
@@ -98,7 +108,7 @@
   text-decoration: none;
 }
 
-/* FOOTER MENU (footer-menu.js) — overrides only, never edit the script.
+/* FOOTER MENU (global/footer-menu.js) — overrides only, never edit the script.
    Sized down to match the 12px footer scale, low opacity at rest so it
    doesn't compete with the copyright. Hover/focus restores full opacity. */
 .footer-copyright {

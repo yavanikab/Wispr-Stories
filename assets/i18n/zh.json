@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "表达 · 创作 · 分享",
+    "tagline": "表达 · 排版 · 分享",
     "help": "使用说明",
     "theme": "切换深色模式"
   },
@@ -12,22 +12,22 @@
   "sharedCta": "✨ <strong>你收到了一张 Wispr Story！</strong> 点击<em>创建我的卡片</em>来制作你自己的。",
   "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari — 或在下方粘贴你的文字。",
   "record": {
-    "label": "1 · 点击说话",
+    "label": "点击说话",
     "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止 — 你的文字将移入文本框准备制作卡片。",
     "status": "点击说话",
-    "sub": "你说话时文字会出现",
-    "generating": "Generating…"
+    "sub": "停止后文字会出现",
+    "generating": "生成中…"
   },
   "orText": "或输入或粘贴你的文字",
   "textarea": {
-    "label": "2 · 你的文字",
+    "label": "你的文字",
     "tip": "先使用上方的录音功能 — 文字会自动出现在这里。或直接输入。或从 Wispr Flow 粘贴。任何语言都可以。",
     "placeholder": "录制你的声音或输入任何内容：生日祝福、回忆、食谱、情书、感恩、建议..."
   },
   "resetBtn": "全部重置",
   "nameRow": {
     "label": "来自",
-    "placeholder": "例如：妈妈、杜尔迦、泰勒、老师、阿布拉、P'Lisa、Ella..."
+    "placeholder": "例如：妈妈、杜尔迦、泰勒、老师、阿布拉、Pi Lisa、Ella..."
   },
   "examples": {
     "label": "需要灵感？点击一个示例"
@@ -37,8 +37,8 @@
     "hint": "语气 · 颜色 · 形状"
   },
   "tone": {
-    "label": "3 · 语气",
-    "tip": "Original: your exact words, unlimited. 改变你的文字在卡片上的感觉。温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是质朴的。只改变字间距和倾斜度 — 不改变大小或粗细。",
+    "label": "语气",
+    "tip": "原文保留您的原话 — 无限制，无每日上限。其他语气通过 AI 重写：温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是直白的。只改变字间距和倾斜度 — 不改变大小或粗细。",
     "original": "原始",
     "warm": "温暖",
     "bold": "大胆",
@@ -46,10 +46,10 @@
     "playful": "活泼",
     "reflective": "反思",
     "honest": "诚实",
-    "rewriting": "Rewriting..."
+    "rewriting": "重写中..."
   },
   "color": {
-    "label": "4 · 卡片颜色",
+    "label": "卡片颜色",
     "tip": "设置卡片背景。实时预览会立即更新。",
     "violet": "紫色",
     "amber": "琥珀色",
@@ -63,7 +63,7 @@
     "indigo": "靛蓝色"
   },
   "shape": {
-    "label": "5 · 形状",
+    "label": "形状",
     "tip": "锐利边缘最适合 WhatsApp。圆角适合画廊和网页。",
     "sharp": "锐利边缘",
     "rounded": "圆角"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "创建卡片",
     "share": "分享卡片",
-    "createTone": "Create {tone} card"
+    "createTone": "创建{tone}卡片"
   },
   "closing": "你的声音，美好地分享",
   "preview": {

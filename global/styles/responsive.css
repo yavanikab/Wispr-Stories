@@ -462,7 +462,13 @@
     padding: 24px 20px;
   }
   .reset-btn {
-    padding: 4px 6px;
-    font-size: 11px;
+    /* Tightened for very narrow phones but keeps the stacked icon-over-
+       label layout from the 720px media block above. */
+    padding: 6px 8px;
+    font-size: 9px;
+    min-width: 50px;
+  }
+  .reset-btn i {
+    font-size: 13px;
   }
 }

@@ -4,10 +4,8 @@
 (function() {
   var _cache = {};
   var _currentLang = 'en';
-  var _showTimeout = setTimeout(function() {
-    document.documentElement.style.visibility = '';
-    document.documentElement.style.opacity = '';
-  }, 3000);
+  /* No reveal-timeout needed — the document is never hidden. English
+     defaults render on first paint; translations swap in when ready. */
 
   function loadTranslations(code) {
     if (_cache[code]) return Promise.resolve(_cache[code]);
@@ -68,12 +66,29 @@
         var val = resolveKey(translations, key);
         if (val) el.title = val;
       });
-      // Show page after language is applied
-      clearTimeout(_showTimeout);
-      document.documentElement.style.visibility = '';
-      document.documentElement.style.opacity = '';
+      /* Page is already visible; nothing to reveal. */
     });
   };
 
   window.getCurrentI18nLang = function() { return _currentLang; };
+
+  // Synchronous lookup for already-loaded translations. Returns the string
+  // for a dot-path key in the current language's cache, or undefined if the
+  // cache hasn't loaded yet or the key doesn't exist. Falls back to the
+  // English cache for missing keys in non-English locales. Used by callers
+  // that need to insert a localized value into a freshly-created element
+  // (e.g. the Style chip summary) outside the [data-i18n] flow.
+  window.getI18nSync = function(key) {
+    var cur = _cache[_currentLang];
+    if (cur) {
+      var v = resolveKey(cur, key);
+      if (v != null) return v;
+    }
+    var en = _cache['en'];
+    if (en) {
+      var fv = resolveKey(en, key);
+      if (fv != null) return fv;
+    }
+    return undefined;
+  };
 })();

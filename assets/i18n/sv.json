@@ -1,6 +1,6 @@
 {
   "nav": {
-    "tagline": "Tala · Skapa · Dela",
+    "tagline": "Tala · Styla · Dela",
     "help": "Hur man använder",
     "theme": "Växla mörkt läge"
   },
@@ -12,22 +12,22 @@
   "sharedCta": "✨ <strong>Du fick en Wispr Story!</strong> Tryck på <em>Skapa mitt kort</em> för att göra ditt eget.",
   "ffNotice": "🌐 Inspelning av röst stöds inte i Firefox. Använd Chrome eller Safari — eller klistra in din text nedan.",
   "record": {
-    "label": "1 · Tryck för att tala",
+    "label": "Tryck för att tala",
     "tip": "Tryck på spela in och tala naturligt. Dina ord visas live. Tryck igen för att stoppa — dina ord flyttas till textrutan redo för kortet.",
     "status": "Tryck för att tala",
-    "sub": "Dina ord visas medan du talar",
-    "generating": "Generating…"
+    "sub": "Dina ord visas när du slutar",
+    "generating": "Genererar…"
   },
   "orText": "eller skriv eller klistra in dina ord",
   "textarea": {
-    "label": "2 · Dina ord",
+    "label": "Dina ord",
     "tip": "Tala först med Spela in ovan — orden hamnar här automatiskt. Eller skriv direkt. Eller klistra in från Wispr Flow. Alla språk fungerar här.",
     "placeholder": "Spela in din röst eller skriv vad som helst: en födelsedagsönskan, ett minne, ett recept, ett kärleksbrev, tacksamhet, råd..."
   },
   "resetBtn": "Återställ allt",
   "nameRow": {
     "label": "Från",
-    "placeholder": "T.ex.: Mamma, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "T.ex.: Mamma, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Behöver du inspiration? Klicka på ett exempel"
@@ -37,8 +37,8 @@
     "hint": "Ton · färg · form"
   },
   "tone": {
-    "label": "3 · Ton",
-    "tip": "Original: your exact words, unlimited. Ändrar hur dina ord känns på kortet. Varm är mjuk. Djärv är direkt. Poetisk flyter med rytm. Lekfull är lätt. Reflekterande är långsam. Ärlig är rå. Ändrar endast teckenavstånd och lutning — inte storlek eller vikt.",
+    "label": "Ton",
+    "tip": "Original behåller dina exakta ord — obegränsat, ingen daglig gräns. Andra toner skrivs om av AI: Varm är mjuk. Djärv är direkt. Poetisk flyter med rytm. Lekfull är lätt. Reflekterande är långsam. Ärlig är rå. Ändrar endast teckenavstånd och lutning — inte storlek eller vikt.",
     "original": "Original",
     "warm": "Varm",
     "bold": "Djärv",
@@ -46,10 +46,10 @@
     "playful": "Lekfull",
     "reflective": "Reflekterande",
     "honest": "Ärlig",
-    "rewriting": "Rewriting..."
+    "rewriting": "Skriver om..."
   },
   "color": {
-    "label": "4 · Kortfärg",
+    "label": "Kortfärg",
     "tip": "Sätter kortets bakgrund. Live-förhandsgranskningen uppdateras direkt.",
     "violet": "Violett",
     "amber": "Bärnsten",
@@ -63,7 +63,7 @@
     "indigo": "Indigo"
   },
   "shape": {
-    "label": "5 · Form",
+    "label": "Form",
     "tip": "Vassa kanter fungerar bäst för WhatsApp. Avrundade hörn passar gallerier och webb.",
     "sharp": "Vassa kanter",
     "rounded": "Avrundade hörn"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "Skapa kort",
     "share": "Dela kort",
-    "createTone": "Create {tone} card"
+    "createTone": "Skapa {tone}-kort"
   },
   "closing": "Din röst, vackert delad",
   "preview": {
@@ -108,7 +108,7 @@
     "go": "Kör",
     "lostKey": "Förlorat din nyckel?",
     "emailPlaceholder": "Ange din e-post",
-    "emailSend": "Skåter återställningsmejl",
+    "emailSend": "Skicka återställningsmejl",
     "disclaimer": "Wispr Stories — skapat för Wispr Flow"
   },
   "capacity": {
@@ -123,7 +123,7 @@
     "step2": "<strong>Anpassa</strong> ditt kort — välj ton, färg och hörnstil.",
     "step3": "<strong>Skapa och dela</strong> — ladda ner som PNG eller dela direkt på sociala plattformar.",
     "gotIt": "Uppfattat — kör igång!",
-    "hint": "Behöver du hjälp senare? Tryck på ❐-ikonen i det övre fältet."
+    "hint": "Behöver du hjälp senare? Tryck på ❓-ikonen i det övre fältet."
   },
   "mobileBar": {
     "create": "Skapa",

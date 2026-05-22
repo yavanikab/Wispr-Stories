@@ -1,33 +1,33 @@
 {
   "nav": {
-    "tagline": "話す · 作る · 共有する",
+    "tagline": "話す · 整える · 共有する",
     "help": "使い方",
     "theme": "ダークモード切替"
   },
   "hero": {
     "title": "一度話して、永遠に共有",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> で話す；丁寧にスタイリング；愛を込めて共有。",
+    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>で音声入力；丁寧にスタイリング；愛を込めて共有。",
     "quote": "\"思い出を大切にしよう；思い出もあなたを大切にしてくれる。\""
   },
-  "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のも作りましょう。",
+    "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のカードも作りましょう。",
   "ffNotice": "🌐 Firefoxでは音声録音がサポートされていません。ChromeまたはSafariを使用してください — または下にテキストを貼り付けてください。",
   "record": {
-    "label": "1 · タップして話す",
+    "label": "タップして話す",
     "tip": "録音を押して自然に話してください。言葉がリアルタイムで表示されます。もう一度タップして停止 — 言葉がカード用のテキストボックスに移動します。",
     "status": "タップして話す",
-    "sub": "話している間に言葉が表示されます",
-    "generating": "Generating…"
+    "sub": "停止すると文字が表示されます",
+    "generating": "生成中…"
   },
   "orText": "または言葉を入力または貼り付け",
   "textarea": {
-    "label": "2 · あなたの言葉",
+    "label": "あなたの言葉",
     "tip": "まず上の録音を使って話す — 言葉が自動的にここに表示されます。または直接入力。またはWispr Flowから貼り付け。どの言語でも使えます。",
     "placeholder": "声を録音するか何でも入力：誕生日の願い、思い出、レシピ、ラブレター、感謝、アドバイス..."
   },
   "resetBtn": "すべてリセット",
   "nameRow": {
     "label": "から",
-    "placeholder": "例：ママ、ドゥルガー、テイラー、先生、アブエラ、P'Lisa、エラ..."
+    "placeholder": "例：ママ、ドゥルガー、テイラー、先生、アブエラ、Pi Lisa、エラ..."
   },
   "examples": {
     "label": "インスピレーションが必要ですか？例をクリック"
@@ -37,8 +37,8 @@
     "hint": "トーン · 色 · 形"
   },
   "tone": {
-    "label": "3 · トーン",
-    "tip": "Original: your exact words, unlimited. カード上の言葉の印象を変えます。暖かいは優しい。大胆は直接的。詩的はリズムを持って流れる。遊び心は軽い。内省的はゆっくり。正直は率直。文字間隔と傾きのみを変更 — サイズや太さは変えません。",
+    "label": "トーン",
+    "tip": "オリジナルはあなたの言葉をそのまま残します — 無制限、毎日の上限なし。他のトーンはAIで書き換えます：暖かいは優しく、大胆は直接的、詩的はリズムを持って流れ、遊び心は軽く、内省的はゆっくり、正直はありのまま。文字間隔と傾きのみを変更 — サイズや太さは変えません。",
     "original": "オリジナル",
     "warm": "暖かい",
     "bold": "大胆",
@@ -46,10 +46,10 @@
     "playful": "遊び心",
     "reflective": "内省的",
     "honest": "正直",
-    "rewriting": "Rewriting..."
+    "rewriting": "書き換え中..."
   },
   "color": {
-    "label": "4 · カードの色",
+    "label": "カードの色",
     "tip": "カードの背景を設定します。ライブプレビューが即座に更新されます。",
     "violet": "バイオレット",
     "amber": "アンバー",
@@ -63,7 +63,7 @@
     "indigo": "インディゴ"
   },
   "shape": {
-    "label": "5 · 形",
+    "label": "形",
     "tip": "シャープな角はWhatsAppに最適。丸い角はギャラリーやウェブに適しています。",
     "sharp": "シャープな角",
     "rounded": "丸い角"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "カードを作成",
     "share": "カードを共有",
-    "createTone": "Create {tone} card"
+    "createTone": "{tone}トーンのカードを作成"
   },
   "closing": "あなたの声、美しく共有",
   "preview": {
@@ -105,7 +105,7 @@
     "or": "— または —",
     "haveKey": "すでにサポーターキーをお持ちですか？",
     "keyPlaceholder": "キーを貼り付け...",
-    "go": "実行",
+    "go": "GO",
     "lostKey": "キーを紛失しましたか？",
     "emailPlaceholder": "メールを入力",
     "emailSend": "復旧メールを送信",

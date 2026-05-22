@@ -3,7 +3,7 @@
  * filling the form yet. Stops permanently on the first real interaction.
  *
  * Reads `allExamples` (from examples-loader.js), `PALS`/`TONES`/`getToneFont`
- * (from wisprstories.js / fonts.js) — all top-level consts/lets, accessible
+ * (from wisprstories.js / global/fonts.js) — all top-level consts/lets, accessible
  * across non-module scripts.
  */
 

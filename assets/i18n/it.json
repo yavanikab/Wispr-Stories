@@ -1,33 +1,33 @@
 {
   "nav": {
-    "tagline": "Parla · Crea · Condividi",
+    "tagline": "Parla · Stila · Condividi",
     "help": "Come usare",
     "theme": "Attiva modalità scura"
   },
   "hero": {
     "title": "Dillo una volta, condividilo per sempre",
-    "subtitle": "Ditta con <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; stilizza con cura; condividi con amore.",
+    "subtitle": "Detta con <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; stilizza con cura; condividi con amore.",
     "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
   },
   "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
   "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari — o incolla il tuo testo qui sotto.",
   "record": {
-    "label": "1 · Tocca per parlare",
+    "label": "Tocca per parlare",
     "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare — le tue parole si spostano nella casella di testo pronte per la card.",
     "status": "Tocca per parlare",
-    "sub": "Le tue parole appaiono mentre parli",
-    "generating": "Generating…"
+    "sub": "Le tue parole appaiono quando ti fermi",
+    "generating": "Generazione…"
   },
   "orText": "o digita o incolla le tue parole",
   "textarea": {
-    "label": "2 · Le tue parole",
+    "label": "Le tue parole",
     "tip": "Parla prima usando Registra sopra — le parole arrivano qui automaticamente. O digita direttamente. O incolla da Wispr Flow. Qualsiasi lingua funziona qui.",
     "placeholder": "Registra la tua voce o digita qualsiasi cosa: un augurio di compleanno, un ricordo, una ricetta, una lettera d'amore, gratitudine, un consiglio..."
   },
   "resetBtn": "Reimposta tutto",
   "nameRow": {
     "label": "Da",
-    "placeholder": "Es: Mamma, Durga, Taylor, Sensei, Abuela, P'Lisa, Ella..."
+    "placeholder": "Es: Mamma, Durga, Taylor, Sensei, Abuela, Pi Lisa, Ella..."
   },
   "examples": {
     "label": "Hai bisogno di ispirazione? Clicca su un esempio"
@@ -37,19 +37,19 @@
     "hint": "Tono · colore · forma"
   },
   "tone": {
-    "label": "3 · Tono",
-    "tip": "Original: your exact words, unlimited. Cambia come le tue parole si sentono sulla card. Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
+    "label": "Tono",
+    "tip": "Originale mantiene le tue parole esatte — illimitato, senza limite giornaliero. Altri toni vengono riscritti con IA: Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
     "original": "Originale",
-    "warm": "Caldo",
+    "warm": "Accogliente",
     "bold": "Audace",
     "poetic": "Poetico",
     "playful": "Giocoso",
     "reflective": "Riflessivo",
     "honest": "Onesto",
-    "rewriting": "Rewriting..."
+    "rewriting": "Riscrittura..."
   },
   "color": {
-    "label": "4 · Colore della card",
+    "label": "Colore della card",
     "tip": "Imposta lo sfondo della card. L'anteprima dal vivo si aggiorna istantaneamente.",
     "violet": "Viola",
     "amber": "Ambra",
@@ -63,7 +63,7 @@
     "indigo": "Indaco"
   },
   "shape": {
-    "label": "5 · Forma",
+    "label": "Forma",
     "tip": "I bordi netti funzionano meglio per WhatsApp. Gli angoli arrotondati sono ideali per gallerie e web.",
     "sharp": "Bordi netti",
     "rounded": "Angoli arrotondati"
@@ -71,7 +71,7 @@
   "actions": {
     "create": "Crea card",
     "share": "Condividi card",
-    "createTone": "Create {tone} card"
+    "createTone": "Crea card {tone}"
   },
   "closing": "La tua voce, magnificamente condivisa",
   "preview": {
@@ -123,7 +123,7 @@
     "step2": "<strong>Personalizza</strong> la tua card — scegli un tono, colore e stile degli angoli.",
     "step3": "<strong>Crea e condividi</strong> — scarica come PNG o condividi direttamente sui social.",
     "gotIt": "Ho capito — andiamo!",
-    "hint": "Hai bisogno di aiuto dopo? Tocca l'icona ❐ nella barra superiore."
+    "hint": "Hai bisogno di aiuto dopo? Tocca l'icona ❓ nella barra superiore."
   },
   "mobileBar": {
     "create": "Crea",

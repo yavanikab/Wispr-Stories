@@ -60,7 +60,8 @@
   margin-top: 2px;
 }
 .rec-sub.live {
-  color: #dc2626;
+  color: var(--ink);
+  font-weight: 500;
 }
 .rec-counter {
   font-size: 11px;
@@ -89,21 +90,25 @@
   word-break: break-word;
   transition: all 0.3s ease;
 }
+/* Live transcription box, active state — calm brand-color breathing glow
+   instead of a red alarm. Red is reserved for the mic button (which has
+   its own pulse). Works in both light and dark modes via --live-glow
+   variables defined in base.css. */
 .live-box.show {
   display: block;
-  background: #fef3f2;
-  border-color: #dc2626;
+  background: var(--cream3);
+  border-color: var(--ink3);
   border-width: 1.5px;
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-  animation: pulse-border 1.5s ease-in-out infinite;
+  box-shadow: 0 0 0 3px var(--live-glow);
+  animation: live-box-breathe 2.4s ease-in-out infinite;
 }
-@keyframes pulse-border {
+@keyframes live-box-breathe {
   0%,
   100% {
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    box-shadow: 0 0 0 3px var(--live-glow);
   }
   50% {
-    box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.15);
+    box-shadow: 0 0 0 6px var(--live-glow-strong);
   }
 }
 
@@ -176,15 +181,58 @@
   font-size: 11px;
 }
 .reset-btn {
+  /* Pushed to the right edge of .rec-row (the row with the mic + Tap to
+     speak), aligned with the top of that section so the user can hit
+     "Start over" without scrolling.
+
+     Default state uses a muted red (#b91c1c) so the destructive intent is
+     readable at a glance without competing with the gold primary CTA.
+     Hover escalates to the brighter alarm-red to signal "this is the
+     point of no return." */
+  margin-left: auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
-  color: var(--ink3);
+  font-weight: 700;
+  color: #b91c1c;
   background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 4px 10px;
+  border: 1px solid rgba(185, 28, 28, 0.35);
+  /* Soft rect (8px) — matches the action-button tier (.btn-c, .btn-s,
+     upgrade buttons). One consistent radius for action-type buttons. */
+  border-radius: 8px;
+  padding: 6px 10px;
   transition: all 0.18s;
   cursor: pointer;
-  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.reset-btn i {
+  font-size: 11px;
+}
+:root.dark .reset-btn {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+/* Mobile — stack icon on top, label on bottom, matching the mobile-bar
+   pattern (Create/Share are also icon-over-text). Saves horizontal space
+   so the button doesn't collide with the mic+title block. */
+@media (max-width: 720px) {
+  .reset-btn {
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px;
+    font-size: 10px;
+    line-height: 1.1;
+    min-width: 56px;
+    align-items: center;
+    justify-content: center;
+  }
+  .reset-btn i {
+    font-size: 14px;
+  }
 }
 .reset-btn:hover {
   color: #dc2626;
@@ -253,49 +301,116 @@
   pointer-events: none;
 }
 
-/* Tone limit badges — show remaining rewrites directly on buttons */
+/* Tone limit badges — show remaining rewrites directly on each tone button.
+   Bumped from 9–10px to 13px so the count is legible at a glance without
+   needing to lean in. Min-width keeps single-digit counts visually balanced
+   with double-digit / infinity glyphs. */
 .tone-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   line-height: 1;
-  margin-left: 4px;
-  padding: 2px 5px;
-  border-radius: 6px;
+  margin-left: 6px;
+  padding: 3px 7px;
+  min-width: 20px;
+  border-radius: 8px;
   vertical-align: middle;
+  letter-spacing: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 .tone-badge-unlimited {
-  background: rgba(34, 197, 94, 0.2);
-  color: #16a34a;
+  background: rgba(34, 197, 94, 0.22);
+  color: #15803d;
+  font-size: 14px;
 }
+/* Selected chip — switch to a solid, high-contrast badge so the count/glyph
+   stays legible against the dark (light-mode) or light (dark-mode) chip
+   background. Translucent backgrounds disappeared against ink chips. */
 .tc.on .tone-badge-unlimited {
-  background: rgba(34, 197, 94, 0.3);
-  color: #16a34a;
+  background: #22c55e;
+  color: #04240f;
 }
 .tone-badge-limited {
-  background: rgba(245, 158, 11, 0.2);
-  color: #d97706;
-  font-size: 9px;
-}
-.tc.on .tone-badge-limited {
-  background: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.22);
   color: #b45309;
 }
+.tc.on .tone-badge-limited {
+  background: #f59e0b;
+  color: #1a1a1a;
+}
+/* Exhausted state — when count hits 0 and the chip is disabled. Stronger
+   red contrast + a subtle pulse so the user notices the lockout. */
 .tc:disabled .tone-badge-limited {
-  background: rgba(220, 38, 38, 0.25);
-  color: #dc2626;
+  background: rgba(220, 38, 38, 0.28);
+  color: #b91c1c;
+  animation: tone-badge-exhausted-pulse 1.8s ease-in-out infinite;
+}
+@keyframes tone-badge-exhausted-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 /* Pro badge — infinity symbol for unlimited rewrites */
 .tone-badge-pro {
-  background: rgba(139, 92, 246, 0.2);
-  color: #7c3aed;
-  font-size: 11px;
+  background: rgba(139, 92, 246, 0.22);
+  color: #6d28d9;
+  font-size: 15px;
 }
 .tc.on .tone-badge-pro {
-  background: rgba(139, 92, 246, 0.3);
-  color: #6d28d9;
+  background: #8b5cf6;
+  color: #ffffff;
+}
+
+/* Dark mode — slightly lighter text + background so badges stay readable
+   against the dark chip surface. */
+:root.dark .tone-badge-unlimited {
+  background: rgba(34, 197, 94, 0.28);
+  color: #4ade80;
+}
+:root.dark .tone-badge-limited {
+  background: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+}
+:root.dark .tc:disabled .tone-badge-limited {
+  background: rgba(220, 38, 38, 0.32);
+  color: #fca5a5;
+}
+:root.dark .tone-badge-pro {
+  background: rgba(139, 92, 246, 0.32);
+  color: #c4b5fd;
+}
+/* Dark-mode + selected chip — explicit override (same specificity as the
+   generic dark-mode rules above, but later in cascade so it wins). Solid
+   high-contrast badges so the count stays legible on the cream-colored
+   selected-chip background in dark mode, mirroring the light-mode fix. */
+:root.dark .tc.on .tone-badge-unlimited {
+  background: #22c55e;
+  color: #04240f;
+}
+:root.dark .tc.on .tone-badge-limited {
+  background: #f59e0b;
+  color: #1a1a1a;
+}
+:root.dark .tc.on .tone-badge-pro {
+  background: #8b5cf6;
+  color: #ffffff;
+}
+
+/* Mobile — keep badges almost as large as desktop. Small drop in padding
+   keeps the chip-row from wrapping awkwardly on narrow screens while still
+   being thumb-friendly. */
+@media (max-width: 720px) {
+  .tone-badge {
+    font-size: 12px;
+    padding: 3px 6px;
+    min-width: 18px;
+    margin-left: 5px;
+  }
+  .tone-badge-unlimited,
+  .tone-badge-pro {
+    font-size: 13px;
+  }
 }
 
 /* Blank state: tone / colour / size / roundness rows are inert until the
@@ -390,6 +505,14 @@
   flex-shrink: 0;
   cursor: pointer;
   touch-action: manipulation;
+  /* Button reset — these swatches are now <button> elements (for proper
+     keyboard/screen-reader semantics). Override the browser's default
+     button chrome so they keep their pure-circle appearance. */
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .pd:hover {
   transform: scale(1.18);
@@ -407,9 +530,11 @@
 .sz {
   background: transparent;
   border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 6px 11px;
-  font-size: 11px;
+  /* Full pill — matches .tc tone chips. Both are inline single-select
+     group pickers and now read as one consistent visual language. */
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
   color: var(--ink2);
   transition: all 0.18s;
   white-space: nowrap;
@@ -430,7 +555,10 @@
    Open by default for the new hierarchy; user can collapse if desired. */
 .customize {
   border-bottom: 1px solid var(--rule);
-  padding: 0 0 18px;
+  /* Internal bottom padding keeps the last sub-section (Shape buttons)
+     from sitting flush against the section's bottom border. The outer
+     .left gap (28px) still handles spacing to the next section. */
+  padding: 0 0 16px;
 }
 .customize > summary.customize-summary {
   list-style: none;
@@ -454,17 +582,47 @@
   color: var(--ink);
 }
 .customize-summary-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
 }
+/* Live chip summary inside the Style accordion's collapsed header. Shows
+   the user's current tone, color, and shape choices at a glance so the
+   collapsed state never feels like state-loss. */
 .customize-summary-hint {
   flex: 1;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ink3);
   font-weight: 400;
-  letter-spacing: 0.01em;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.cz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink2);
+  white-space: nowrap;
+}
+.cz-chip-sep {
+  color: var(--ink3);
+  opacity: 0.5;
+  user-select: none;
+}
+.cz-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+:root.dark .cz-swatch {
+  border-color: rgba(255, 255, 235, 0.25);
 }
 .customize-chevron {
   font-size: 10px;
@@ -497,7 +655,8 @@ details.customize:not([open]) > *:not(summary.customize-summary) {
   border: 1px solid var(--rule);
   border-radius: 16px;
   padding: 24px;
-  margin-bottom: 20px;
+  /* Bottom spacing is owned by .left's gap (28px) — no margin-bottom here.
+     See spacing-rhythm pass: parent gap is the single source of truth. */
 }
 .input-hero > div {
   margin-bottom: 0;
@@ -527,11 +686,11 @@ details.customize:not([open]) > *:not(summary.customize-summary) {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 24px;
   padding: 12px 16px;
   background: var(--cream2);
   border: 1px solid var(--rule);
   border-radius: 12px;
+  /* Bottom spacing owned by .left's gap (28px) — no margin-bottom. */
 }
 .name-label {
   font-size: 14px;

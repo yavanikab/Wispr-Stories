@@ -71,20 +71,9 @@
   outline-offset: 3px;
   border-radius: 4px;
 }
-/* FIREFOX NOTICE */
-.ff-notice {
-  background: var(--cream2);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--ink2);
-  line-height: 1.55;
-  display: none;
-}
-.ff-notice.show {
-  display: block;
-}
+/* Firefox + shared-link notices replaced by the unified `.notice` slot;
+   see typography.css. The old .ff-notice / .shared-cta classes are gone
+   from the HTML — no styles needed here. */
 
 /* DARK MODE OVERRIDES */
 :root.dark .card-panel-text {

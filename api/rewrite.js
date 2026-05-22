@@ -6,6 +6,24 @@ import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 // Each tone has its own 5-rewrite daily budget (5 x 6 tones = 30 max/day).
 const FREE_MAX_PER_TONE = 5;
 
+// Global Redis cache for rewrite results (keyed by tone + text hash).
+// Cache hits skip both the OpenRouter call and rate limit consumption.
+const CACHE_TTL_SEC = 86400; // 24 hours
+
+// Bump whenever the prompt logic changes — old entries are orphaned and
+// expire on their own TTL, so prompt fixes take effect immediately without
+// a manual Redis flush.
+const PROMPT_VERSION = 'v2';
+
+function cacheKey(tone, text) {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash |= 0;
+  }
+  return `wispr:rewrites:cache:${PROMPT_VERSION}:${tone}:${Math.abs(hash).toString(36)}`;
+}
+
 // Tone-specific prompts for rewriting
 const TONE_PROMPTS = {
   warm: 'Rewrite this message to sound warm, friendly, and heartfelt. Keep it natural and personal.',
@@ -15,6 +33,31 @@ const TONE_PROMPTS = {
   reflective: 'Rewrite this message to sound thoughtful, contemplative, and introspective.',
   honest: 'Rewrite this message to sound direct, authentic, and genuine. No fluff.',
 };
+
+// Classify the dominant script of the input so the prompt can give the LLM
+// a positive, declarative instruction ("respond in Tamil script") instead of
+// a one-sided guard that small models routinely misinterpret. Japanese is
+// checked before Chinese because pure-Kanji Japanese would otherwise hit the
+// CJK range and be tagged Chinese.
+function detectScript(text) {
+  if (/[\u3040-\u309F\u30A0-\u30FF]/.test(text)) return 'Japanese';
+  if (/[\uAC00-\uD7AF]/.test(text))             return 'Korean';
+  if (/[\u4E00-\u9FFF]/.test(text))             return 'Chinese';
+  if (/[\u0900-\u097F]/.test(text))             return 'Devanagari (Hindi/Marathi)';
+  if (/[\u0980-\u09FF]/.test(text))             return 'Bengali';
+  if (/[\u0A00-\u0A7F]/.test(text))             return 'Gurmukhi (Punjabi)';
+  if (/[\u0A80-\u0AFF]/.test(text))             return 'Gujarati';
+  if (/[\u0B00-\u0B7F]/.test(text))             return 'Oriya';
+  if (/[\u0B80-\u0BFF]/.test(text))             return 'Tamil';
+  if (/[\u0C00-\u0C7F]/.test(text))             return 'Telugu';
+  if (/[\u0C80-\u0CFF]/.test(text))             return 'Kannada';
+  if (/[\u0D00-\u0D7F]/.test(text))             return 'Malayalam';
+  if (/[\u0E00-\u0E7F]/.test(text))             return 'Thai';
+  if (/[\u0600-\u06FF]/.test(text))             return 'Arabic';
+  if (/[\u0400-\u04FF]/.test(text))             return 'Cyrillic';
+  if (/[\u0370-\u03FF]/.test(text))             return 'Greek';
+  return 'Latin';
+}
 
 function truncateToSentenceBoundary(text, maxChars) {
   if (text.length <= maxChars) return text;
@@ -57,6 +100,23 @@ export default async function handler(req) {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+
+    // Check global Redis cache for this tone+text combination.
+    // Cache hits skip both the OpenRouter call and rate limit consumption.
+    try {
+      const redis = getRedis();
+      const cached = await redis.get(cacheKey(tone, text));
+      if (cached) {
+        const payload = { text: cached, original: text, tone };
+        if (isPro) payload.isPro = true;
+        return new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    } catch (cacheErr) {
+      console.warn('[Rewrite] Cache check failed, proceeding:', cacheErr.message);
     }
 
     // Check per-tone rewrite limit for free users.
@@ -103,36 +163,61 @@ export default async function handler(req) {
       });
     }
 
-    const prompt = `${TONE_PROMPTS[tone]} Keep it under 150 characters. Return ONLY the rewritten text, no quotes or commentary.\n\nOriginal message: "${text}"`;
+    const script = detectScript(text);
+    const scriptRule = script === 'Latin'
+      ? 'The input uses Latin script. Respond in Latin script only. If the input mixes English with romanized Hindi/Indic words (Hinglish), keep that mix — do NOT convert to Devanagari or any native script. If the input is plain English, respond in plain English.'
+      : `The input is written in ${script} script. Respond in ${script} script. Do NOT transliterate to Latin/Romanized form.`;
+    const prompt = `${TONE_PROMPTS[tone]} Keep it under 150 characters. Return ONLY the rewritten text, no quotes or commentary.\n\nLANGUAGE RULE: Respond in the exact same language and script as the input. Do not translate. ${scriptRule}\n\nOriginal message: "${text}"`;
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    // Try free model first, fall back to paid if rate-limited
+    const models = [
+      'openai/gpt-oss-120b:free',
+      // 'inclusionai/ling-2.6-flash', // ← uncomment before Vercel deploy for paid fallback
+    ];
+    let lastError = null;
+    let data = null;
 
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openrouterKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://wisprstories.vercel.app',
-        'X-Title': 'Wispr Stories',
-      },
-      body: JSON.stringify({
-        model: 'qwen/qwen3-next-80b-a3b-instruct:free',
-        messages: [
-          {
-            role: 'system',
-            content: 'You rewrite short voice messages into greeting cards with specific tones. Return ONLY the rewritten text.',
-          },
-          { role: 'user', content: prompt },
-        ],
-        max_tokens: 100,
-        temperature: 0.7,
-      }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
+    for (const model of models) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-    if (!res.ok) {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openrouterKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://wisprstories.vercel.app',
+          'X-Title': 'Wispr Stories',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            {
+              role: 'system',
+              content: 'You rewrite short voice messages into greeting cards with specific tones. You ALWAYS respond in the exact same language and script as the input. You never translate or transliterate. Return ONLY the rewritten text.',
+            },
+            { role: 'user', content: prompt },
+          ],
+          max_tokens: 100,
+          temperature: 0.7,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        data = await res.json();
+        break;
+      }
+
+      // Only fall back to next model on 429 (rate limit)
+      if (res.status === 429) {
+        lastError = await res.text();
+        console.warn(`[Rewrite] Model ${model} rate-limited, trying fallback`);
+        continue;
+      }
+
+      // Non-429 error — return immediately
       const err = await res.text();
       return new Response(JSON.stringify({ error: 'LLM API error', detail: err }), {
         status: res.status,
@@ -140,7 +225,12 @@ export default async function handler(req) {
       });
     }
 
-    const data = await res.json();
+    if (!data) {
+      return new Response(JSON.stringify({ error: 'LLM API error', detail: lastError }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     let rewritten = data.choices?.[0]?.message?.content?.trim() || '';
 
     // Remove quotes if the LLM wrapped the response in quotes
@@ -148,6 +238,14 @@ export default async function handler(req) {
 
     // Enforce 150-char limit with sentence-boundary truncation
     rewritten = truncateToSentenceBoundary(rewritten, 150);
+
+    // Store in Redis cache so future requests for the same tone+text skip OpenRouter
+    try {
+      const redis = getRedis();
+      await redis.set(cacheKey(tone, text), rewritten, { ex: CACHE_TTL_SEC });
+    } catch (cacheErr) {
+      console.warn('[Rewrite] Cache write failed, continuing:', cacheErr.message);
+    }
 
     // Compute remaining count for frontend UI sync.
     // For Pro users, send isPro signal. For free users, send per-tone used/remaining.
