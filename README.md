@@ -15,7 +15,7 @@
 <p align="center">
   A zero-friction, browser-based app that turns your voice into beautiful, shareable cards.
   <br>
-  No account · No install · 20 UI languages · voice transcription in any browser-supported language
+  No account · No install · 21 UI languages · voice transcription in any browser-supported language (Deepgram Nova-3 fallback elsewhere)
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Vanilla-HTML%2FCSS%2FJS-blue?style=flat-square" alt="Vanilla HTML/CSS/JS">
   <img src="https://img.shields.io/badge/Deployed-Vercel-000?style=flat-square&logo=vercel" alt="Vercel">
-  <img src="https://img.shields.io/badge/20-UI%20locales-orange?style=flat-square" alt="20 UI locales">
+  <img src="https://img.shields.io/badge/21-UI%20locales-orange?style=flat-square" alt="21 UI locales">
   <img src="https://img.shields.io/badge/Zero-Backend-green?style=flat-square" alt="Zero Backend">
 </p>
 
@@ -39,7 +39,7 @@ Wispr Stories is a browser-based tool that turns voice into a shareable card. An
 
 **The core insight:** Wispr Flow is powerful but invisible. People dictate emails, recipes, and memories every day — but none of it is shareable. Wispr Stories is the social layer that was missing.
 
-Every shared card carries "Wispr Stories — made for Wispr Flow" and links to [wisprflow.ai](https://wisprflow.ai?ref=wispr-stories). The card itself is the advertisement.
+Wispr Stories is an independent fan project — not affiliated, not sponsored. [Wispr Flow](https://wisprflow.ai?ref=wispr-stories) is credited in the page footer and shared-link previews; the cards themselves carry only the user's words and a small Wispr Stories mark.
 
 ## The Grandparent Test
 
@@ -59,8 +59,8 @@ Every shared card carries "Wispr Stories — made for Wispr Flow" and links to [
 - 🎨 **6 card palettes** — Violet, Amber, Crimson, Emerald, Ocean, Rose
 - ✍️ **6 tones** — Warm, Bold, Poetic, Playful, Reflective, Honest (changes font style + glyph)
 - 📐 **4 aspect ratios** — 4:5 Instagram, 16:9 widescreen, 3:4 universal, 9:16 Stories
-- 🌍 **20 UI languages** — English, German, Spanish, French, Gujarati, Hindi, Indonesian, Italian, Japanese, Kannada, Korean, Malayalam, Punjabi, Portuguese, Russian, Swedish, Tamil, Telugu, Thai, Turkish, Mandarin Chinese. Card content stays in the user's original language.
-- 🔤 **RTL infrastructure** — `dir="rtl"` and script-specific CSS render right-to-left correctly; ready for Arabic, Hebrew, Farsi, Urdu locale files when added (none ship today)
+- 🌍 **21 UI languages** — English, German, Spanish, French, Gujarati, Hindi, Indonesian, Italian, Japanese, Kannada, Korean, Malayalam, Punjabi, Portuguese, Russian, Swedish, Tamil, Telugu, Thai, Turkish, Mandarin Chinese. Card content stays in the user's original language.
+- 🔤 **RTL infrastructure** — `dir="rtl"` and script-specific CSS render right-to-left correctly; ready for Arabic, Farsi, Urdu locale files when added (none ship today)
 - 📱 **Mobile-first** — responsive design with 44px tap targets, fluid typography
 - 📤 **Native sharing** — Web Share API sends PNG + app link together on iOS/Android
 - 🖼️ **OG image generation** — Vercel Edge function for rich link previews
@@ -69,7 +69,7 @@ Every shared card carries "Wispr Stories — made for Wispr Flow" and links to [
 
 ## Quick Start
 
-No build step. Open `wisprstories.html` in any browser, or run `node serve.js` for local development. Deploy to Vercel with `vercel --prod`.
+No build step. Open `wisprstories.html` in any browser, or run `node serve.cjs` for local development. Deploy to Vercel with `vercel --prod`.
 
 ## Tech Stack
 
@@ -91,37 +91,56 @@ No build step. Open `wisprstories.html` in any browser, or run `node serve.js` f
 wispr-stories/
 ├── wisprstories.html          # Main HTML entry point
 ├── wisprstories.js            # App logic
-├── global/fonts.js              # Script-detection font mapping
-├── serve.js                   # Zero-dependency Node dev server
+├── serve.cjs                  # Zero-dependency Node dev server
 ├── vercel.json                # Vercel deployment + security headers
 ├── package.json               # Minimal: only @vercel/og
 │
-├── api/
-│   ├── card.js                # Edge handler: shared-card redirect + OG metadata
-│   └── og.js                  # Edge OG image renderer
+├── api/                       # Vercel Edge functions
+│   ├── card.js                # Shared-card redirect + OG metadata
+│   ├── og.js                  # OG image renderer (@vercel/og)
+│   ├── stt.js                 # Deepgram Nova-3 speech-to-text fallback
+│   ├── rewrite.js             # OpenRouter LLM tone rewriting (script-aware)
+│   ├── upload.js              # Shared-card upload
+│   ├── usage.js               # Daily quota tracking
+│   ├── limits.js              # Per-tone rate limits
+│   ├── pro-status.js          # Pro tier validation
+│   ├── validate-key.js        # Pro key validation
+│   └── cleanup.js             # Expired-share cleanup
+│
+├── lib/
+│   └── redis.js               # Upstash Redis client (quotas + cache)
 │
 ├── assets/
-│   ├── ws-logo-bl.png         # Logo (black)
-│   ├── ws-logo-wh.png         # Logo (white)
-│   ├── ws-logo-blwbg.png      # Logo (with background)
+│   ├── ws-logo-{bl,wh,blwbg}.png  # Logo variants
 │   ├── og-image.png           # 1200×630 OG preview
 │   ├── html2canvas/           # Local html2canvas bundle
-│   ├── languages/             # Language flag icons
+│   ├── languages/             # Language flag icons + languages.json
+│   ├── i18n/                  # 21 UI locale JSON files + NATIVE-REVIEW.md
 │   └── fontawesome/           # Icon fonts
 │
 ├── global/
-│   ├── styles/
-│   │   ├── main.css           # Style import aggregator
-│   │   ├── base.css           # Reset styles
-│   │   ├── components.css     # Card, buttons, nav, footer
+│   ├── fonts.js               # Script-detection font mapping
+│   ├── styles/                # 13 CSS modules
+│   │   ├── main.css           # Import aggregator
+│   │   ├── base.css           # Reset
+│   │   ├── layout.css         # Page layout
+│   │   ├── nav.css            # Top nav
+│   │   ├── inputs.css         # Textarea, name input
+│   │   ├── actions.css        # Buttons, tone chips, palette row
+│   │   ├── card.css           # Card surface + variants
+│   │   ├── components.css     # Modals, notices, mobile bar
+│   │   ├── overlays.css       # Backdrops, toasts
+│   │   ├── tooltips.css       # Tooltip primitives
+│   │   ├── typography.css     # Tone font classes + scripts
 │   │   ├── responsive.css     # Mobile breakpoints
-│   │   └── fonts.css          # Tone font classes
-│   └── occasions/             # Occasion-specific styles
+│   │   └── fonts.css          # @font-face declarations
+│   └── occasions/             # Occasion-aware example grid
+│       ├── languages.json     # Locale metadata + sample sentences
+│       ├── occasions.json     # Occasion → per-language examples
+│       ├── examples-loader.js # Renders the inspiration grid
+│       └── occasions.{js,css} # Occasion detection + styling
 │
-├── docs/                      # Design specs, research notes
-├── prototype-voice-cards.html # Voice attachment prototype (deferred)
-├── prototype-waveform-play.html # Waveform playback prototype (deferred)
-└── legacy/                    # Archived previous versions
+└── docs/                      # Design specs, research notes
 ```
 
 ## Browser Support
@@ -140,7 +159,7 @@ Firefox users see a notice directing them to paste text instead. All other featu
 ### ✅ Completed
 
 - [x] Voice recording with live transcription (Web Speech API)
-- [x] 42 language support with RTL text
+- [x] 21 UI languages with RTL infrastructure (Arabic/Farsi/Urdu locale files not shipping today, but the rendering path is in place)
 - [x] 6 card palettes + 6 tones
 - [x] 4 social media aspect ratios
 - [x] PNG export via html2canvas
@@ -149,15 +168,15 @@ Firefox users see a notice directing them to paste text instead. All other featu
 - [x] Dark mode
 - [x] Multi-script font support (Devanagari, Bengali, CJK, Arabic, etc.)
 - [x] Input-source card labels (Voice Original / Story Styled)
-- [x] OpenRouter Whisper fallback for unsupported browsers
+- [x] Deepgram Nova-3 Multilingual fallback for unsupported browsers (`api/stt.js`)
 - [x] Web Speech API stability fixes (restart loop, timeout, error handling)
 - [x] Pre-baked WebP card backgrounds (no mix-blend-mode export issues)
+- [x] LLM tone rewriting via OpenRouter (`api/rewrite.js`) — script-aware prompt preserves the input's language and script
 - [x] Security: input validation, HTML escaping, JSON encoding
 
 ### 🚧 Deferred (designed, not built)
 
-- [ ] **Voice-attached cards** — tap the waveform on a shared card to hear the original voice (prototypes exist: `prototype-voice-cards.html`, `prototype-waveform-play.html`)
-- [ ] **LLM tone rewriting** — OpenRouter serverless function to genuinely reshape content per tone (not just visual styling)
+- [ ] **Voice-attached cards** — tap the waveform on a shared card to hear the original voice
 - [ ] **Shareable link cards** — animated web-based view at `wisprstories.vercel.app/s/abc123` instead of static PNG
 
 ## Acknowledgments
