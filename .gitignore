@@ -10,14 +10,6 @@ start-mobile.ps1
 .bak/
 legacy/
 docs/*
-!docs/superpowers/
-docs/superpowers/*
-!docs/superpowers/specs/
-!docs/superpowers/plans/
-docs/superpowers/specs/*
-docs/superpowers/plans/*
-!docs/superpowers/specs/2026-05-21-remotion-wispr-stories-promo-design.md
-!docs/superpowers/plans/2026-05-21-remotion-wispr-stories-promo.md
 Birthday cake-pana.svg
 server.log
 *.log
