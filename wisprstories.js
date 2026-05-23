@@ -709,9 +709,14 @@ async function startDeepgramRecording() {
       if (remaining <= 0) {
         clearInterval(recDurationTimer);
         recDurationTimer = null;
+        isRec = false;
         showToast("Max recording time reached (" + recMaxDuration + "s)");
         if (mediaRec && mediaRec.state !== "inactive") {
-          mediaRec.stop();
+          stopDeepgramRecording().then(function(result) {
+            fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+            var actualDuration = finishRec();
+            reportRecordingDuration(actualDuration || result.duration);
+          });
         }
         return;
       }
@@ -783,20 +788,35 @@ function stopDeepgramRecording() {
       reader.onloadend = async () => {
         try {
           const base64 = reader.result.split(",")[1];
-          const res = await fetch("/api/stt", {
-            method: "POST",
-            headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
-            body: JSON.stringify({ audio: base64, format: mediaRec.mimeType }),
-          });
-          if (!res.ok) {
-            const err = await res.text();
-            console.error("[Deepgram] API error:", err);
-            showToast("Transcription failed \u2014 tap record to try again");
+          var controller = new AbortController();
+          var sttTimeout = setTimeout(function() { controller.abort(); }, 10000);
+          try {
+            const res = await fetch("/api/stt", {
+              method: "POST",
+              headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
+              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: curLang }),
+              signal: controller.signal,
+            });
+            clearTimeout(sttTimeout);
+            if (!res.ok) {
+              const err = await res.text();
+              console.error("[Deepgram] API error:", err);
+              showToast("Transcription failed \u2014 tap record to try again");
+              resolve({ text: "", duration });
+              return;
+            }
+            const data = await res.json();
+            resolve({ text: data.text || "", duration });
+          } catch (e) {
+            clearTimeout(sttTimeout);
+            if (e.name === 'AbortError') {
+              console.warn("[Deepgram] Request timed out");
+              showToast("Transcription timed out \u2014 tap record to try again");
+            } else {
+              console.error("[Deepgram] Error:", e);
+            }
             resolve({ text: "", duration });
-            return;
           }
-          const data = await res.json();
-          resolve({ text: data.text || "", duration });
         } catch (e) {
           console.error("[Deepgram] Error:", e);
           resolve({ text: "", duration });
@@ -813,6 +833,14 @@ function startRec() {
     showToast(
       "Voice recording requires HTTPS \u2014 open via localhost or deploy to use"
     );
+    return;
+  }
+
+  // Malayalam and Punjabi: Deepgram doesn't support — use browser Web Speech API
+  var langCode = (curLang || '').slice(0, 2).toLowerCase();
+  if (langCode === 'ml' || langCode === 'pa') {
+    document.getElementById("recSub").textContent = "Browser speech \u2014 Tap to speak";
+    trySpeechFallback();
     return;
   }
 
@@ -1133,6 +1161,12 @@ if (langSelEl) {
     saveDraft();
     // Re-localize the Style chip summary to the new page language.
     setTimeout(updateStyleChipSummary, 100);
+    // Notify users of browser STT limitation for ml/pa
+    var _lc = (curLang || '').slice(0, 2).toLowerCase();
+    if ((_lc === 'ml' || _lc === 'pa') && !localStorage.getItem('wsMlPaNote')) {
+      showToast("This language uses browser speech recognition. Speak clearly for best results.");
+      try { localStorage.setItem('wsMlPaNote', '1'); } catch (_e) {}
+    }
   });
 }
 document.getElementById("toneRow").addEventListener("click", async (e) => {
