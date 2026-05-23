@@ -1,9 +1,14 @@
 {
   "name": "Wispr Stories",
   "short_name": "Wispr Stories",
-  "description": "Turn your voice into beautiful, shareable cards",
+  "description": "Speak your words, share your story — turn your voice into beautiful, shareable cards in 21 languages.",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["social", "productivity", "lifestyle"],
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#ffffeb",
   "theme_color": "#ffffeb",
   "icons": [
@@ -19,5 +24,25 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Start a card",
+      "short_name": "New card",
+      "description": "Open Wispr Stories ready to record or type",
+      "url": "/?source=shortcut-new",
+      "icons": [
+        { "src": "assets/ws-logo-blwbg.png", "sizes": "192x192", "type": "image/png" }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text"
+    }
+  },
+  "prefer_related_applications": false
 }

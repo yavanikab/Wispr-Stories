@@ -7,11 +7,11 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>
-      Wispr Stories &mdash; Turn your voice into beautiful, shareable cards
+      Wispr Stories &mdash; Turn your voice into shareable cards, in your language, in seconds
     </title>
     <meta
       name="description"
-      content="Turn your voice into beautiful, shareable cards. Speak naturally in 42 languages and get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
+      content="Turn your voice into shareable cards, in your language, in seconds. No install, no account needed."
     />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://wisprstories.vercel.app" />
@@ -19,11 +19,11 @@
     <meta property="og:url" content="https://wisprstories.vercel.app" />
     <meta
       property="og:title"
-      content="Wispr Stories &mdash; Turn your voice into beautiful, shareable cards"
+      content="Wispr Stories &mdash; Turn your voice into shareable cards, in your language, in seconds"
     />
     <meta
       property="og:description"
-      content="Speak naturally in 42 languages. Get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
+      content="Speak naturally in 21 languages. Get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
     />
     <meta property="og:site_name" content="Wispr Stories" />
     <meta property="og:locale" content="en_US" />
@@ -41,11 +41,11 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="Wispr Stories &mdash; Turn your voice into beautiful, shareable cards"
+      content="Wispr Stories &mdash; Turn your voice into shareable cards, in your language, in seconds"
     />
     <meta
       name="twitter:description"
-      content="Speak naturally in 42 languages. Get a stunning card to share. No account needed."
+      content="Speak naturally in 21 languages. Get a stunning card to share. No account needed."
     />
     <meta
       name="twitter:image"
@@ -67,6 +67,14 @@
     <link rel="icon" type="image/png" href="assets/ws-logo-blwbg.png" />
     <link rel="apple-touch-icon" href="assets/ws-logo-blwbg.png" />
     <link rel="manifest" href="site.webmanifest" />
+    <link
+      rel="search"
+      type="application/opensearchdescription+xml"
+      title="Wispr Stories"
+      href="/opensearch.xml"
+    />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="msapplication-TileColor" content="#ffffeb" />
     <script>
       if (
         localStorage.getItem("theme") === "dark" ||
@@ -80,6 +88,17 @@
          swap — that's a much better experience than staring at a blank
          screen while the translation file downloads. The previous
          visibility/opacity hide is intentionally removed. */
+
+      /* Service worker — registered on production hosts only. localhost and
+         the Vercel preview branches skip registration so a stale SW doesn't
+         shadow live edits during development. */
+      if ("serviceWorker" in navigator && location.hostname === "wisprstories.vercel.app") {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .catch(function () { /* SW registration failed — app still works */ });
+        });
+      }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -104,7 +123,7 @@
       rel="stylesheet"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Hachi+Maru+Pop&family=Kosugi+Maru&family=M+PLUS+Rounded+1c&family=Zen+Maru+Gothic&family=WDXL+Lubrifont+JP+N&family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Gowun+Dodum&family=Jua&family=Yeon+Sung&family=Hahmlet:wght@400&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=Zhi+Mang+Xing&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Sans+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=LXGW+WenKai+TC&family=Chiron+GoRound+TC:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Hachi+Maru+Pop&family=Kosugi+Maru&family=M+PLUS+Rounded+1c&family=Kosugi&family=WDXL+Lubrifont+JP+N&family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Gowun+Dodum&family=Jua&family=Yeon+Sung&family=Hahmlet:wght@400&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=Zhi+Mang+Xing&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Sans+TC:wght@400;700&family=Noto+Serif+TC:wght@400;700&family=LXGW+WenKai+TC&family=Chiron+GoRound+TC:wght@400&display=swap"
       rel="stylesheet"
     />
 
@@ -124,7 +143,7 @@
         "@type": "WebApplication",
         "name": "Wispr Stories",
         "url": "https://wisprstories.vercel.app",
-        "description": "Turn your voice into beautiful, shareable cards in 42 languages.",
+        "description": "Turn your voice into shareable cards, in your language, in seconds.",
         "applicationCategory": "Multimedia",
         "operatingSystem": "All",
         "browserRequirements": "Chrome or Safari for voice recording",

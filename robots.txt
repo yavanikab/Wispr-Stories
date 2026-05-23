@@ -1,0 +1,10 @@
+# Wispr Stories — robots policy
+# Public app; everything indexable except API endpoints and ephemeral share blobs.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /c/
+Disallow: /.well-known/
+
+Sitemap: https://wisprstories.vercel.app/sitemap.xml

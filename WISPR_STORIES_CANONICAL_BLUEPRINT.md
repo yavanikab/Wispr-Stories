@@ -24,7 +24,7 @@ Typing is slow and exhausting — especially on mobile. Wispr Flow solves this f
 
 The gap is not technical. It is awareness. Nobody has shown ordinary people what speaking instead of typing produces.
 
-Wispr Stories closes that gap by giving anyone — in any language, on any device — one effortless moment of proof. Speak naturally. Get something beautiful. Share it instantly.
+Wispr Stories closes that gap by giving anyone — in your language, on any device — one effortless moment of proof. Speak naturally. Get something beautiful. Share it instantly.
 
 ---
 
@@ -54,18 +54,20 @@ The app prioritises non-technical users first.
 3. Tap **Record** and speak naturally — words appear live
 4. On stopping, transcript moves into the text box automatically
 5. Alternatively, type directly or paste from Wispr Flow
-6. Choose a tone, card colour, and aspect ratio
-7. Tap **Create my card** — card locks in with a pulse animation
-8. Tap **Share card** — downloads as a PNG image
-9. Share the image on WhatsApp, Instagram, Twitter, or anywhere
+6. Choose a tone, card colour, and corner style (rounded/sharp)
+7. Optionally click an **example card** from the inspiration grid to auto-fill text, tone, and colour
+8. Tap **Create my card** — card locks in with a pulse animation
+9. Rewrite via LLM tone button (optional, 5/tone/day free)
+10. Tap **Share card** — share modal opens with 4 options: native share (image + URL), download PNG, copy link, copy image
+11. Recipient receives either a PNG (via WhatsApp/Instagram) or a shareable link (`wisprstories.vercel.app/c/shortId`) with OG preview
 
 ### What the card contains
 
 - A ghost display glyph (varies by tone) overlaid on the card background
-- A spiral watermark matching Wispr Flow's own share card aesthetic
+- A spiral watermark (pre-rendered into the background image, matching Wispr Flow's share card aesthetic)
 - A white inner panel with the user's text
 - An audio waveform — signals this content was voice-created
-- A **"🎙 Voice original" label** — confirms the content came from a real person's voice, not typed or AI-generated. This is intentionally kept on the shared card to preserve authenticity
+- A **"Voice original" / "Story card" label** — shows "Voice original" when recorded, "Story card" when typed/pasted
 - User name and Wispr Stories brand at the bottom
 - "wisprflow.ai" as the attribution link
 
@@ -79,7 +81,7 @@ The app prioritises non-technical users first.
 - **Secondary text:** `#555548`, `#99998a`
 - **Rules / borders:** `rgba(26,26,26,0.1)`
 
-### Card palettes (6 options)
+### Card palettes (10 options) × 2 corner styles (rounded/sharp = 20 backgrounds)
 
 | Name | Colour |
 |---|---|
@@ -89,6 +91,12 @@ The app prioritises non-technical users first.
 | Emerald | `#059669` |
 | Ocean | `#0284c7` |
 | Rose | `#db2777` |
+| Orange | `#f97316` |
+| Teal | `#14b8a6` |
+| Fuchsia | `#d946ef` |
+| Indigo | `#6366f1` |
+
+Card backgrounds are pre-baked WebP images at native resolution (stored in `assets/card-bgs/`). The spiral watermark is pre-rendered into each image — no CSS `mix-blend-mode` compositing needed during export.
 
 ### Typography
 - **Display / brand:** Playfair Display (serif)
@@ -111,13 +119,14 @@ Tone changes **only** `font-style` and `letter-spacing`. Font size and weight ne
 
 | Ratio | Best for |
 |---|---|
-| 4:5 | Instagram feed (default) |
-| 16:9 | Twitter, YouTube (widescreen) |
-| 3:4 | Universal |
-| 9:16 | Instagram Stories, WhatsApp Stories |
+| 2:2 (square) | WhatsApp large preview (default and only current ratio; 4:5, 16:9, 3:4, 9:16 are designed but not built) |
+| 4:5 | Instagram feed (designed) |
+| 16:9 | Twitter, YouTube (designed) |
+| 3:4 | Universal (designed) |
+| 9:16 | Instagram Stories, WhatsApp Stories (designed) |
 
 ### Spiral watermark
-Embedded in CSS as `background-image`. Uses `mix-blend-mode: screen` and `filter: invert(1)` to appear as a soft white overlay on dark card backgrounds.
+Pre-rendered into each card background WebP image. No CSS `mix-blend-mode` compositing needed during html2canvas export.
 
 ---
 
@@ -143,15 +152,17 @@ Single column: inputs → preview → footer. The preview is not sticky on mobil
 
 ## 7. Language Support
 
-Language selection is a dropdown of 37 languages. It is **only relevant when recording** — typing and pasting work in any language without changing it.
+Language selection is a dropdown of 21 languages. It is **only relevant when recording** — typing and pasting work in any language without changing it.
 
-Supported languages include English (US/UK), Hindi, Hinglish, Spanish (Spain/Mexico), French, Portuguese (Brazil/Portugal), Arabic, Mandarin (Simplified/Traditional), German, Japanese, Korean, Russian, Italian, Turkish, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Urdu, Bahasa Indonesia, Bahasa Melayu, Vietnamese, Thai, Farsi, Dutch, Polish, Swedish, Hebrew, Ukrainian, Romanian, Hungarian, Danish, Finnish.
+Supported languages for STT: English, Chinese (Mandarin), Hindi, Spanish, French, Portuguese, Russian, Indonesian, German, Japanese, Punjabi, Korean, Telugu, Tamil, Turkish, Italian, Thai, Gujarati, Kannada, Malayalam, Swedish. Deepgram Nova-3 fallback covers 36+ languages through auto-detection.
+
+**UI translation locales (20 + English):** 20 non-English locale files cover the same set plus Arabic and Urdu RTL support (currently hidden, infrastructure ready). See `assets/i18n/NATIVE-REVIEW.md` for per-locale review status.
 
 **Browser coverage:** Chrome supports the most languages (~70+). Safari and Edge support a subset. Firefox has no Web Speech API — a notice is shown directing Firefox users to paste instead.
 
 **RTL support:** Arabic, Hebrew, Farsi, and Urdu trigger `dir="rtl"` on the card panel automatically.
 
-**Multilingual examples:** Nine examples span English, Hindi, Hinglish, Spanish, Bengali, French, and German. Clicking an example automatically selects the correct recording language in the dropdown.
+**Multilingual examples:** The inspiration grid offers example cards across multiple languages. Clicking an example automatically selects the correct recording language and fills the text.
 
 ---
 
@@ -163,7 +174,7 @@ Supported languages include English (US/UK), Hindi, Hinglish, Spanish (Spain/Mex
 |---|---|---|
 | Voice transcription (primary) | Web Speech API (browser-native) | Free |
 | Voice transcription (fallback) | Deepgram Nova-3 Multilingual (Batch) via `api/stt.js` | $0.0043/min, $200 free credit (~555 hrs) |
-| Card rendering | HTML + CSS | Free |
+| Card rendering | HTML + CSS + pre-baked WebP backgrounds | Free |
 | PNG export | html2canvas (CDN) | Free |
 | Mobile sharing | Web Share API (native share sheet) | Free |
 | Fonts | Google Fonts CDN | Free |
@@ -203,6 +214,46 @@ The app is no longer purely client-side. It uses Vercel serverless functions for
 | Cumulative audio/user/day | 75s | 15 min (900s) |
 | Tone rewrites/user/day | 10 | Unlimited |
 
+### Occasion system
+
+The app has 13 built-in occasions that auto-detect from the user's text:
+
+| Occasion | Detection method |
+|---|---|
+| Birthday | Regex triggers in 30+ languages |
+| Diwali | Hindi, Tamil, Telugu, Bengali, Gujarati, and other Indian language triggers |
+| Christmas | 20+ language triggers |
+| Halloween | 10+ language triggers |
+| New Year | Language triggers |
+| Valentine's Day | Language triggers |
+| Wedding Day | Language triggers |
+| Friendship Day | Language triggers |
+| Anniversary | Language triggers |
+| Mother's Day | Language triggers |
+| Father's Day | Language triggers |
+| Siblings Day | Language triggers |
+| Independence Day | Date-aware (based on user's country, 10 countries mapped) |
+
+When a match is found, an occasion-themed WebP image appears in the card header and the card text examples auto-populate with relevant content. The detection logic (`global/occasions/occasions.js`) supports plain-string triggers and regex patterns.
+
+### PWA / Service worker
+
+The app is installable as a Progressive Web App:
+- `site.webmanifest` — install prompt, shortcuts, share target, theme colour
+- `sw.js` — service worker with three-tier caching:
+  - **Same-origin dynamic** (`/api/*`, `/c/*`): network-only
+  - **Cross-origin** (fonts, CDNs): stale-while-revalidate
+  - **Same-origin static**: cache-first with offline navigation fallback
+- Cache name: `wispr-stories-v0.9.3`
+- Offline: manual typing still works; recording, fonts, and image export require connectivity
+
+### Script-aware font system
+
+Per-script font mapping via `global/fonts.js`. Each of the 7 tones has a distinct font family assigned to 16 script types:
+- Latin, Cyrillic, Devanagari, Bengali, Gurmukhi, Gujarati, Tamil, Telugu, Kannada, Malayalam, Thai, Arabic, Chinese Simplified, Chinese Traditional, Japanese, Korean
+
+Mixed-script text (e.g., "Happy जन्मदिन!") is handled by splitting text into script segments and wrapping each in a `<span>` with the appropriate font. CJK disambiguation uses Hiragana/Katakana (→ Japanese) and Hangul (→ Korean) pre-scanning.
+
 ### Cost safeguards (7 layers)
 
 1. **15s max recording length** — caps per-recording cost
@@ -227,11 +278,61 @@ See `docs/cost-architecture.md` for full cost breakdown and scaling scenarios.
 
 ## 9. Files
 
+### Core app
 | File | Description |
 |---|---|
-| `wispr_stories_final.html` | Complete working prototype — single self-contained file |
-| `wispr_stories_docs_final.md` | This document |
-| `flow-spiral.svg` | Spiral watermark asset (already embedded in final HTML) |
+| `wisprstories.html` | Main HTML entry — SEO meta, OG/Twitter Cards, PWA manifest link, service-worker registration, style/script includes |
+| `wisprstories.js` | App logic — recording, transcription, card render, palette/tone/rounded controls, share modal, rewrite preview, drafts, i18n wiring |
+| `global/styles/` | 13 CSS modules: `base`, `layout`, `nav`, `inputs`, `actions`, `card`, `components`, `overlays`, `tooltips`, `typography`, `responsive`, `fonts`, `main` (aggregator) |
+| `global/fonts.js` | Per-script font mapping — 16 script types × 7 tones, context-aware CJK detection, mixed-script text splitting |
+| `global/footer-menu.js` | Collapsible footer support menu |
+| `global/demo.js` | Optional page-load demo animation (backed up, disabled) |
+| `global/occasions/` | Occasion auto-detection system (13 occasions, date-aware, regex pattern matching) |
+| `assets/i18n/` | 21 locale JSON files (`en.json` + 20 UI translations) + `i18n.js` loader + `NATIVE-REVIEW.md` |
+| `assets/i18n/i18n.js` | i18n loader with `data-i18n` attribute system |
+| `assets/languages/` | Language support data: `languages.json`, `languages-loader.js`, `languages.css` |
+| `assets/card-bgs/` | 20 pre-baked WebP card backgrounds (10 colours × 2 corner styles) |
+| `assets/og-1080/` | 20 OG image templates at 1080×1080 (used as PNG fallback backgrounds) |
+| `assets/og-1200x630/` | 20 OG image templates at 1200×630 (social preview fallbacks) |
+| `assets/html2canvas/` | Vendored html2canvas bundle (loaded on demand, not from CDN) |
+| `assets/occasions/` | 12 occasion-themed WebP images (birthday, Diwali, Christmas, etc.) |
+| `sw.js` | Service worker — cache-first shell, network-only `/api/` and `/c/`, offline navigation fallback |
+| `site.webmanifest` | PWA manifest — install prompt, shortcuts, share target, theming |
+| `serve.cjs` | Zero-dependency Node dev server (built-ins only) |
+| `vercel.json` | Deploy config — rewrites, security headers, cron schedule |
+| `package.json` | Runtime deps: `@upstash/redis`, `@vercel/blob`, `@vercel/og`, `sharp` |
+
+### Serverless API routes (12)
+| File | Description |
+|---|---|
+| `api/stt.js` | Deepgram Nova-3 Multilingual transcription fallback |
+| `api/rewrite.js` | OpenRouter LLM tone rewriting (DeepSeek V4 Flash Free) |
+| `api/upload.js` | Upload card PNG + generate OG image via `sharp`, store in Vercel Blob |
+| `api/c/[id].js` | Shared-card landing page — OG meta for bots, redirect for humans |
+| `api/card.js` | Card data endpoint |
+| `api/og.js` | Dynamic OG image renderer via `@vercel/og` |
+| `api/cleanup.js` | Daily blob cleanup (Vercel Cron, 36h retention) |
+| `api/usage.js` | Daily user-cap counter (Upstash Redis) |
+| `api/limits.js` | Per-tone rate-limit lookup (Upstash Redis) |
+| `api/pro-status.js` | Pro key validation against server-side allowlist |
+| `api/validate-key.js` | Pro key validation (stub — always returns "Invalid key") |
+| `api/webhook/bmc.js` | BuyMeACoffee webhook → auto key generation |
+| `lib/redis.js` | Shared Upstash Redis client + key registry |
+
+### Documentation
+| File | Description |
+|---|---|
+| `WISPR_STORIES_CANONICAL_BLUEPRINT.md` | This document |
+| `docs/interview-quick-reference.md` | Single source of truth for interview prep |
+| `docs/project-structure.md` | Internal layout reference |
+| `docs/cost-architecture.md` | Cost breakdown and scaling scenarios |
+| `docs/stt-provider-migration.md` | Deepgram Nova-3 migration notes |
+| `docs/upgrade-system-design.md` | Pro upgrade key system design |
+
+### Isolated sub-project
+| File | Description |
+|---|---|
+| `remotion-demo/` | Isolated React/Remotion promo video project — self-contained, not app runtime |
 
 ---
 
@@ -251,13 +352,24 @@ See `docs/cost-architecture.md` for full cost breakdown and scaling scenarios.
 
 ---
 
-## 11. What Tone Does Now vs What It Will Do
+## 11. What Tone Does Now
 
-**Current (visual only):**
-Selecting a tone changes `font-style` and `letter-spacing` on card text, and changes the background glyph. Font size and weight are locked — no awkward visual jumps between examples.
+**Visual layer (always applied):**
+Selecting a tone changes font-family, `font-style`, `font-weight`, and `letter-spacing` on card text, and changes the background glyph. Font size is locked — no awkward visual jumps between examples.
 
-**Planned (with OpenRouter LLM backend):**
-Raw transcript is sent to the LLM with a tone-specific prompt. The LLM reshapes the content — Warm softens the language, Bold tightens to punchy sentences, Poetic restructures with rhythm. This makes tone a genuine content transformation, not just a visual modifier.
+**Content rewriting layer (LLM, via OpenRouter DeepSeek V4 Flash Free):**
+Raw transcript can be sent to the LLM with a tone-specific prompt via the Rewrite button. The LLM reshapes the content — Warm softens the language, Bold tightens to punchy sentences, Poetic restructures with rhythm. This makes tone a genuine content transformation, not just a visual modifier.
+
+| Tone | Font style | Letter spacing | Glyph | LLM prompt style |
+|---|---|---|---|---|
+| Warm | Normal | 0.01em | ♥ | Softens, warms language |
+| Bold | Normal | -0.2px | ! | Tightens, punchy sentences |
+| Poetic | Italic | 0.02em | ~ | Restructures with rhythm |
+| Playful | Normal | 0.02em | ♪ | Lightens, playful tone |
+| Reflective | Normal | 0.01em | · | Deepens, contemplative |
+| Honest | Normal | 0 | — | Strips to essentials |
+
+**Limits:** Free users get 5 rewrites per tone per day (server-enforced via Redis). Pro users get unlimited. The 150-character limit with sentence-boundary truncation prevents runaway costs and ensures the LLM prompt stays focused.
 
 ---
 
@@ -268,13 +380,29 @@ The card is downloaded as a PNG image. The user forwards it on WhatsApp, posts i
 
 ---
 
+## 13. Share Link Pipeline
+
+In addition to PNG sharing, the app generates shareable links via Vercel Blob:
+
+1. User clicks "Share" → html2canvas captures card as PNG
+2. `POST /api/upload` sends raw PNG bytes to Vercel Blob
+3. Server generates a padded 1200×630 OG variant via `sharp`
+4. Returns an 8-character alphanumeric `shortId`
+5. Share modal opens with 4 actions: native share, download PNG, copy link (`wisprstories.vercel.app/c/<shortId>`), copy image
+6. **Bot** (WhatsApp/Twitter preview scraper) → gets OG meta → shows large card preview
+7. **Human** → gets landing page with full card image + "Create Your Own" CTA
+
+Blobs in `cards/` and `og/` older than 36 hours are deleted daily by `api/cleanup.js` (Vercel Cron, 3 AM UTC, auth via `CRON_SECRET`).
+
+---
+
 > ⚠️ **CRITICAL IMPLEMENTATION NOTE — DO NOT SKIP**
 >
 > **Problem:** A PNG shared on WhatsApp or Instagram does not automatically include a clickable link. The recipient sees the image only.
 >
 > **Solution:** Use the Web Share API to share **both the PNG file AND the app URL together** in a single share action. On iOS and Android, WhatsApp accepts `navigator.share({ files: [pngFile], url: 'https://wisprstories.vercel.app', text: 'Make your own voice card:' })`. The recipient gets the image plus a tappable link in the same message.
 >
-> **Current state:** The codebase shares the PNG file only. The URL must be added to the share payload in the `navigator.share()` call in `wispr_stories_final.html`.
+> **Current state:** The codebase shares the PNG file only. The URL must be added to the share payload in the `navigator.share()` call in `wisprstories.html`.
 >
 > **Claude Code / coding agent instruction:** When implementing or modifying the share button, always include `url: 'https://wisprstories.vercel.app'` and `text: 'Make your own voice card:'` alongside `files: [file]` in the `navigator.share()` call. Never share the file alone.
 
@@ -305,11 +433,11 @@ When a new user feels inspired to create their own card, they should be sent to 
 
 ---
 
-## 13. Deployment
+## 14. Deployment
 
 **URL:** `wisprstories.vercel.app`
 **Host:** Vercel free tier
-**Deploy method:** Drag `wispr_stories_final.html` into Vercel dashboard, or run `vercel --prod` from the project folder. No configuration required.
+**Deploy method:** Run `vercel --prod` from project root (applies `vercel.json` config, security headers, and cron schedule). Drag-and-drop to Vercel dashboard works for static files but doesn't apply `vercel.json` headers.
 
 The referral link on the card should include a tracking parameter:
 `https://wisprflow.ai?ref=wispr-stories`
@@ -318,7 +446,7 @@ This lets Wispr Flow's team see exactly how many visits and downloads originated
 
 ---
 
-## 14. Interview Pitch
+## 15. Interview Pitch
 
 > "Wispr Flow is one of the most powerful voice tools available, but most people have never heard of it — not because the product is not good, but because it is invisible. You dictate privately and nothing you create is shareable.
 >
@@ -326,46 +454,47 @@ This lets Wispr Flow's team see exactly how many visits and downloads originated
 >
 > Every card links back to Wispr Flow. But the conversion does not happen by pushing new users to a download page. It happens by letting them experience the magic themselves first — in their browser, in 60 seconds. After they create their own card, they see the Wispr Flow CTA at exactly the right moment.
 >
-> The app works in 37 languages, exports a PNG you can forward directly on WhatsApp or Instagram, and runs entirely in the browser with no backend. It is deployed at wisprstories.vercel.app. The next step is adding a single OpenRouter serverless function so tone actually reshapes your spoken words — not just the font."
+> The app works in 21 languages for STT (with 20+1 UI locales), exports a PNG or shareable link for WhatsApp or Instagram, and uses serverless functions for tone rewriting, STT fallback, and image upload. It is deployed at wisprstories.vercel.app. The tone system now reshapes your spoken words via LLM — not just the font."
 
 ---
 
-## 15. Open Questions for Next Phase
+## 16. Open Questions & Remaining Work
 
-1. **Deepgram STT integration:** Create `api/stt.js` with Deepgram Nova-3 Multilingual batch endpoint. Requires `DEEPGRAM_API_KEY` env var. See `docs/stt-provider-migration.md` for API comparison and fallback chain design.
+### ✅ Completed (since initial prototype)
 
-2. **15s recording limit enforcement:** Implement client-side timer + server-side validation. Pro tier gets 30s max. Needs UI feedback when limit is reached.
+| # | Item | Status |
+|---|------|--------|
+| 1 | **Deepgram STT integration** — `api/stt.js` with Nova-3 Multilingual batch endpoint | ✅ Built and deployed |
+| 2 | **Recording limit enforcement** — 15s max (free) / 30s max (Pro), client timer + server-side Redis validation | ✅ Built and deployed |
+| 3 | **Silence detection** — Web Audio API RMS < 0.01 over 2s, prevents silent audio from hitting API | ✅ Built and deployed |
+| 4 | **Remaining recordings counter** — Server-side via `/api/limits`, shows remaining per session | ✅ Built |
+| 5 | **Tone rewriting polish** — Client-side preview on card, original preserved in textarea, 150-char limit with sentence-boundary truncation, 5 rewrites/tone/day (free), unlimited (Pro) | ✅ Built and deployed |
+| 6 | **i18n (20 UI locales + English)** — `assets/i18n/` with 21 JSON files, `i18n.js` loader, `data-i18n` attribute system, RTL support | ✅ Built and deployed |
+| 8 | **Upgrade system (server-side)** — Redis validation, key format `WS-{OCCASION}-{YEAR}-{XXXX}`, BMC webhook, endpoints exist but `validate-key.js` is still a stub | ✅ Partially built |
+| 11 | **PNG + shareable link** — Vercel Blob + `api/c/[id].js` with OG metadata, short URLs | ✅ Built and deployed |
 
-3. **Silence detection:** Implement client-side Web Audio API RMS energy check. Threshold: RMS < 0.01 over 2 seconds = silence. Prevents silent audio from hitting Deepgram. Show "We didn't catch that — try again" for silent recordings.
+### 🔄 Remaining Work
 
-4. **Remaining recordings counter:** Show user how many recordings they have left today (free: 5/day, Pro: 50/day). Server-side via `/api/limits`.
+| # | Item | Priority | Notes |
+|---|------|----------|-------|
+| 7 | **Onboarding banner** — First-launch detection, banner UI with dismiss animation | Medium | Designed, not built |
+| 9 | **Wispr Flow API research** — Is there a documented API or OAuth for in-app dictation? | Medium | Would remove manual copy-paste step |
+| 10 | **Mobile preview UX** — Floating "Preview" button on mobile so users don't scroll past the card | Medium | Currently card sits below inputs |
+| 12 | **Voice-attached cards (DEFERRED)** — Waveform plays original voice via Vercel Blob | Low | Designed, 2 prototypes exist |
+| — | **Upgrade key validation (server-side)** — Replace localStorage stub with real Redis | Medium | Stub always returns "Invalid key" |
 
-5. **Tone rewriting polish:** Client-side preview on card, preserve original in textarea. Enforce 150-char limit with sentence-boundary truncation. Currently the API exists and is wired, but the UX needs refinement.
+### Voice-attached cards design details (for when resumed)
 
-6. **i18n (23 languages):** Create `assets/i18n/` directory, build `i18n.js` loader with `data-i18n` attribute system, translate UI strings to all 23 languages (zh, en, hi, es, ar, fr, pt, ru, ur, id, de, ja, pa, ko, te, ta, tr, it, th, gu, kn, ml, sv), add RTL support for Arabic/Urdu (`dir="rtl"` on `<html>`), wire language selector to nav. Card content stays English.
+Two working prototypes capture the full UX and code patterns:
+- [`prototype-voice-cards.html`](prototype-voice-cards.html) — upload/record tabs, voice toggle, recipient phone preview
+- [`prototype-waveform-play.html`](prototype-waveform-play.html) — waveform-as-play-button, real-audio amplitude analysis via Web Audio API
 
-7. **Onboarding banner:** First-launch detection (localStorage flag), banner UI with dismiss animation, help icon trigger for re-access. Designed and planned, not built.
+**Implementation plan when resumed:**
+- **Phase 1 (sender side, ~1 day):** Add Record/Upload tabs and "Attach my voice" toggle. Live preview waveform draws from real audio amplitudes and becomes clickable to play. Download still produces silent PNG.
+- **Phase 2 (closing the loop, ~1 day):** Store audio in Vercel Blob. On share, upload audio and attach URL to shared-card link. Update `api/card.js` for playback.
+- **Phase 3 (polish, ~half day):** "Voice attached" indicator, audio duration label, ~2MB / 60s cap, replace-audio control.
 
-8. **Upgrade system (server-side):** Replace current localStorage stub with Upstash Redis validation. Key format: `WS-{OCCASION}-{YEAR}-{XXXX}`. BuyMeACoffee webhook for auto key generation. Designed and partially built (endpoints exist, need full integration).
-
-9. **Wispr Flow API:** Is there a documented API or OAuth that would allow in-app dictation instead of copy-paste? This would remove the manual step entirely and make the experience seamless. Worth researching before the next development phase.
-
-10. **Mobile preview UX:** On mobile, the card preview sits below the inputs and requires scrolling. A floating "Preview" button or tab toggle would make the experience significantly better for older users who may not know to scroll down.
-
-11. **PNG vs link sharing:** Currently the shared artefact is a PNG image. A future option is generating a shareable link (e.g. `wisprstories.vercel.app/s/abc123`) that opens the card in an animated, web-based view — more engaging than a static image and clickable through to the app. Already implemented via Vercel Blob + `api/c/[id].js`.
-
-12. **Voice-attached cards (DEFERRED — designed, not built):** Today the recipient of a card can read it but not hear it. The design intent is that the existing on-card waveform becomes the play surface — tapping it plays the original voice, with the bars drawn from the real audio amplitude. The sender chooses per card whether to attach voice or keep it text-only via a toggle in the left column. Two working prototypes capture the full UX and code patterns:
-    - [`prototype-voice-cards.html`](prototype-voice-cards.html) — the upload/record tabs, the voice toggle, and the recipient phone preview
-    - [`prototype-waveform-play.html`](prototype-waveform-play.html) — the waveform-as-play-button integrated into the real card aesthetic, including real-audio amplitude analysis via Web Audio API
-
-    **Implementation plan when resumed:**
-    - **Phase 1 (sender side, ~1 day):** Add Record/Upload tabs and the "Attach my voice" toggle to the left column. Make the live preview's waveform draw from real audio amplitudes and become clickable to play. No sharing changes yet — download still produces a silent PNG.
-    - **Phase 2 (closing the loop, ~1 day):** Store audio in Vercel Blob (free tier, ~1GB, generous bandwidth). On Share, upload audio and attach the URL to the shared-card link. Update `api/card.js` so the recipient's page plays the audio when the waveform is tapped.
-    - **Phase 3 (polish, ~half day):** "Voice attached" indicator on the share button, audio duration label, ~2MB / 60s cap, replace-audio control.
-
-    **Constraint:** the downloaded card stays a PNG (no audio embedded — no image format supports audio). Voice is delivered only via the shared link. The sender's own download is silent by design, matching today's behaviour. Optionally a small "Save voice file" link can let the sender keep the MP3 too.
-
-    **Why deferred:** prioritised submission deadline. The two prototype files are the working spec — they should be referenced before any code is written in Phase 1.
+**Constraint:** Downloaded card stays PNG (no audio format supports embedded audio). Voice delivered via shared link only.
 
 ---
 
@@ -373,15 +502,15 @@ This lets Wispr Flow's team see exactly how many visits and downloads originated
 
 ---
 
-## 14. Pitches & Interview Preparation (Revised)
+## 17. Pitches & Interview Preparation (Revised)
 
 ### Resume — 1–2 sentence project description
-> **Wispr Stories** — A voice-to-card web app that lets anyone speak naturally and receive a beautifully designed shareable card, built as an open-source companion to Wispr Flow. Supports 37 languages, four social media aspect ratios, and deploys as a single HTML file with no backend required.
+> **Wispr Stories** — A voice-to-card web app that lets anyone speak naturally and receive a beautifully designed shareable card, built as an open-source companion to Wispr Flow. Supports 21 languages for STT (20+1 UI locales), 10 palettes × 2 corner styles, and deploys via Vercel with serverless functions for tone rewriting, STT fallback, and image upload.
 
 ---
 
 ### Email / cover letter — 3–4 sentences when applying to Wispr Flow
-> One thing I noticed while studying Wispr Flow is that it solves a genuinely hard problem — making voice as natural as typing — but the output stays invisible. Nobody outside the user ever sees what gets created. I built Wispr Stories to close that gap: it turns any voice transcript into a shareable, beautifully designed card that drives word-of-mouth discovery for Wispr Flow. It works in 37 languages, exports directly to WhatsApp and Instagram, and runs entirely in the browser with no installation — because the people who need it most are not developers.
+> One thing I noticed while studying Wispr Flow is that it solves a genuinely hard problem — making voice as natural as typing — but the output stays invisible. Nobody outside the user ever sees what gets created. I built Wispr Stories to close that gap: it turns any voice transcript into a shareable, beautifully designed card that drives word-of-mouth discovery for Wispr Flow. It works in 21 languages, exports as both a PNG and shareable link for WhatsApp and Instagram, and opens in any browser with no installation — because the people who need it most are not developers.
 
 ---
 
@@ -390,7 +519,7 @@ This lets Wispr Flow's team see exactly how many visits and downloads originated
 >
 > So I asked: what if every piece of voice-created content could become something worth sharing? A beautiful card, like a Spotify share card or a Medium pull-quote — but for anything you say. A grandmother's recipe. A birthday message. A field note from a founder on a commute.
 >
-> The app works in 37 languages, exports as a PNG you can forward directly on WhatsApp or Instagram, and opens in any browser with no installation. I designed it specifically for people who are not power users — older adults, non-English speakers, anyone who types slowly because nobody showed them there was a better way. When they share that card and someone asks how it was made, that is a Wispr Flow download that advertising cannot buy.
+> The app works in 21 languages for STT (20+1 UI locales), exports as a PNG or shareable link on WhatsApp or Instagram, and opens in any browser with no installation. I designed it specifically for people who are not power users — older adults, non-English speakers, anyone who types slowly because nobody showed them there was a better way. When they share that card and someone asks how it was made, that is a Wispr Flow download that advertising cannot buy.
 >
 > What makes it unique is the direction of the funnel. Most companion tools assume users already know the product. Wispr Stories works for people who have never heard of Wispr Flow — and it introduces them through something emotional and personal, not a product page. The card earns the discovery.
 

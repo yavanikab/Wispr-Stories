@@ -145,13 +145,35 @@ const SCRIPT_FONTS = {
     arab: "IBM Plex Sans Arabic",
     zhs: "Zhi Mang Xing",
     zht: "Noto Sans TC",
-    jpn: "Zen Maru Gothic",
+    jpn: "Kosugi",
     kor: "Hahmlet",
   },
 };
 
-function charScript(ch) {
+// CJK Unified Ideographs (U+4E00-U+9FFF) are shared by Chinese (Hanzi),
+// Japanese (Kanji), and Korean (Hanja). A character-only classifier can't
+// tell them apart. detectLanguageContext does a quick pre-scan for
+// distinguishing markers — Hiragana/Katakana means the whole text is
+// Japanese, Hangul means it is Korean — and the result is threaded into
+// charScript so every Kanji/Hanja in the document is tagged with the
+// correct language instead of falling through to Chinese.
+function detectLanguageContext(text) {
+  for (const ch of text) {
+    const c = ch.codePointAt(0);
+    if ((c >= 0x3040 && c <= 0x309f) || (c >= 0x30a0 && c <= 0x30ff)) return "jpn";
+    if (c >= 0xac00 && c <= 0xd7af) return "kor";
+  }
+  return null;
+}
+
+function charScript(ch, context) {
   const c = ch.codePointAt(0);
+  // CJK Unified Ideographs are ambiguous on their own — route by context.
+  if (c >= 0x4e00 && c <= 0x9fff) {
+    if (context === "jpn") return "jpn"; // Kanji inside Japanese text
+    if (context === "kor") return "kor"; // Hanja inside Korean text
+    return "zhs";                         // pure CJK → Chinese
+  }
   if ((c >= 0x3040 && c <= 0x309f) || (c >= 0x30a0 && c <= 0x30ff)) return "jpn";
   if (c >= 0x0e00 && c <= 0x0e7f) return "thai";
   if (c >= 0x0900 && c <= 0x097f) return "deva";
@@ -165,13 +187,13 @@ function charScript(ch) {
   if (c >= 0x0600 && c <= 0x06ff) return "arab";
   if (c >= 0xac00 && c <= 0xd7af) return "kor";
   if (c >= 0x0400 && c <= 0x04ff) return "cyr";
-  if (c >= 0x4e00 && c <= 0x9fff) return "zhs";
   return "dev";
 }
 
 function detectScript(t) {
+  const ctx = detectLanguageContext(t);
   for (const ch of t) {
-    const s = charScript(ch);
+    const s = charScript(ch, ctx);
     if (s !== "dev") return s;
   }
   return "dev";
@@ -183,10 +205,11 @@ function getToneFont(tone, text) {
 }
 
 function splitByScript(text) {
+  const ctx = detectLanguageContext(text);
   const segments = [];
   let cur = "", curScript = "dev";
   for (const ch of text) {
-    const s = charScript(ch);
+    const s = charScript(ch, ctx);
     if (s !== curScript && cur) {
       segments.push({ text: cur, script: curScript });
       cur = "";

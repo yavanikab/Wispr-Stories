@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] — 2026-05-23
+
+### Fixed
+- **Rewrite API: all non-English languages returned English** — `openai/gpt-oss-120b:free` was the primary model and reliably ignored LANGUAGE RULE instructions for non-Latin scripts, translating Korean, Tamil, Telugu, Arabic, Japanese, Hindi, etc. into English regardless of how the prompt was worded. Root cause: the model's multilingual instruction-following is too weak. Fix:
+  1. Switched primary model to `qwen/qwen3-14b:free` — a purpose-built multilingual model that correctly follows language-preservation instructions.
+  2. Added `isLanguageMismatch()` output validator: after each model responds, the API checks whether a non-Latin input produced a Latin-only output (i.e., the model translated instead of rewrote). If it detects a mismatch, it falls through to the paid fallback rather than returning the bad translation.
+  3. Enabled `inclusionai/ling-2.6-flash` as paid fallback, triggering on **both** HTTP 429 (rate-limit) and language mismatch (not just 429 as before).
+  4. Bumped `PROMPT_VERSION` to `v3` so any wrong-language responses that were cached under `v2` are bypassed immediately — no manual Redis flush needed.
+
+---
+
 ## [Unreleased] — 2026-05-22
 
 ### Added
@@ -24,6 +35,13 @@
   - `record.generating`: `"Generating…"` (defined per-locale but currently dead — see Known issues below)
   All four strings translated across `de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh` and `tone.tip` brought in sync with the new English wording in every locale. JSON parse-validated. CJK / Indic / Thai / Korean / Indonesian locales additionally tracked in `assets/i18n/NATIVE-REVIEW.md` with confidence levels and per-string review questions.
 - **`actions.createTone` placeholder grammar** — Picked a phrasing per locale that produces grammatically-safe output when the localized tone label is interpolated: `{tone}e Karte erstellen` (DE, exploits feminine `-e` declension); `Skapa {tone}-kort` (SV, native hyphenated compound); `Создать карточку в тоне «{tone}»` (RU, sidesteps adjective case agreement); `{tone}トーンのカード` (JA) and `{tone} 톤으로 카드 만들기` (KO) using "tone" as a noun connector so noun-form labels don't clash with the noun.
+
+### Fixed
+- **Remotion demo: WebP alpha-channel card backgrounds caused frame flicker in social variant** — Card background images (`card-bgs/*.webp`) had `yuva420p` alpha channels, causing Remotion to decode them as video streams and produce inconsistent output on alternating frames. YAVG brightness jumped 15-28 points between consecutive frames in the card scene. Converted all three files to PNG (`rgba`). PSNR between consecutive card-scene frames improved from 12.99 to 47.08.
+- **FinalFrame transition: instant cut replaces 18-frame fade** — The final CTA panel previously used an 18-frame fade-in over the share scene, creating a cream wash. Reduced to a 1-frame instant cut (`[revealStart - 1, revealStart] → [0, 1]`) so the FinalFrame transitions cleanly.
+
+### Rendering artifacts
+- `remotion-demo/out/wispr-stories-promo-social-v2.mp4` — Re-rendered after PNG fix (3.7 MB, no flicker)
 
 ### Known issues (discovered, not fixed)
 - **`shareModal.generating` vs `record.generating` key mismatch** — `wisprstories.js:1845` looks up the share-button spinner label via `getI18nSync("shareModal.generating")`, but every locale defines the key as `record.generating`. The lookup always misses and falls back to the hardcoded English `"Generating…"` in all 21 locales including English. Two-line fix: either rename the i18n key everywhere to `shareModal.generating`, or change the JS lookup to `record.generating`. Documented in `assets/i18n/NATIVE-REVIEW.md`. Deferred from this pass to avoid mixing schema changes into a translation fix.

@@ -135,6 +135,42 @@ function handleLimits(req, res) {
   });
 }
 
+// Validate pro key against Upstash Redis REST API (mirrors api/rewrite.js logic for local dev)
+async function validateProKeyRedis(proKey) {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token || !proKey) return false;
+  try {
+    const redisKey = `wispr:keys:${proKey.trim()}`;
+    const res = await fetch(`${url}/get/${encodeURIComponent(redisKey)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.result !== null && data.result !== undefined;
+  } catch (e) {
+    console.warn('[ProKey] Redis validation failed, treating as free:', e.message);
+    return false;
+  }
+}
+
+// In-memory per-tone usage tracker (mirrors Redis logic in api/rewrite.js for local dev)
+const FREE_MAX_PER_TONE = 5;
+const localToneCounts = { date: '', counts: {} };
+
+function getLocalToneCount(tone) {
+  const today = new Date().toDateString();
+  if (localToneCounts.date !== today) { localToneCounts.date = today; localToneCounts.counts = {}; }
+  return localToneCounts.counts[tone] || 0;
+}
+
+function incrementLocalToneCount(tone) {
+  const today = new Date().toDateString();
+  if (localToneCounts.date !== today) { localToneCounts.date = today; localToneCounts.counts = {}; }
+  localToneCounts.counts[tone] = (localToneCounts.counts[tone] || 0) + 1;
+  return localToneCounts.counts[tone];
+}
+
 function handleRewrite(req, res) {
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
@@ -143,20 +179,108 @@ function handleRewrite(req, res) {
   }
   let body = '';
   req.on('data', chunk => { body += chunk; });
-  req.on('end', () => {
+  req.on('end', async () => {
     try {
-      const { text, tone } = JSON.parse(body);
-      const TONE_REWRITES = {
-        warm: 'Your words carry warmth and kindness — a gentle reminder of what truly matters.',
-        bold: 'This is your moment. Speak it loud. Let it echo.',
-        poetic: 'Like whispers on the wind, these words drift softly into eternity.',
-        playful: 'Hey there! Just dropping a little sunshine your way — because you deserve it!',
-        reflective: 'In the quiet spaces between moments, we find what truly endures.',
-        honest: "Here's the truth, plain and simple — no sugarcoating, just real.",
+      const { text, tone, proKey } = JSON.parse(body);
+
+      // Validate pro status server-side — same logic as api/rewrite.js
+      const isPro = await validateProKeyRedis(proKey);
+
+      // Enforce per-tone daily limit for free users only
+      if (!isPro) {
+        const currentCount = getLocalToneCount(tone);
+        if (currentCount >= FREE_MAX_PER_TONE) {
+          res.writeHead(429, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Daily limit reached for this tone', tone, used: currentCount, max: FREE_MAX_PER_TONE, remaining: 0 }));
+          return;
+        }
+      }
+
+      const apiKey = process.env.OPENROUTER_API_KEY;
+
+      if (!apiKey) {
+        // No key — echo original text so at least the language is preserved in mock mode
+        console.log('[Rewrite] No OPENROUTER_API_KEY — echoing original text');
+        if (isPro) {
+          mockJson(res, { text, original: text, tone, isPro: true });
+        } else {
+          const used = incrementLocalToneCount(tone);
+          mockJson(res, { text, original: text, tone, used, max: FREE_MAX_PER_TONE, remaining: Math.max(0, FREE_MAX_PER_TONE - used) });
+        }
+        return;
+      }
+
+      const TONE_PROMPTS = {
+        warm: 'Rewrite this message to sound warm, friendly, and heartfelt. Keep it natural and personal.',
+        bold: 'Rewrite this message to sound bold, confident, and impactful. Make it punchy and direct.',
+        poetic: 'Rewrite this message to sound poetic, lyrical, and rhythmic. Use beautiful language.',
+        playful: 'Rewrite this message to sound playful, fun, and lighthearted. Add a touch of humor.',
+        reflective: 'Rewrite this message to sound thoughtful, contemplative, and introspective.',
+        honest: 'Rewrite this message to sound direct, authentic, and genuine. No fluff.',
       };
-      const rewritten = TONE_REWRITES[tone] || text;
-      console.log('[Rewrite] Mock:', tone, '→', rewritten.slice(0, 50));
-      mockJson(res, { text: rewritten, original: text, tone });
+
+      function detectScript(t) {
+        if (/[぀-ゟ゠-ヿ]/.test(t)) return 'Japanese';
+        if (/[가-힯]/.test(t)) return 'Korean';
+        if (/[一-鿿]/.test(t)) return 'Chinese';
+        if (/[ऀ-ॿ]/.test(t)) return 'Devanagari (Hindi/Marathi)';
+        if (/[ঀ-৿]/.test(t)) return 'Bengali';
+        if (/[਀-੿]/.test(t)) return 'Gurmukhi (Punjabi)';
+        if (/[઀-૿]/.test(t)) return 'Gujarati';
+        if (/[஀-௿]/.test(t)) return 'Tamil';
+        if (/[ఀ-౿]/.test(t)) return 'Telugu';
+        if (/[ಀ-೿]/.test(t)) return 'Kannada';
+        if (/[ഀ-ൿ]/.test(t)) return 'Malayalam';
+        if (/[฀-๿]/.test(t)) return 'Thai';
+        if (/[؀-ۿ]/.test(t)) return 'Arabic';
+        if (/[Ѐ-ӿ]/.test(t)) return 'Cyrillic';
+        return 'Latin';
+      }
+
+      const script = detectScript(text);
+      const scriptRule = script === 'Latin'
+        ? 'The input uses Latin script. Respond in Latin script only. If the input mixes English with romanized words (Hinglish), keep that mix.'
+        : `The input is written in ${script} script. Respond in ${script} script. Do NOT transliterate to Latin/Romanized form.`;
+      const prompt = `${TONE_PROMPTS[tone] || TONE_PROMPTS.warm} Keep it under 150 characters. Return ONLY the rewritten text, no quotes or commentary.\n\nLANGUAGE RULE: Respond in the exact same language and script as the input. Do not translate. ${scriptRule}\n\nOriginal message: "${text}"`;
+
+      const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://wisprstories.vercel.app',
+          'X-Title': 'Wispr Stories',
+        },
+        body: JSON.stringify({
+          model: isPro ? 'inclusionai/ling-2.6-flash' : 'google/gemma-4-31b-it:free',
+          messages: [
+            { role: 'system', content: 'You rewrite short voice messages into greeting cards with specific tones. You ALWAYS respond in the exact same language and script as the input. You never translate or transliterate. Return ONLY the rewritten text.' },
+            { role: 'user', content: prompt },
+          ],
+          max_tokens: 100,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!orRes.ok) {
+        const err = await orRes.text();
+        console.error('[Rewrite] OpenRouter error:', err);
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'OpenRouter error', detail: err }));
+        return;
+      }
+
+      const data = await orRes.json();
+      let rewritten = data.choices?.[0]?.message?.content?.trim() || text;
+      rewritten = rewritten.replace(/^["']|["']$/g, '').trim();
+      if (isPro) {
+        console.log('[Rewrite] OK (pro):', tone, script, '→', rewritten.slice(0, 60));
+        mockJson(res, { text: rewritten, original: text, tone, isPro: true });
+      } else {
+        const used = incrementLocalToneCount(tone);
+        console.log('[Rewrite] OK:', tone, script, `(${used}/${FREE_MAX_PER_TONE})`, '→', rewritten.slice(0, 60));
+        mockJson(res, { text: rewritten, original: text, tone, used, max: FREE_MAX_PER_TONE, remaining: Math.max(0, FREE_MAX_PER_TONE - used) });
+      }
     } catch (e) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: e.message }));
@@ -165,7 +289,26 @@ function handleRewrite(req, res) {
 }
 
 function handleProStatus(req, res) {
-  mockJson(res, { isPro: false });
+  if (req.method !== 'POST') {
+    res.writeHead(405, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+  let body = '';
+  req.on('data', chunk => { body += chunk; });
+  req.on('end', async () => {
+    try {
+      const { key } = JSON.parse(body);
+      const isPro = await validateProKeyRedis(key);
+      if (isPro) {
+        mockJson(res, { isPro: true, tier: 'pro' });
+      } else {
+        mockJson(res, { isPro: false });
+      }
+    } catch (e) {
+      mockJson(res, { isPro: false });
+    }
+  });
 }
 
 function handleUpload(req, res) {

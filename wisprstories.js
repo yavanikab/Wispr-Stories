@@ -1207,7 +1207,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     const res = await fetch("/api/rewrite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, tone, sessionId, isPro }),
+      body: JSON.stringify({ text, tone, sessionId, proKey: sessionStorage.getItem("wsProKey") || null }),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);

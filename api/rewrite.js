@@ -13,7 +13,7 @@ const CACHE_TTL_SEC = 86400; // 24 hours
 // Bump whenever the prompt logic changes — old entries are orphaned and
 // expire on their own TTL, so prompt fixes take effect immediately without
 // a manual Redis flush.
-const PROMPT_VERSION = 'v2';
+const PROMPT_VERSION = 'v3';
 
 function cacheKey(tone, text) {
   let hash = 0;
@@ -59,6 +59,15 @@ function detectScript(text) {
   return 'Latin';
 }
 
+// Returns true if the model translated the text to English despite a non-Latin input.
+// Detects this by checking whether a non-Latin input produced a Latin-only output.
+function isLanguageMismatch(inputText, outputText) {
+  const inputScript = detectScript(inputText);
+  if (inputScript === 'Latin') return false; // Latin input is fine either way
+  const outputScript = detectScript(outputText);
+  return outputScript === 'Latin'; // Non-Latin input but Latin output → translated
+}
+
 function truncateToSentenceBoundary(text, maxChars) {
   if (text.length <= maxChars) return text;
 
@@ -86,7 +95,7 @@ export default async function handler(req) {
   }
 
   try {
-    const { text, tone, sessionId, isPro } = await req.json();
+    const { text, tone, sessionId, proKey } = await req.json();
 
     if (!text || !tone) {
       return new Response(JSON.stringify({ error: 'Missing text or tone' }), {
@@ -100,6 +109,20 @@ export default async function handler(req) {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+
+    // Validate pro status server-side via Redis.
+    // Never trust the client-sent isPro flag — proKey is validated here directly.
+    // Fail closed: if Redis is unavailable, treat as free user.
+    let isPro = false;
+    if (proKey) {
+      try {
+        const redis = getRedis();
+        const keyData = await redis.get(KEYS.upgradeKey(proKey.trim()));
+        isPro = !!keyData;
+      } catch (proErr) {
+        console.warn('[Rewrite] Pro key check failed, treating as free:', proErr.message);
+      }
     }
 
     // Check global Redis cache for this tone+text combination.
@@ -169,15 +192,17 @@ export default async function handler(req) {
       : `The input is written in ${script} script. Respond in ${script} script. Do NOT transliterate to Latin/Romanized form.`;
     const prompt = `${TONE_PROMPTS[tone]} Keep it under 150 characters. Return ONLY the rewritten text, no quotes or commentary.\n\nLANGUAGE RULE: Respond in the exact same language and script as the input. Do not translate. ${scriptRule}\n\nOriginal message: "${text}"`;
 
-    // Try free model first, fall back to paid if rate-limited
-    const models = [
-      'openai/gpt-oss-120b:free',
-      // 'inclusionai/ling-2.6-flash', // ← uncomment before Vercel deploy for paid fallback
-    ];
+    // STRICT RULE: inclusionai/ling-2.6-flash is ONLY for verified pro users.
+    // It must never appear in the free-user model list under any circumstance.
+    const models = isPro
+      ? ['inclusionai/ling-2.6-flash']   // paid model — pro users only
+      : ['google/gemma-4-31b-it:free'];  // free model — free users only
     let lastError = null;
     let data = null;
 
-    for (const model of models) {
+    for (let mi = 0; mi < models.length; mi++) {
+      const model = models[mi];
+      const isLastModel = mi === models.length - 1;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 20000);
 
@@ -205,24 +230,32 @@ export default async function handler(req) {
       });
       clearTimeout(timeoutId);
 
-      if (res.ok) {
-        data = await res.json();
-        break;
+      if (!res.ok) {
+        // Fall back to next model on 429 (rate-limit)
+        if (res.status === 429) {
+          lastError = await res.text();
+          console.warn(`[Rewrite] Model ${model} rate-limited, trying fallback`);
+          continue;
+        }
+        // Non-429 error — return immediately
+        const err = await res.text();
+        return new Response(JSON.stringify({ error: 'LLM API error', detail: err }), {
+          status: res.status,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
 
-      // Only fall back to next model on 429 (rate limit)
-      if (res.status === 429) {
-        lastError = await res.text();
-        console.warn(`[Rewrite] Model ${model} rate-limited, trying fallback`);
+      const candidate = await res.json();
+      const candidateText = candidate.choices?.[0]?.message?.content?.trim() || '';
+
+      // If free model returned English for a non-Latin input, fall through to paid fallback.
+      if (!isLastModel && isLanguageMismatch(text, candidateText)) {
+        console.warn(`[Rewrite] ${model} language mismatch (${detectScript(text)} input → Latin output), trying fallback`);
         continue;
       }
 
-      // Non-429 error — return immediately
-      const err = await res.text();
-      return new Response(JSON.stringify({ error: 'LLM API error', detail: err }), {
-        status: res.status,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      data = candidate;
+      break;
     }
 
     if (!data) {

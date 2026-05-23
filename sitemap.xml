@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Wispr Stories — sitemap
+  Single-page app at /. Ephemeral share routes under /c/{id} are not listed
+  because they expire (~36h, see api/cleanup.js) and are user-private. If a
+  curated examples archive ships, add it as a separate <url> entry below.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://wisprstories.vercel.app/</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

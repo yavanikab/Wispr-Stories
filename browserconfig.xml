@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Windows tile / pinned-site configuration (Edge legacy, IE11, Windows Start tiles).
+  Discovered automatically when wisprstories.html declares:
+    <meta name="msapplication-config" content="/browserconfig.xml">
+  Pairs with site.webmanifest (Android/Chrome) and apple-touch-icon (iOS) so
+  the install/pinned experience is consistent across Android, iOS, and Windows.
+-->
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="assets/ws-logo-blwbg.png"/>
+      <TileColor>#ffffeb</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>
