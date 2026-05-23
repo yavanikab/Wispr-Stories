@@ -25,6 +25,21 @@ function getCardBgImage() {
 }
 // Cache for already-preloaded URLs so we don't re-fire Image() requests.
 const _cardBgPreloaded = new Set();
+
+// Page init — one-time activation via URL hash
+(function() {
+  var _m = window.location.hash.match(/^#ws-admin=(.+)$/);
+  if (_m && _m[1]) {
+    try { localStorage.setItem('wsAdminSecret', _m[1]); } catch (_e) {}
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+})();
+function getAdminHeaders() {
+  var _s;
+  try { _s = localStorage.getItem('wsAdminSecret'); } catch (_e) {}
+  return _s ? { 'X-Admin-Secret': _s } : {};
+}
+
 function preloadCardBgVariant(corners) {
   PAL_NAMES.forEach((name) => {
     const src = cardBgUrl(corners, name);
@@ -770,7 +785,7 @@ function stopDeepgramRecording() {
           const base64 = reader.result.split(",")[1];
           const res = await fetch("/api/stt", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
             body: JSON.stringify({ audio: base64, format: mediaRec.mimeType }),
           });
           if (!res.ok) {
@@ -1048,7 +1063,7 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
       body: JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: maxDuration, checkOnly: true }),
     });
     const data = await res.json();
@@ -1081,7 +1096,7 @@ async function reportRecordingDuration(actualDuration) {
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
       body: JSON.stringify({ sessionId, isPro, audioDuration: actualDuration, checkOnly: false }),
     });
     const data = await res.json();
