@@ -20,6 +20,15 @@ export default async function handler(req) {
   try {
     const { sessionId, isPro, audioDuration, checkOnly, proKey } = await req.json();
 
+    // Skip all limits if admin secret matches
+    const adminSecret = req.headers.get('x-admin-secret');
+    if (adminSecret && process.env.ADMIN_API_SECRET && adminSecret === process.env.ADMIN_API_SECRET) {
+      return new Response(JSON.stringify({ allowed: true, isAdmin: true, recordingsMax: 9999, cumulativeMax: 999999 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     // Validate pro status server-side — never trust client-sent isPro alone
     let validatedPro = false;
     if (proKey) {
