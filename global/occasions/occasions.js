@@ -45,13 +45,6 @@ function sanitizeText(text) {
   return text.toLowerCase().trim();
 }
 
-function isWordBoundary(text, idx, forward) {
-  var pos = forward ? idx : idx - 1;
-  if (pos < 0 || pos >= text.length) return true;
-  var c = text[pos];
-  return /[\s\p{P}]/u.test(c);
-}
-
 function findOccasionMatch(text, triggers) {
   var sanitized = sanitizeText(text);
   if (!sanitized) return -1;
@@ -94,24 +87,12 @@ function findOccasionMatch(text, triggers) {
       var triggerLower = p.toLowerCase();
       var idx2 = 0;
       while ((idx2 = sanitized.indexOf(triggerLower, idx2)) !== -1) {
-        var endIdx = idx2 + triggerLower.length;
-        var atStart = idx2 === 0 || isWordBoundary(sanitized, idx2, false);
-        var atEnd = endIdx >= sanitized.length || isWordBoundary(sanitized, endIdx, true);
-
-        if (atStart && atEnd) {
-          if (idx2 === 0) return 0;
-          var pre2 = idx2 - 1;
-          while (pre2 >= 0 && /\s/.test(sanitized[pre2])) pre2--;
-
-          if (pre2 < 0) {
-            if (earliest === -1 || idx2 < earliest) earliest = idx2;
-          } else {
-            var c2 = sanitized[pre2];
-            if (".!?\n—\"':;,¿¡。、，！？：；」』】》।آ،،：；".indexOf(c2) !== -1) {
-              if (earliest === -1 || idx2 < earliest) earliest = idx2;
-            }
-          }
-        }
+        // Substring match — no word boundaries, no punctuation checks.
+        // Enables non-space-separated scripts (Thai, CJK) and inflected
+        // forms (syskondagen, napját, günün). Occasion images are cosmetic;
+        // false-positive risk is negligible.
+        if (idx2 === 0) return 0;
+        if (earliest === -1 || idx2 < earliest) earliest = idx2;
         idx2++;
       }
     }
