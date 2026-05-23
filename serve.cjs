@@ -45,7 +45,8 @@ const MIME = {
 function handleStt(req, res) {
   // Health check — tells client if Deepgram is configured
   if (req.method === 'GET') {
-    const available = !!process.env.DEEPGRAM_API_KEY && !process.env.DEEPGRAM_API_KEY.includes('YOUR_ACTUAL_KEY');
+    const available = (!!process.env.DEEPGRAM_API_KEY && !process.env.DEEPGRAM_API_KEY.includes('YOUR_ACTUAL_KEY'))
+      || (!!process.env.DEEPGRAM_API_KEY_ADMIN && !process.env.DEEPGRAM_API_KEY_ADMIN.includes('YOUR_ACTUAL_KEY'));
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ available }));
     return;
@@ -57,7 +58,11 @@ function handleStt(req, res) {
     return;
   }
 
-  const apiKey = process.env.DEEPGRAM_API_KEY;
+  // Route to admin key if admin secret matches
+  const adminSecret = req.headers['x-admin-secret'];
+  const isAdmin = adminSecret && process.env.ADMIN_API_SECRET && adminSecret === process.env.ADMIN_API_SECRET;
+  const apiKey = isAdmin ? process.env.DEEPGRAM_API_KEY_ADMIN : process.env.DEEPGRAM_API_KEY;
+
   if (!apiKey || apiKey.includes('YOUR_ACTUAL_KEY')) {
     // Mock mode for local testing — no Deepgram credits consumed
     console.log('[Deepgram] No API key — returning mock transcription');
@@ -77,7 +82,7 @@ function handleStt(req, res) {
       const audioBuffer = Buffer.from(audio, 'base64');
 
       // Deepgram batch API — send audio directly, get transcript back
-      const url = 'https://api.deepgram.com/v1/listen?model=nova-3&language=multilingual&smart_format=true&punctuate=true';
+      const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true';
       const deepgramRes = await fetch(url, {
         method: 'POST',
         headers: {
@@ -128,7 +133,14 @@ function handleLimits(req, res) {
   req.on('data', chunk => { body += chunk; });
   req.on('end', () => {
     try {
-      const { checkOnly } = JSON.parse(body);
+      const parsed = JSON.parse(body);
+      // Skip limits if admin secret matches
+      const adminSecret = req.headers['x-admin-secret'];
+      if (adminSecret && process.env.ADMIN_API_SECRET && adminSecret === process.env.ADMIN_API_SECRET) {
+        mockJson(res, { allowed: true, isAdmin: true, recordingsMax: 9999, cumulativeMax: 999999 });
+        return;
+      }
+      const { checkOnly } = parsed;
       // Mock: always allow, return sample counts
       mockJson(res, {
         allowed: true,
