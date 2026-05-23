@@ -78,11 +78,14 @@ function handleStt(req, res) {
   req.on('data', chunk => { body += chunk; });
   req.on('end', async () => {
     try {
-      const { audio, format } = JSON.parse(body);
+      const { audio, format, language } = JSON.parse(body);
       const audioBuffer = Buffer.from(audio, 'base64');
 
-      // Deepgram batch API — send audio directly, get transcript back
-      const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true';
+      // Deepgram batch API — pass language code for non-English
+      var dgLang = (language || '').slice(0, 2).toLowerCase();
+      var dgSupported = ['de','es','fr','gu','hi','id','it','ja','kn','ko','pt','ru','sv','ta','te','th','tr','zh'];
+      var langParam = dgLang && dgSupported.indexOf(dgLang) !== -1 ? '&language=' + dgLang : '';
+      const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true' + langParam;
       const deepgramRes = await fetch(url, {
         method: 'POST',
         headers: {
