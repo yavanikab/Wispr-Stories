@@ -39,15 +39,36 @@ export default async function handler(req) {
   }
 
   try {
-    // Verify webhook signature (BMC secret)
+    // Read raw body for HMAC verification before JSON parsing
+    const rawBody = await req.text();
+
+    // Verify BMC webhook signature via HMAC-SHA256
     const bmcSecret = process.env.BMC_WEBHOOK_SECRET;
     if (bmcSecret) {
       const signature = req.headers.get('x-bmc-signature') || '';
-      // In production, verify HMAC signature here
-      // For now, we trust the endpoint is secure
+      if (!signature) {
+        return new Response(JSON.stringify({ error: 'Missing signature' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      const encoder = new TextEncoder();
+      const hmacKey = await crypto.subtle.importKey(
+        'raw', encoder.encode(bmcSecret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false, ['verify']
+      );
+      const sigBytes = Uint8Array.from(atob(signature), function(c) { return c.charCodeAt(0); });
+      const valid = await crypto.subtle.verify('HMAC', hmacKey, sigBytes, encoder.encode(rawBody));
+      if (!valid) {
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
     }
 
-    const body = await req.json();
+    const body = JSON.parse(rawBody);
     const email = body.payer_email;
     const message = body.message || '';
     const amount = body.amount || '5';
@@ -61,12 +82,25 @@ export default async function handler(req) {
     }
 
     const redis = getRedis();
+
+    // Deduplicate by transaction ID
+    if (txnId) {
+      const txnKey = 'wispr:txn:' + txnId;
+      const existing = await redis.get(txnKey);
+      if (existing) {
+        return new Response(JSON.stringify({ success: true, key: existing, email, note: 'already_processed' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     const occasion = detectOccasion(message);
     const year = new Date().getUTCFullYear();
     const randomCode = generateRandomCode(4);
-    const key = `WS-${occasion}-${year}-${randomCode}`;
+    const key = 'WS-' + occasion + '-' + year + '-' + randomCode;
 
-    // Store key in Redis
+    const ONE_YEAR = 31536000;
     const keyData = {
       email,
       tier: 'pro',
@@ -77,11 +111,10 @@ export default async function handler(req) {
     };
 
     const redisKey = KEYS.upgradeKey(key);
-    const emailKey = KEYS.emailLookup(email.toLowerCase());
 
     const pipeline = redis.pipeline();
-    pipeline.set(redisKey, JSON.stringify(keyData));
-    pipeline.set(emailKey, key);
+    pipeline.set(redisKey, JSON.stringify(keyData), { ex: ONE_YEAR });
+    if (txnId) pipeline.set('wispr:txn:' + txnId, key, { ex: 3600 });
     await pipeline.exec();
 
     // In production, send confirmation email here (via Resend/SendGrid)

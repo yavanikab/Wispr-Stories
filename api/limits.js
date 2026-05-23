@@ -18,7 +18,20 @@ export default async function handler(req) {
   }
 
   try {
-    const { sessionId, isPro, audioDuration, checkOnly } = await req.json();
+    const { sessionId, isPro, audioDuration, checkOnly, proKey } = await req.json();
+
+    // Validate pro status server-side — never trust client-sent isPro alone
+    let validatedPro = false;
+    if (proKey) {
+      try {
+        const redis = getRedis();
+        const keyData = await redis.get(KEYS.upgradeKey(proKey.trim()));
+        validatedPro = !!keyData;
+      } catch (e) {
+        console.warn('[Limits] Pro key check failed, treating as free:', e.message);
+      }
+    }
+    const effectivePro = !!isPro && validatedPro;
 
     const redis = getRedis();
     const today = new Date().toISOString().slice(0, 10);
@@ -30,9 +43,9 @@ export default async function handler(req) {
     const recordings = parseInt(await redis.get(recordingsKey) || '0', 10);
     const cumulative = parseInt(await redis.get(cumulativeKey) || '0', 10);
 
-    const maxRecordings = isPro ? PRO_MAX_RECORDINGS : FREE_MAX_RECORDINGS;
-    const maxSeconds = isPro ? PRO_MAX_SECONDS : FREE_MAX_SECONDS;
-    const maxLength = isPro ? PRO_MAX_LENGTH : FREE_MAX_LENGTH;
+    const maxRecordings = effectivePro ? PRO_MAX_RECORDINGS : FREE_MAX_RECORDINGS;
+    const maxSeconds = effectivePro ? PRO_MAX_SECONDS : FREE_MAX_SECONDS;
+    const maxLength = effectivePro ? PRO_MAX_LENGTH : FREE_MAX_LENGTH;
 
     // Check audio length
     if (audioDuration > maxLength) {

@@ -2,7 +2,7 @@ export const config = { runtime: 'edge' };
 
 import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
 
-const DAILY_USER_CAP = 99;
+const DAILY_USER_CAP = 9999;
 
 export default async function handler(req) {
   if (req.method !== 'POST') {
