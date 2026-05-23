@@ -184,7 +184,7 @@ function loadDraft() {
     if (!raw) return false;
     const draft = JSON.parse(raw);
     if (draft.text) document.getElementById("sta").value = draft.text;
-    if (draft.name) document.getElementById("nin").value = String(draft.name).replace(/[^\p{L} _-]/gu, "").slice(0, 18);
+    if (draft.name) document.getElementById("nin").value = [...String(draft.name)].slice(0, 18).join("");
     inputSource = draft.inputSource === "voice" ? "voice" : "story";
     if (draft.tone) applyTone(draft.tone);
     if (draft.palette != null) applyPal(draft.palette);
@@ -1316,15 +1316,7 @@ document.getElementById("sta").addEventListener("paste", () => {
   setTimeout(function() { updateCard(); saveDraft(); }, 50);
 });
 document.getElementById("nin").addEventListener("input", function() {
-  // Allow letters, spaces, hyphens, and underscores so names like
-  // "Lola Maria", "Mary-Anne", and "lola_maria" pass through. Any other
-  // character (digits, punctuation, symbols) is stripped on input.
-  const cleaned = this.value.replace(/[^\p{L} _-]/gu, "").slice(0, 18);
-  if (cleaned !== this.value) {
-    const pos = this.selectionStart;
-    this.value = cleaned;
-    try { this.setSelectionRange(pos - 1, pos - 1); } catch (e) {}
-  }
+  this.value = [...this.value].slice(0, 18).join("");
   updateCard();
   saveDraft();
 });
@@ -1374,7 +1366,7 @@ if (location.hash && location.hash.length > 1) {
   var hP = params.get("p");
   inputSource = "story";
   if (hText) document.getElementById("sta").value = hText;
-  if (hName) document.getElementById("nin").value = hName.replace(/[^\p{L} _-]/gu, "").slice(0, 18);
+  if (hName) document.getElementById("nin").value = [...hName].slice(0, 18).join("");
   if (hTone) applyTone(hTone);
   if (hP != null) applyPal(parseInt(hP));
   if (hText) { updateCard(); cardReady = true; document.getElementById("btnS").disabled = false; document.getElementById("wcta").classList.add("show"); document.getElementById("dlBtn").style.display = "block"; restored = true; }
@@ -1758,7 +1750,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
   if (!c) return;
   inputSource = "story";
   document.getElementById("sta").value = (c.dataset.text || "").slice(0, 150);
-  document.getElementById("nin").value = (c.dataset.name || "").replace(/[^\p{L} _-]/gu, "").slice(0, 18);
+  document.getElementById("nin").value = [...(c.dataset.name || "")].slice(0, 18).join("");
   if (c.dataset.tone) {
     const tone = c.dataset.tone;
     if (tone !== "original" && !isSupporter() && getRewritesLeftForTone(tone) === 0) {
