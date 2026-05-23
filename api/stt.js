@@ -27,13 +27,16 @@ export default async function handler(req) {
   }
 
   try {
-    const { audio, format } = await req.json();
+    const { audio, format, language } = await req.json();
     const binaryStr = atob(audio);
     const bytes = new Uint8Array(binaryStr.length);
     for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
 
-    // Deepgram Nova-3 Multilingual (Batch) — single request, raw audio bytes
-    const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true';
+    // Deepgram Nova-3 Multilingual (Batch) — pass language code for non-English
+    var dgLang = (language || '').slice(0, 2).toLowerCase();
+    var dgSupported = ['de','es','fr','gu','hi','id','it','ja','kn','ko','pt','ru','sv','ta','te','th','tr','zh'];
+    var langParam = dgLang && dgSupported.indexOf(dgLang) !== -1 ? '&language=' + dgLang : '';
+    const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true' + langParam;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
