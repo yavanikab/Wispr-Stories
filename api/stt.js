@@ -1,6 +1,14 @@
 export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
+  // Health check — used by client to decide Deepgram vs Web Speech API
+  if (req.method === 'GET') {
+    const available = !!process.env.DEEPGRAM_API_KEY;
+    return new Response(JSON.stringify({ available }), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405, headers: { 'Content-Type': 'application/json' },

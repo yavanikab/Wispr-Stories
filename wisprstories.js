@@ -100,17 +100,10 @@ const isSafari =
   navigator.vendor === "Apple Computer, Inc." &&
   !navigator.userAgent.includes("CriOS");
 
-let usingWhisper = false,
+let usingDeepgram = false,
   mediaRec = null,
   audioChunks = [],
-  whisperStartTime = null;
-
-const isFF = navigator.userAgent.toLowerCase().includes("firefox");
-if (isFF) {
-  const rb = document.getElementById("recBtn");
-  rb.style.opacity = ".35";
-  rb.style.pointerEvents = "none";
-}
+  deepgramStartTime = null;
 
 // Unified notice system — one slot, one message at a time, dismissable.
 // Priority: Firefox warning beats shared-link CTA (the functional/blocking
@@ -123,10 +116,7 @@ function showNotice(type) {
   if (!el || !txt) return;
   const tr = (key) => (typeof getI18nSync === "function" ? getI18nSync(key) : null);
   let html = "";
-  if (type === "firefox") {
-    html = tr("ffNotice") ||
-      "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.";
-  } else if (type === "shared") {
+  if (type === "shared") {
     html = tr("sharedCta") ||
       "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.";
   } else {
@@ -145,9 +135,7 @@ function dismissNotice() {
 document.getElementById("noticeDismiss")?.addEventListener("click", dismissNotice);
 
 // Pick the highest-priority notice for this session.
-if (isFF) {
-  showNotice("firefox");
-} else if (location.hash && location.hash.length > 1) {
+if (location.hash && location.hash.length > 1) {
   try {
     const params = new URLSearchParams(location.hash.slice(1));
     if (params.get("text")) showNotice("shared");
@@ -661,7 +649,7 @@ const SILENCE_RMS_THRESHOLD = 0.01;
 const SILENCE_SAMPLE_INTERVAL_MS = 500;
 const SILENCE_MIN_DURATION_MS = 2000;
 
-async function startWhisperFallback() {
+async function startDeepgramRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const mt = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
@@ -669,7 +657,7 @@ async function startWhisperFallback() {
       : "audio/webm";
     mediaRec = new MediaRecorder(stream, { mimeType: mt });
     audioChunks = [];
-    whisperStartTime = Date.now();
+    deepgramStartTime = Date.now();
     recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     mediaRec.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.push(e.data);
@@ -701,7 +689,7 @@ async function startWhisperFallback() {
 
     // Max duration timer for Whisper fallback
     recDurationTimer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - whisperStartTime) / 1000);
+      const elapsed = Math.floor((Date.now() - deepgramStartTime) / 1000);
       const remaining = recMaxDuration - elapsed;
       if (remaining <= 0) {
         clearInterval(recDurationTimer);
@@ -743,7 +731,7 @@ function cleanupSilenceDetection() {
   silenceRmsSamples = [];
 }
 
-function stopWhisperFallback() {
+function stopDeepgramRecording() {
   return new Promise((resolve) => {
     if (!mediaRec || mediaRec.state === "inactive") {
       cleanupSilenceDetection();
@@ -751,8 +739,8 @@ function stopWhisperFallback() {
         clearInterval(recDurationTimer);
         recDurationTimer = null;
       }
-      const duration = whisperStartTime ? Math.floor((Date.now() - whisperStartTime) / 1000) : 0;
-      whisperStartTime = null;
+      const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
+      deepgramStartTime = null;
       resolve({ text: "", duration });
       return;
     }
@@ -763,8 +751,8 @@ function stopWhisperFallback() {
         clearInterval(recDurationTimer);
         recDurationTimer = null;
       }
-      const duration = whisperStartTime ? Math.floor((Date.now() - whisperStartTime) / 1000) : 0;
-      whisperStartTime = null;
+      const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
+      deepgramStartTime = null;
       const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
       audioChunks = [];
 
@@ -787,21 +775,15 @@ function stopWhisperFallback() {
           });
           if (!res.ok) {
             const err = await res.text();
-            console.error("[Whisper] API error:", err);
-            showToast(
-              "Transcription failed \u2014 need to run 'vercel dev' or deploy"
-            );
+            console.error("[Deepgram] API error:", err);
+            showToast("Transcription failed \u2014 tap record to try again");
             resolve({ text: "", duration });
             return;
           }
           const data = await res.json();
-          if (data.mock) {
-            console.log("[STT] Mock transcription returned (no API key set)");
-            showToast("Recording works! Add Deepgram key for real transcription");
-          }
           resolve({ text: data.text || "", duration });
         } catch (e) {
-          console.error("[Whisper] Error:", e);
+          console.error("[Deepgram] Error:", e);
           resolve({ text: "", duration });
         }
       };
@@ -812,41 +794,61 @@ function stopWhisperFallback() {
 }
 
 function startRec() {
-  if (isFF) {
-    showToast("Voice not supported in Firefox");
-    return;
-  }
   if (location.protocol === "file:") {
     showToast(
       "Voice recording requires HTTPS \u2014 open via localhost or deploy to use"
     );
     return;
   }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    console.warn("[Speech] Web Speech API not available — using Deepgram fallback");
-    showToast("Web Speech API unavailable — using direct recording...");
-    usingWhisper = true;
-    startWhisperFallback().then((ok) => {
-      if (ok) {
-        isRec = true;
-        document.getElementById("recBtn").classList.add("on");
-        document.getElementById("recSt").textContent = "Recording\u2026";
-        document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
-        document.getElementById("recSub").classList.add("live");
-        document.getElementById("liveBox").textContent = "Recording audio directly...";
-      } else {
-        showToast("Could not start recording \u2014 try typing instead");
-        usingWhisper = false;
-        isRec = false;
-        finishRec();
-      }
-    });
-    return;
+
+  // Deepgram is the primary STT — check if it's configured
+  fetch("/api/stt?check=1").then(function(r) { return r.json(); }).then(function(data) {
+    if (data.available) {
+      usingDeepgram = true;
+      startDeepgramRecording().then(function(ok) {
+        if (ok) {
+          isRec = true;
+          document.getElementById("recBtn").classList.add("on");
+          document.getElementById("recSt").textContent = "Recording\u2026";
+          document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
+          document.getElementById("recSub").classList.add("live");
+          document.getElementById("liveBox").textContent = "Recording\u2026";
+        } else {
+          // mic permission denied — try WSA fallback
+          usingDeepgram = false;
+          trySpeechFallback();
+        }
+      });
+    } else {
+      // Deepgram not configured — fall back to Web Speech API
+      trySpeechFallback();
+    }
+  }).catch(function() {
+    // Network error checking Deepgram — try WSA
+    trySpeechFallback();
+  });
+
+  function trySpeechFallback() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      showToast("Voice recording unavailable \u2014 try typing instead");
+      finishRec();
+      return;
+    }
+    startWebSpeechAPI();
   }
+}
+
+function startWebSpeechAPI() {
   if (recogTimeout) {
     clearTimeout(recogTimeout);
     recogTimeout = null;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast("Voice recording unavailable \u2014 try typing instead");
+    finishRec();
+    return;
   }
   curLang = curLang || "en-US";
   fullTx = "";
@@ -862,7 +864,7 @@ function startRec() {
   }
   recog.onstart = () => {
     isRec = true;
-    recStartTime = Date.now();
+    if (recStartTime === null) recStartTime = Date.now();
     recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     document.getElementById("recBtn").classList.add("on");
     document.getElementById("recSt").textContent = "Listening\u2026";
@@ -911,7 +913,7 @@ function startRec() {
     }
   };
   recog.onend = () => {
-    if (usingWhisper) return;
+    if (usingDeepgram) return;
     console.log("[Speech] Ended, isRec=" + isRec);
     if (recogTimeout) {
       clearTimeout(recogTimeout);
@@ -959,19 +961,8 @@ function startRec() {
       return;
     }
     if (e.error === "network") {
-      showToast("Speech service unavailable \u2014 trying alternative...");
-      usingWhisper = true;
-      startWhisperFallback().then((ok) => {
-        if (ok) {
-          document.getElementById("recSub").textContent =
-            "Tap again to stop and transcribe";
-        } else {
-          showToast("Could not start recording \u2014 try typing instead");
-          usingWhisper = false;
-          isRec = false;
-          finishRec();
-        }
-      });
+      showToast("Speech service unavailable \u2014 try again");
+      isRec = false;
       return;
     }
     if (e.error === "no-speech")
@@ -999,7 +990,7 @@ function finishRec() {
   }
   const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
   recStartTime = null;
-  usingWhisper = false;
+  usingDeepgram = false;
   document.getElementById("recBtn").classList.remove("on");
   document.getElementById("recSt").textContent =
     (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
@@ -1028,8 +1019,8 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       clearInterval(recDurationTimer);
       recDurationTimer = null;
     }
-    if (usingWhisper) {
-      const result = await stopWhisperFallback();
+    if (usingDeepgram) {
+      const result = await stopDeepgramRecording();
       fullTx = result.text ? result.text.trim().slice(0, 150) : "";
       const actualDuration = finishRec();
       await reportRecordingDuration(actualDuration || result.duration);
@@ -2154,8 +2145,8 @@ document.addEventListener("keydown", (e) => {
   e.preventDefault();
   if (isRec) {
     isRec = false;
-    if (usingWhisper) {
-      stopWhisperFallback().then((result) => {
+    if (usingDeepgram) {
+      stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
@@ -2254,7 +2245,7 @@ window.ensureHtml2canvas = (function () {
     diag.push("[Diagnostic] ⚠️ Web Speech API requires HTTPS or localhost");
   }
   if (!SR) {
-    diag.push("[Diagnostic] ⚠️ Web Speech API not supported — will use Deepgram fallback");
+    diag.push("[Diagnostic] Web Speech API not supported — Deepgram only");
   }
   console.log(diag.join("\n"));
 })();

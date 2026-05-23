@@ -177,7 +177,7 @@ export default async function handler(req) {
       }
     }
 
-    // Call OpenRouter with Owl Alpha
+    // Call OpenRouter — Gemma 4 (free) / Ling 2.6 Flash (pro)
     const openrouterKey = process.env.OPENROUTER_API_KEY;
     if (!openrouterKey) {
       return new Response(JSON.stringify({ error: 'Server not configured' }), {

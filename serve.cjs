@@ -43,6 +43,14 @@ const MIME = {
 
 // Handle /api/stt — proxy to Deepgram Nova-3 Multilingual (batch)
 function handleStt(req, res) {
+  // Health check — tells client if Deepgram is configured
+  if (req.method === 'GET') {
+    const available = !!process.env.DEEPGRAM_API_KEY && !process.env.DEEPGRAM_API_KEY.includes('YOUR_ACTUAL_KEY');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ available }));
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.writeHead(405, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Method not allowed' }));
@@ -359,6 +367,6 @@ http.createServer((req, res) => {
   console.log(`  http://localhost:${PORT}`);
   console.log(`\n  On your phone (via port forwarding):`);
   console.log(`  http://localhost:${PORT}`);
-  console.log(`\n  API routes handled locally: /api/stt (Deepgram), all others mocked`);
+  console.log(`\n  API routes handled locally: /api/stt (Deepgram + health check), all others mocked`);
   console.log(`\n  Press Ctrl+C to stop.\n`);
 });
