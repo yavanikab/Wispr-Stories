@@ -1,27 +1,32 @@
 // Wispr Stories — service worker
 //
-// Goal: make the typing path installable + usable offline. Voice recording,
+// Goal: make the app installable and usable offline. Voice recording,
 // rewrites, uploads, and STT all need the network — those requests bypass
-// the cache and fail fast when offline. Static shell (HTML/CSS/JS/fonts/icons)
-// is served cache-first so the app boots instantly on revisit.
+// the cache and fail gracefully when offline. The static shell (HTML/CSS/JS/
+// fonts/icons) is cached so the app boots instantly on revisit.
+//
+// Cache strategy:
+//   - HTML and JS              → network-first (always fetch latest when
+//                                online; fall back to cache when offline)
+//   - CSS and static assets    → cache-first (fast on repeat visits)
+//   - Cross-origin (fonts etc) → stale-while-revalidate
+//   - /api/* and /c/*          → network-only (never cached)
 //
 // Cache lifecycle:
-//   - Version is baked into CACHE_NAME. Bump it on any shell change.
-//   - On `activate`, all caches not matching the current name are deleted.
-//
-// Network rules:
-//   - Same-origin /api/* and /c/*       → network-only (never cached)
-//   - Cross-origin (fonts, CDNs)        → stale-while-revalidate
-//   - Same-origin everything else       → cache-first, populate on miss
+//   CACHE_NAME is a stable identifier — no version number needed.
+//   Because HTML and JS use network-first, users always get fresh code when
+//   online. Only change CACHE_NAME when you want to force a full cache
+//   flush across all existing users (rare — major structural changes only).
 
-const CACHE_NAME = 'wispr-stories-v0.9.3';
+const CACHE_NAME = 'wispr-stories-shell';
 
-// Files cached on install so the app shell works on first offline visit.
-// Keep this list minimal — every entry must succeed or install fails.
+// Files seeded into the cache on install so the app works on first
+// offline visit. Keep this list to the true shell only — every entry
+// must succeed or the entire install fails.
 const PRECACHE_URLS = [
   '/',
   '/wisprstories.html',
-  '/wisprstories.js?v=20260522-v0.9.3',
+  '/wisprstories.js',
   '/site.webmanifest',
   '/assets/ws-logo-blwbg.png',
   '/assets/ws-logo-wh.png',
@@ -52,8 +57,8 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  // Same-origin dynamic routes — always go to network. Caching a rewrite
-  // result or a /c/{id} share lookup would serve stale data.
+  // Same-origin dynamic routes — always go to network. Never cache API
+  // responses or share-link lookups.
   if (url.origin === self.location.origin) {
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/c/')) {
       return; // browser handles it; we don't intercept
@@ -71,7 +76,7 @@ self.addEventListener('fetch', (event) => {
               if (resp && resp.status === 200) cache.put(req, resp.clone());
               return resp;
             })
-            .catch(() => cached); // offline fallback
+            .catch(() => cached);
           return cached || fetchPromise;
         })
       )
@@ -79,20 +84,43 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Same-origin static — cache-first, populate on miss.
+  // HTML and JS — network-first. Always fetch the latest version when online
+  // so users never get stale app code. Fall back to cache only when offline.
+  const isHtmlOrJs = url.pathname === '/'
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('.js');
+
+  if (isHtmlOrJs) {
+    event.respondWith(
+      fetch(req)
+        .then((resp) => {
+          if (resp && resp.status === 200 && resp.type === 'basic') {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          }
+          return resp;
+        })
+        .catch(() =>
+          caches.match(req).then((cached) =>
+            cached || caches.match('/wisprstories.html')
+          )
+        )
+    );
+    return;
+  }
+
+  // Everything else (CSS, images, fonts, icons) — cache-first for speed,
+  // populate on miss, offline fallback to cached shell.
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
       return fetch(req).then((resp) => {
-        // Only cache OK basic responses (skip opaque/redirects).
         if (resp && resp.status === 200 && resp.type === 'basic') {
           const respClone = resp.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, respClone));
         }
         return resp;
       }).catch(() => {
-        // Offline + not in cache — return the cached shell so navigation
-        // requests still resolve to something meaningful.
         if (req.mode === 'navigate') return caches.match('/wisprstories.html');
         return new Response('', { status: 504, statusText: 'Offline' });
       });

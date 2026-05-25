@@ -25,8 +25,20 @@ async function loadLanguages() {
       var item = document.createElement('button');
       item.className = 'lang-dropdown-item';
       item.type = 'button';
-      item.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i><strong>' + lang.label + '</strong>';
       item.onclick = function() { setLanguage(lang, btn, input); };
+      if (lang.code === 'en') {
+        item.textContent = lang.label;
+      } else {
+        var nn = document.createElement('span');
+        nn.className = 'ldi-native';
+        nn.textContent = lang.nativeName;
+        var en = document.createElement('span');
+        en.className = 'ldi-en';
+        en.textContent = lang.label;
+        item.appendChild(nn);
+        item.appendChild(document.createTextNode(' - '));
+        item.appendChild(en);
+      }
       dropdown.appendChild(item);
     });
 
@@ -44,7 +56,7 @@ function setLanguage(lang, btn, input) {
   if (input) input.value = lang.code;
   if (btn) {
     var btnText = document.getElementById('langBtnText');
-    if (btnText) btnText.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i><span>' + lang.label + '</span>';
+    if (btnText) btnText.innerHTML = '<i class="fa-solid fa-globe"></i> Language';
   }
   if (input) input.dispatchEvent(new Event('change', { bubbles: true }));
 

@@ -244,7 +244,7 @@ The app is installable as a Progressive Web App:
   - **Same-origin dynamic** (`/api/*`, `/c/*`): network-only
   - **Cross-origin** (fonts, CDNs): stale-while-revalidate
   - **Same-origin static**: cache-first with offline navigation fallback
-- Cache name: `wispr-stories-v0.9.3`
+- Cache name: `wispr-stories-v0.9.4`
 - Offline: manual typing still works; recording, fonts, and image export require connectivity
 
 ### Script-aware font system

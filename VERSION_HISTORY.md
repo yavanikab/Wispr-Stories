@@ -1,5 +1,60 @@
 # Version History
 
+## v0.9.6 — Hero subtitle + Occasions cleanup + Audit fixes (2026-05-24)
+
+### Features
+- Hero subtitle updated in all 21 i18n locales: "Record with the mic or dictate with Wispr Flow. Style and share with love." — native-script translations for all 20 non-English locales.
+- Republic Day (India, Jan 26) added to date-aware occasions with country-flag display.
+- Language-based festival filtering: occasions can restrict triggering to specific languages (India-only, country-specific).
+- Speech-language modal now internationalized with `data-i18n` attributes.
+- 2026 & 2027 date tables for all 54 occasions documented.
+
+### Bug fixes
+- 3 stale `[Deepgram]` console labels changed to `[STT]` for engine-agnostic diagnostics.
+- Web Speech restart uses `speechLang` instead of `curLang` (restart honors speech language).
+- `serve.cjs` Deepgram key check no longer blocks OpenRouter Whisper path.
+- `api/stt.js` health check validates placeholder keys (`YOUR_ACTUAL_KEY`).
+- Reset button properly cleans up MediaRecorder/stream tracks and reports recording duration on all stop paths.
+- `getUserCountry()` normalizes short language codes to full COUNTRY_MAPPING keys.
+- Duplicate font stacks removed from `base.css`; Hebrew dead fonts excised.
+
+### Technical
+- 12 WebP occasion images converted to PNG (fixes html2canvas rendering stability).
+- 53 occasion image files renamed to lowercase-with-hyphens convention.
+- `occasions.json` paths updated to `.png` format.
+- `languages` field supported in occasion trigger entries for per-language filtering.
+- `docs/admin-setup.md` now documents `OPENROUTER_API_KEY`, `CRON_SECRET`, `BLOB_READ_WRITE_TOKEN`.
+
+## v0.9.5 — Hybrid STT routing (Deepgram + Whisper) + UI fixes (2026-05-24)
+
+### Features
+- Hybrid STT engine routing: Western + Indian languages (14) use Deepgram Nova-3 (free $200 credits); CJK/Thai + Malayalam/Punjabi (6) use OpenRouter `openai/whisper-large-v3-turbo` (paid)
+- Malayalam/Punjabi no longer forced to Web Speech API fallback — routed to Whisper via server
+- All 20 speech-languages are now server-transcribed; Web Speech API is only used when server STT is unavailable
+
+### Bug fixes
+- Recording timer display now shows correct starting value ("15s remaining" instead of blinking "14s remaining" on first tick) in both Deepgram and Web Speech paths
+- Speech-language trigger pill uses consistent border-radius (`6px`) matching the nav language button instead of full pill shape (`20px`)
+
+### Technical
+- `serve.cjs` and `api/stt.js`: dual-engine STT routing — health check returns `available: true` if EITHER Deepgram or OpenRouter key is configured; POST handler routes by `whisperLanguages = ['th','ja','ko','zh','ml','pa']` to OpenRouter `/v1/audio/transcriptions`, all others to Deepgram
+- Format sanitizer strips MIME type parameters (`audio/webm;codecs=opus` → `webm`) for OpenRouter compatibility
+- Client error label changed from `[Deepgram]` to `[STT]` for accurate diagnostics
+
+## v0.9.4 — Doc audit + rewrite multilingual fix + version consolidation (2026-05-23)
+
+### Bug fixes
+- Rewrite API: switched to `qwen/qwen3-14b:free` (multilingual model) with `isLanguageMismatch()` output validator + `PROMPT_VERSION v3` cache bump
+- Fixed "no backend" claims across interview docs; corrected language counts (42→21), tone icons, rewrite limits (10→5), serverless status, AssemblyAI→Deepgram references
+
+### Documentation
+- Consolidated CHANGELOG.md `[Unreleased]` entries into `v0.9.4`
+- Updated `WISPR_STORIES_CANONICAL_BLUEPRINT.md`: palette count 6→10, file list, tone status, open questions, added occasion/PWA/font system docs, deduplicated section numbering
+- Fixed `docs/interview-quick-reference.md`, `docs/INTERVIEW_GUIDE.md`, `docs/competitor-prep.md`, `docs/cost-architecture.md` factual errors
+- Deleted 3 duplicate HTML doc files
+- Bumped `sw.js` cache to `wispr-stories-v0.9.4`
+- Updated README.md (6→10 palettes, clarified aspect ratios)
+
 ## [Unreleased] — i18n cleanup + UI refinements + Remotion demo
 
 ### 2026-05-22 — i18n English-leak cleanup + UI refinements

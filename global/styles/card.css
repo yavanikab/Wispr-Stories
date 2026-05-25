@@ -321,17 +321,120 @@
   width: clamp(120px, 20vw, 260px);
   height: auto;
   z-index: 1;
-  pointer-events: none;
-}
-
-.shell.has-card .bg-ghost-decoration {
-  display: none;
+  cursor: pointer;
 }
 
 .bg-ghost-img {
   width: 100%;
   height: auto;
   display: block;
+  transition: transform 0.15s;
+  pointer-events: none;
+}
+.bg-ghost-img:active {
+  transform: scale(0.92);
+}
+
+/* Ghost wiggle on click */
+@keyframes ghostWiggle {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-6deg); }
+  40%  { transform: rotate(5deg); }
+  60%  { transform: rotate(-4deg); }
+  80%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+.bg-ghost-img.wiggle {
+  animation: ghostWiggle 0.4s ease;
+}
+
+/* Speech bubble */
+.ghost-bubble {
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  transform-origin: bottom center;
+  background: var(--cream2);
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  opacity: 0;
+  transition: none;
+  pointer-events: none;
+  z-index: 100;
+}
+.ghost-bubble.show {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+}
+.ghost-bubble.float-out {
+  transform: translateX(-50%) scale(0.9) translateY(-30px);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Border tail — the stroke layer (larger) */
+.ghost-bubble::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+/* Fill tail — the background layer (smaller, shifted up to reveal border edges) */
+.ghost-bubble::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--cream2);
+  pointer-events: none;
+}
+.ghost-bubble-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+  font-family: var(--sans);
+}
+.ghost-bubble-text .typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--ink);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.7s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+:root.dark .ghost-bubble {
+  background: #2a2a2a;
+  border-color: rgba(255,255,235,0.2);
+}
+:root.dark .ghost-bubble::before {
+  border-top-color: rgba(255,255,235,0.2);
+}
+:root.dark .ghost-bubble::after {
+  border-top-color: #2a2a2a;
+}
+:root.dark .ghost-bubble-text { color: #ffffeb; }
+:root.dark .ghost-bubble-text .typing-cursor { background: #ffffeb; }
+
+.shell.has-card .bg-ghost-decoration {
+  display: none;
 }
 
 /* DOWNLOAD BUTTON — "sticker" overlap pattern. The button sits at

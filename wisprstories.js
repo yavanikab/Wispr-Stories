@@ -63,7 +63,7 @@ function hasCardContent() {
   const card = document.getElementById("card");
   return card && !card.classList.contains("card-empty");
 }
-const RTL = [];
+// RTL intentionally disabled — page layout stays LTR always
 
 // Map script codes (from fonts.js detectScript) to language codes (from languages.json)
 const SCRIPT_TO_LANG = {
@@ -92,6 +92,8 @@ function getLanguageName(code) {
 }
 
 
+var speechLang = localStorage.getItem('wsSpeechLang') || '';
+
 let curP = 0,
   curTone = "original",
   curLang = localStorage.getItem("wsLang") || "en",
@@ -101,8 +103,7 @@ let curP = 0,
 let recog = null,
   isRec = false,
   fullTx = "";
-let cardReady = false,
-  _lastBlob = null;
+let cardReady = false;
 let recogTimeout = null,
   recogRestartCount = 0;
 const RECOG_MAX_RESTARTS = 5;
@@ -423,7 +424,14 @@ function handleUpgradeEmail() {
     msg.className = "upgrade-modal-msg err";
     return;
   }
-  msg.textContent = "Thank you! I\u2019ll get back to you shortly.";
+  // Open a pre-filled email to the support address so the user can send
+  // their recovery request directly. No backend email system needed.
+  const subject = encodeURIComponent("Wispr Stories \u2014 Lost Supporter Key");
+  const body = encodeURIComponent(
+    "Hi,\n\nI lost my Wispr Stories supporter key.\nMy purchase email was: " + email + "\n\nPlease resend my key. Thank you!"
+  );
+  window.open("mailto:yellowgreenlabs@proton.me?subject=" + subject + "&body=" + body);
+  msg.textContent = "Opening your email app \u2014 send the message and I\u2019ll reply with your key.";
   msg.className = "upgrade-modal-msg ok";
 }
 
@@ -524,10 +532,11 @@ function applyTone(tone) {
       } else {
         showPill();
         if (left === 0) {
-          pill.textContent = "0 " + toneLabel.toLowerCase() + " rewrites left today \u2014 try another tone";
+          pill.textContent = (getI18nSync("rewrite.exhausted") || "0 {tone} rewrites left today — try another tone").replace("{tone}", toneLabel.toLowerCase());
           pill.className = "tone-pill exhausted";
         } else {
-          pill.textContent = left + " " + toneLabel.toLowerCase() + " rewrite" + (left === 1 ? "" : "s") + " left today";
+          var leftKey = left === 1 ? "rewrite.left" : "rewrite.plural";
+          pill.textContent = (getI18nSync(leftKey) || "{n} {tone} rewrites left today").replace("{n}", left).replace("{tone}", toneLabel.toLowerCase());
           pill.className = "tone-pill";
         }
         upgBtn.style.display = "";
@@ -702,7 +711,8 @@ async function startDeepgramRecording() {
       console.warn("[Silence] Analyser setup failed:", e.message);
     }
 
-    // Max duration timer for Whisper fallback
+    // Show initial max duration before first timer tick
+    document.getElementById("recSub").textContent = recMaxDuration + "s remaining";
     recDurationTimer = setInterval(() => {
       const elapsed = Math.floor((Date.now() - deepgramStartTime) / 1000);
       const remaining = recMaxDuration - elapsed;
@@ -794,13 +804,13 @@ function stopDeepgramRecording() {
             const res = await fetch("/api/stt", {
               method: "POST",
               headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
-              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: curLang }),
+              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: speechLang, sessionId: localStorage.getItem("wsSessionId") || null }),
               signal: controller.signal,
             });
             clearTimeout(sttTimeout);
             if (!res.ok) {
               const err = await res.text();
-              console.error("[Deepgram] API error:", err);
+              console.error("[STT] API error:", err);
               showToast("Transcription failed \u2014 tap record to try again");
               resolve({ text: "", duration });
               return;
@@ -810,15 +820,15 @@ function stopDeepgramRecording() {
           } catch (e) {
             clearTimeout(sttTimeout);
             if (e.name === 'AbortError') {
-              console.warn("[Deepgram] Request timed out");
+              console.warn("[STT] Request timed out");
               showToast("Transcription timed out \u2014 tap record to try again");
             } else {
-              console.error("[Deepgram] Error:", e);
+              console.error("[STT] Error:", e);
             }
             resolve({ text: "", duration });
           }
         } catch (e) {
-          console.error("[Deepgram] Error:", e);
+          console.error("[STT] Error:", e);
           resolve({ text: "", duration });
         }
       };
@@ -836,15 +846,7 @@ function startRec() {
     return;
   }
 
-  // Malayalam and Punjabi: Deepgram doesn't support — use browser Web Speech API
-  var langCode = (curLang || '').slice(0, 2).toLowerCase();
-  if (langCode === 'ml' || langCode === 'pa') {
-    document.getElementById("recSub").textContent = "Browser speech \u2014 Tap to speak";
-    trySpeechFallback();
-    return;
-  }
-
-  // Deepgram is the primary STT — check if it's configured
+  // Server STT health check — routes to Deepgram or Whisper based on language
   fetch("/api/stt?check=1").then(function(r) { return r.json(); }).then(function(data) {
     if (data.available) {
       usingDeepgram = true;
@@ -893,13 +895,13 @@ function startWebSpeechAPI() {
     finishRec();
     return;
   }
-  curLang = curLang || "en-US";
   fullTx = "";
   recogRestartCount = 0;
   recog = new SR();
   recog.continuous = false;
   recog.interimResults = true;
-  recog.lang = curLang;
+  var _wsLocales = { de:'de-DE', es:'es-ES', fr:'fr-FR', gu:'gu-IN', hi:'hi-IN', id:'id-ID', it:'it-IT', ja:'ja-JP', kn:'kn-IN', ko:'ko-KR', ml:'ml-IN', pa:'pa-IN', pt:'pt-BR', ru:'ru-RU', sv:'sv-SE', ta:'ta-IN', te:'te-IN', th:'th-TH', tr:'tr-TR', zh:'zh-CN' };
+  recog.lang = _wsLocales[speechLang] || _wsLocales[curLang] || 'en-US';
   if (isSafari && curLang !== "en-US") {
     showToast(
       "Safari may only support English (US) for voice recognition"
@@ -911,7 +913,7 @@ function startWebSpeechAPI() {
     recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     document.getElementById("recBtn").classList.add("on");
     document.getElementById("recSt").textContent = "Listening\u2026";
-    document.getElementById("recSub").textContent = "Tap again to stop";
+    document.getElementById("recSub").textContent = recMaxDuration + "s remaining";
     document.getElementById("recSub").classList.add("live");
     document.getElementById("liveBox").classList.add("show");
     console.log("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
@@ -976,7 +978,7 @@ function startWebSpeechAPI() {
       setTimeout(() => {
         if (!isRec) return;
         try {
-          recog.lang = curLang;
+          recog.lang = speechLang;
           recog.start();
           console.log(
             "[Speech] Restarted (attempt " + recogRestartCount + ")"
@@ -1161,14 +1163,62 @@ if (langSelEl) {
     saveDraft();
     // Re-localize the Style chip summary to the new page language.
     setTimeout(updateStyleChipSummary, 100);
-    // Notify users of browser STT limitation for ml/pa
-    var _lc = (curLang || '').slice(0, 2).toLowerCase();
-    if ((_lc === 'ml' || _lc === 'pa') && !localStorage.getItem('wsMlPaNote')) {
-      showToast("This language uses browser speech recognition. Speak clearly for best results.");
-      try { localStorage.setItem('wsMlPaNote', '1'); } catch (_e) {}
-    }
   });
 }
+// Speech language selector
+function updateSlTrigger() {
+  var t = document.getElementById('speechLangTrigger');
+  if (!t) return;
+  if (!speechLang) {
+    t.innerHTML = '<i class="fi fi-us"></i> <span>Auto-detect</span> <span class="sl-arr"></span>';
+    return;
+  }
+  var lang = allLanguages.find(function(l){ return l.code === speechLang; });
+  if (lang) {
+    t.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i> <span>' + lang.label + '</span> <span class="sl-arr"></span>';
+  }
+}
+function openSlModal() {
+  var m = document.getElementById('slModal');
+  if (!m) return;
+  m.classList.add('open');
+  document.body.classList.add('modal-open');
+  populateSlGrid();
+}
+function closeSlModal() {
+  var m = document.getElementById('slModal');
+  if (!m) return;
+  m.classList.remove('open');
+  document.body.classList.remove('modal-open');
+}
+function populateSlGrid() {
+  var g = document.getElementById('slGrid');
+  if (!g) return;
+  g.innerHTML = '';
+  var items = [{ code:'', label:'Auto-detect (English)', native:'', flagCode:'us' }];
+  allLanguages.forEach(function(l){ items.push(l); });
+  items.forEach(function(l){
+    var d = document.createElement('div');
+    d.className = 'sl-modal-item' + (speechLang === l.code ? ' selected' : '');
+    d.dataset.code = l.code || '';
+    var flag = (l.flagCode || 'us').toLowerCase();
+    d.innerHTML = '<span class="fi fi-' + flag + '"></span><span class="sl-label"><span class="sl-en">' + l.label + '</span>' + (l.code && l.nativeName && l.nativeName !== l.label ? '<span class="sl-native">' + l.nativeName + '</span>' : '<span class="sl-native">' + (l.code ? l.label : 'Auto') + '</span>') + '</span>';
+    d.addEventListener('click', function(){
+      speechLang = this.dataset.code;
+      try { localStorage.setItem('wsSpeechLang', speechLang); } catch(_e){}
+      updateSlTrigger();
+      closeSlModal();
+    });
+    g.appendChild(d);
+  });
+}
+document.getElementById('speechLangTrigger').addEventListener('click', function(){ openSlModal(); });
+document.getElementById('slClose').addEventListener('click', function(){ closeSlModal(); });
+document.getElementById('slBackdrop').addEventListener('click', function(){ closeSlModal(); });
+// init trigger
+if (typeof allLanguages !== 'undefined' && allLanguages.length) updateSlTrigger();
+document.addEventListener('languagesReady', function(){ updateSlTrigger(); });
+
 document.getElementById("toneRow").addEventListener("click", async (e) => {
   const c = e.target.closest(".tc");
   if (!c || c.disabled) return;
@@ -1363,8 +1413,22 @@ document.getElementById("nin").addEventListener("input", function() {
 document.getElementById("resetBtn").addEventListener("click", () => {
   rewriteCache = {};
   if (isRec) {
-    recog.stop();
     isRec = false;
+    if (usingDeepgram) {
+      stopDeepgramRecording().then((result) => {
+        fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+        const actualDuration = finishRec();
+        reportRecordingDuration(actualDuration || result.duration);
+      });
+    } else {
+      if (recogTimeout) {
+        clearTimeout(recogTimeout);
+        recogTimeout = null;
+      }
+      if (recog) recog.stop();
+      const actualDuration = finishRec();
+      reportRecordingDuration(actualDuration);
+    }
     fullTx = "";
     document.getElementById("recBtn").classList.remove("on");
     document.getElementById("recSt").textContent =
@@ -1497,7 +1561,7 @@ function tryAutoDetectLang() {
   for (const code of tryCodes) {
     if (allLanguages.find((l) => l.code === code)) {
       curLang = code;
-      isRTL = RTL.includes(code);
+      isRTL = false;
       window.setLanguageByCode(code);
       return;
     }
@@ -1807,7 +1871,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
     // without touching the page UI language. The page language stays on the
     // user's chosen locale; only the card display language follows the example.
     curLang = c.dataset.lang;
-    isRTL = RTL.includes(curLang);
+    isRTL = false;
   }
   updateCard();
   cardReady = true;
@@ -2206,7 +2270,11 @@ document.addEventListener("keydown", (e) => {
       clearTimeout(recogTimeout);
       recogTimeout = null;
     }
-    if (recog) recog.stop();
+    if (recog) {
+      recog.stop();
+      const actualDuration = finishRec();
+      reportRecordingDuration(actualDuration);
+    }
   } else startRec();
 });
 
@@ -2305,3 +2373,63 @@ window.ensureHtml2canvas = (function () {
 document.addEventListener('languagesReady', function () {
   if (typeof updateStyleChipSummary === 'function') updateStyleChipSummary();
 });
+
+// Ghost Easter egg — click the ghost to reveal the tagline
+(function() {
+  var ghostEl = document.getElementById('ghostDecoration');
+  var ghostImg = document.getElementById('ghostImg');
+  var bubbleEl = document.getElementById('ghostBubble');
+  var textEl = document.getElementById('ghostBubbleText');
+  if (!ghostEl || !ghostImg || !bubbleEl || !textEl) return;
+
+  var TAGLINE = 'Speak \u00B7 Style \u00B7 Share';
+  var isRunning = false;
+  var timer = null;
+
+  ghostEl.addEventListener('click', function(e) {
+    if (isRunning) return;
+    isRunning = true;
+    clearTimeout(timer);
+
+    // Reset bubble
+    bubbleEl.classList.remove('show', 'float-out');
+    textEl.textContent = '';
+
+    // Wiggle the ghost
+    ghostImg.classList.remove('wiggle');
+    void ghostImg.offsetWidth; // force reflow
+    ghostImg.classList.add('wiggle');
+
+    // Show bubble mid-wiggle
+    timer = setTimeout(function() {
+      bubbleEl.classList.add('show');
+
+      // Typewriter
+      var chars = TAGLINE.split('');
+      var i = 0;
+      var cursorSpan = document.createElement('span');
+      cursorSpan.className = 'typing-cursor';
+      textEl.textContent = '';
+      textEl.appendChild(cursorSpan);
+
+      function typeNext() {
+        if (i >= chars.length) {
+          // Remove cursor, hold, then float out
+          if (cursorSpan.parentNode) cursorSpan.remove();
+          timer = setTimeout(function() {
+            bubbleEl.classList.add('float-out');
+            timer = setTimeout(function() {
+              bubbleEl.classList.remove('show', 'float-out');
+              isRunning = false;
+            }, 500);
+          }, 1500);
+          return;
+        }
+        textEl.insertBefore(document.createTextNode(chars[i]), cursorSpan);
+        i++;
+        timer = setTimeout(typeNext, 70);
+      }
+      typeNext();
+    }, 250);
+  });
+})();

@@ -111,6 +111,16 @@ export default async function handler(req) {
       });
     }
 
+    // Server-side length guard. The client enforces 150 chars via maxlength,
+    // but a direct API call could send much longer text and amplify LLM costs.
+    // 500 chars is generous enough for any legitimate use while capping abuse.
+    if (text.length > 500) {
+      return new Response(JSON.stringify({ error: 'Text too long — maximum 500 characters' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     // Validate pro status server-side via Redis.
     // Never trust the client-sent isPro flag — proKey is validated here directly.
     // Fail closed: if Redis is unavailable, treat as free user.

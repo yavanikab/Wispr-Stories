@@ -1,13 +1,13 @@
 /* Wispr Stories — main stylesheet */
-@import "fonts.css";
+@import "fonts.css?v=20260524-v0.9.6";
 @import "base.css?v=20260521-live-glow";
-@import "nav.css";
+@import "nav.css?v=20260524-v0.9.6";
 @import "layout.css?v=20260521-gap28";
 @import "typography.css?v=20260521-notice";
 @import "tooltips.css?v=20260521-a11y";
 @import "inputs.css?v=20260521-radii";
 @import "actions.css?v=20260521-radii";
 @import "card.css?v=20260522-wcta-gap";
-@import "overlays.css";
+@import "overlays.css?v=20260524-v0.9.6";
 @import "components.css?v=20260521-notice";
-@import "responsive.css";
+@import "responsive.css?v=20260524-v0.9.6";

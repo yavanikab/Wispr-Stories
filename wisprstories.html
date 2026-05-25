@@ -14,6 +14,7 @@
       content="Turn your voice into shareable cards, in your language, in seconds. No install, no account needed."
     />
     <meta name="robots" content="index, follow" />
+    <meta name="google-site-verification" content="ISQu91mAcH9X70ViTg6fYuZSAP3x0Y8AIDEU8pn5v34" />
     <link rel="canonical" href="https://wisprstories.vercel.app" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://wisprstories.vercel.app" />
@@ -27,6 +28,26 @@
     />
     <meta property="og:site_name" content="Wispr Stories" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:locale:alternate" content="ru_RU" />
+    <meta property="og:locale:alternate" content="id_ID" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+    <meta property="og:locale:alternate" content="pa_IN" />
+    <meta property="og:locale:alternate" content="ko_KR" />
+    <meta property="og:locale:alternate" content="te_IN" />
+    <meta property="og:locale:alternate" content="ta_IN" />
+    <meta property="og:locale:alternate" content="tr_TR" />
+    <meta property="og:locale:alternate" content="it_IT" />
+    <meta property="og:locale:alternate" content="th_TH" />
+    <meta property="og:locale:alternate" content="gu_IN" />
+    <meta property="og:locale:alternate" content="kn_IN" />
+    <meta property="og:locale:alternate" content="ml_IN" />
+    <meta property="og:locale:alternate" content="sv_SE" />
     <meta
       property="og:image"
       content="https://wisprstories.vercel.app/assets/og-image.png"
@@ -132,7 +153,7 @@
     <link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
     <link
       rel="stylesheet"
-      href="global/styles/main.css?v=20260522-v1.0.3"
+      href="global/styles/main.css"
     />
     <link rel="stylesheet" href="global/occasions/occasions.css" />
     <link rel="stylesheet" href="assets/flag-icons/css/flag-icons.min.css" />
@@ -147,6 +168,14 @@
         "applicationCategory": "Multimedia",
         "operatingSystem": "All",
         "browserRequirements": "Chrome or Safari for voice recording",
+        "availableLanguage": [
+          "English", "Hindi", "Chinese", "Spanish", "French",
+          "Portuguese", "Russian", "Indonesian", "German", "Japanese",
+          "Punjabi", "Korean", "Telugu", "Tamil", "Turkish",
+          "Italian", "Thai", "Gujarati", "Kannada", "Malayalam", "Swedish"
+        ],
+        "featureList": "Voice recording, 21 languages, tone rewriting, card customisation, WhatsApp sharing, Instagram sharing, PNG download",
+        "screenshot": "https://wisprstories.vercel.app/assets/og-image.png",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -172,9 +201,6 @@
         >
       </a>
       <div class="nav-right">
-        <span class="nav-tag" tabindex="0"
-          ><span data-i18n="nav.tagline">Speak &middot; Create &middot; Share</span></span
-        >
         <div class="lang-wrap-sel" id="langWrapSel">
           <button class="lang-btn" id="langBtn" type="button" aria-label="Select language">
             <span id="langBtnText"></span>
@@ -207,7 +233,7 @@
       <div class="left">
         <div>
           <h1 class="hl-h1" data-i18n="hero.title">Say it once, share it forever</h1>
-          <p class="hl-h2" data-i18n="hero.subtitle">Dictate with <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="wispr-flow-link"><strong><em>Wispr Flow</em></strong></a>; style with care; share with love.</p>
+          <p class="hl-h2" data-i18n="hero.subtitle">Record with the mic or dictate with <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="wispr-flow-link"><strong><em>Wispr Flow</em></strong></a>. Style and share with love.</p>
         </div>
 
         <!-- Unified notice slot. Shows at most one message at a time
@@ -236,6 +262,7 @@
                 ></span
               >
             </div>
+            <div class="speech-lang-trigger" id="speechLangTrigger"><i class="fi fi-us"></i> <span>English</span> <span class="sl-arr"></span></div>
             <div class="rec-row">
               <button class="rec-btn" id="recBtn" aria-label="Record">
                 <svg viewBox="0 0 20 20" fill="none">
@@ -593,7 +620,7 @@
         <div class="pvw-lbl" data-i18n="preview.label">Live preview</div>
         <div id="tonePillWrap" class="tone-pill-wrap" style="display: none">
           <span id="tonePill" class="tone-pill"></span>
-          <button id="upgradeBtn" class="tone-upgrade-link">Upgrade</button>
+          <button id="upgradeBtn" class="tone-upgrade-link" data-i18n="upgrade">Upgrade</button>
         </div>
         <div class="card-wrap">
           <button class="dl-btn" id="dlBtn" style="display: none">
@@ -649,12 +676,16 @@
         </div>
       </div>
 
-      <div class="bg-ghost-decoration">
+      <div class="bg-ghost-decoration" id="ghostDecoration">
         <img
           src="assets/bg-ghost.png"
           alt="Wispr Stories illustration"
           class="bg-ghost-img"
+          id="ghostImg"
         />
+        <div class="ghost-bubble" id="ghostBubble">
+          <span class="ghost-bubble-text" id="ghostBubbleText"></span>
+        </div>
       </div>
 
       <!-- FOOTER -->
@@ -719,7 +750,7 @@
         </p>
         <a
           class="upgrade-modal-btn upgrade-modal-btn-primary"
-          href="https://buymeacoffee.com"
+          href="https://buymeacoffee.com/yg_labs"
           target="_blank"
           rel="noopener"
           data-i18n="upgradeModal.buyCoffee"
@@ -759,6 +790,17 @@
         </div>
         <div id="upgradeEmailMsg" class="upgrade-modal-msg"></div>
         <p class="upgrade-modal-disclaimer" data-i18n="upgradeModal.disclaimer">Wispr Stories &mdash; made for Wispr Flow</p>
+      </div>
+    </div>
+
+    <!-- SPEECH LANGUAGE MODAL -->
+    <div class="sl-modal" id="slModal">
+      <div class="sl-modal-backdrop" id="slBackdrop"></div>
+      <div class="sl-modal-content">
+        <button class="sl-modal-close" id="slClose">&times;</button>
+        <div class="sl-modal-title" data-i18n="speechLang.title">Select speech language</div>
+        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language for better transcription accuracy</p>
+        <div class="sl-modal-grid" id="slGrid"></div>
       </div>
     </div>
 
@@ -849,12 +891,12 @@
       </div>
     </div>
 
-    <script src="assets/i18n/i18n.js?v=20260521-no-hide"></script>
+    <script src="assets/i18n/i18n.js"></script>
     <script src="assets/languages/languages-loader.js"></script>
     <script src="global/occasions/examples-loader.js"></script>
     <script src="global/occasions/occasions.js"></script>
     <script src="global/fonts.js"></script>
-    <script src="wisprstories.js?v=20260522-v0.9.3"></script>
+    <script src="wisprstories.js"></script>
     <script src="global/demo.js"></script>
   </body>
 </html>

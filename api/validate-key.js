@@ -33,11 +33,18 @@ export default async function handler(req) {
 
     const keyData = typeof data === 'string' ? JSON.parse(data) : data;
 
+    // Revoked keys (refunded supporters) get a clear reason, not a generic 'invalid_key'
+    if (keyData.revoked) {
+      return new Response(JSON.stringify({ valid: false, reason: 'revoked' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Never return PII — email and purchase date stay server-side only.
     return new Response(JSON.stringify({
       valid: true,
       tier: keyData.tier || 'pro',
-      email: keyData.email || '',
-      purchasedAt: keyData.date || '',
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

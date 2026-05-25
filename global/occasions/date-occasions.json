@@ -1,4 +1,18 @@
 {
+  "republic-day": {
+    "id": "republic-day",
+    "type": "date-aware",
+    "displayType": "country-flag",
+    "triggers": [
+      "republic day",
+      "happy republic day",
+      "republic day wishes",
+      "republic day greetings"
+    ],
+    "dateMap": {
+      "India": "01-26"
+    }
+  },
   "independence-day": {
     "id": "independence-day",
     "type": "date-aware",

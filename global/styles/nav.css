@@ -70,14 +70,6 @@
   letter-spacing: -0.3px;
   color: var(--ink);
 }
-.nav-tag {
-  font-size: 12px;
-  color: var(--ink3);
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  display: inline-flex;
-}
-.nav-tag:focus-visible,
 .footer-wave:focus-visible {
   outline: 1px solid var(--ink3);
   outline-offset: 3px;

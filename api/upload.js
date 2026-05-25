@@ -31,9 +31,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Read raw PNG bytes directly from request body
+    // Read raw PNG bytes directly from request body.
+    // Hard-cap at 2 MB — a 1080×1080 card PNG is typically 200–600 KB,
+    // so 2 MB gives ample headroom while preventing runaway uploads.
+    const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+    let totalBytes = 0;
     const chunks = [];
     for await (const chunk of req) {
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_UPLOAD_BYTES) {
+        res.statusCode = 413;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'File too large — maximum 2 MB' }));
+        return;
+      }
       chunks.push(chunk);
     }
     const pngBuffer = Buffer.concat(chunks);
@@ -70,7 +81,8 @@ export default async function handler(req, res) {
     });
 
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Restrict CORS to own origin — upload should only be callable from the app itself.
+    res.setHeader('Access-Control-Allow-Origin', 'https://wisprstories.vercel.app');
     res.end(JSON.stringify({ shortId }));
   } catch (e) {
     res.statusCode = 500;

@@ -6,7 +6,7 @@
   },
   "hero": {
     "title": "Say it once, share it forever",
-    "subtitle": "Dictate with <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; style with care; share with love.",
+    "subtitle": "Record with the mic or dictate with <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>. Style and share with love.",
     "quote": "\"Hold onto memories; they will hold onto you.\""
   },
   "sharedCta": "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.",
@@ -17,6 +17,10 @@
     "status": "Tap to speak",
     "sub": "Words appear when you stop",
     "generating": "Generating…"
+  },
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy"
   },
   "orText": "or type or paste your words",
   "textarea": {
@@ -72,6 +76,11 @@
     "create": "Create card",
     "share": "Share card",
     "createTone": "Create {tone} card"
+  },
+  "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
   },
   "closing": "Your voice, beautifully shared",
   "preview": {

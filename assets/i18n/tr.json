@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "Bir kez söyle, sonsuza dek paylaş",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> ile dikte et; özenle biçimlendir; sevgiyle paylaş.",
+    "subtitle": "Mikrofonla kaydet veya <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> ile dikte et. Şekillendir ve sevgiyle paylaş.",
     "quote": "\"Anılara sıkı sıkıya tutun; onlar da size tutunacaktır.\""
   },
   "sharedCta": "✨ <strong>Bir Wispr Story aldınız!</strong> Kendinkini yapmak için <em>Kartımı oluştur</em> dokunun.",
   "ffNotice": "🌐 Firefox'ta ses kaydı desteklenmiyor. Chrome veya Safari kullanın — veya metninizi aşağıya yapıştırın.",
   "record": {
-    "label": "Konuşmak için dokunun",
+    "label": "Sesiniz",
     "tip": "Kaydet'e basın ve doğal bir şekilde konuşun. Kelimeleriniz canlı olarak görünür. Durdurmak için tekrar dokunun — kelimeleriniz kart için hazır metin kutusuna taşınır.",
     "status": "Konuşmak için dokunun",
     "sub": "Durduğunuzda kelimeleriniz görünür",
@@ -73,7 +73,11 @@
     "share": "Kart paylaş",
     "createTone": "{tone} kart oluştur"
   },
-  "closing": "Sesiniz, güzelce paylaşıldı",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "Sesiniz, güzelce paylaşıldı",
   "preview": {
     "label": "Canlı önizleme"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flow'u ücretsiz deneyin →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — i&ccedil;in yapıldı <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Bağımsız proje · Wispr Flow ile bağlantılı değil",
     "copyright": "© 2026"
   },

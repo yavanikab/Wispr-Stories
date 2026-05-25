@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "说一次，永远分享",
-    "subtitle": "用 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> 口述；用心排版；用爱分享。",
+    "subtitle": "用麦克风录音或用<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>口述。排版并分享爱。",
     "quote": "\"抓住记忆，它们也会抓住你。\""
   },
   "sharedCta": "✨ <strong>你收到了一张 Wispr Story！</strong> 点击<em>创建我的卡片</em>来制作你自己的。",
   "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari — 或在下方粘贴你的文字。",
   "record": {
-    "label": "点击说话",
+    "label": "你的声音",
     "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止 — 你的文字将移入文本框准备制作卡片。",
     "status": "点击说话",
     "sub": "停止后文字会出现",
@@ -73,7 +73,11 @@
     "share": "分享卡片",
     "createTone": "创建{tone}卡片"
   },
-  "closing": "你的声音，美好地分享",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "你的声音，美好地分享",
   "preview": {
     "label": "实时预览"
   },
@@ -86,7 +90,7 @@
     "link": "免费试用 Wispr Flow →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — 为...而制作 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "独立项目 · 与 Wispr Flow 无关联",
     "copyright": "© 2026"
   },

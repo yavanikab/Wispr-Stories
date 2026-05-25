@@ -112,6 +112,29 @@
         display: none;
       }
     }
+
+    .fmenu-version {
+      display: none;
+      text-align: center;
+      padding: 10px 16px 8px;
+      border-top: 1px solid var(--fmenu-bg-shade-3);
+      line-height: 1.4;
+    }
+    .fmenu-version.loaded {
+      display: block;
+    }
+    .fmenu-version-number {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      color: oklch(from var(--fmenu-primary) calc(l + 0.05) c h);
+    }
+    .fmenu-version-name {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      color: var(--fmenu-secondary);
+    }
   `;
   document.head.appendChild(style);
 
@@ -129,19 +152,23 @@
     >[ <i class="fa-solid fa-question"></i> ]</a>
 
     <div class="fmenu-panel hidden" id="fmenu-panel">
-      <a href="#" class="fmenu-link">
+      <a href="https://buymeacoffee.com/yg_labs" class="fmenu-link" target="_blank" rel="noopener noreferrer">
         <i class="fa-solid fa-hand-holding-heart"></i> Support Here
       </a>
       <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank">
         <i class="fa-brands fa-medium"></i> Read Articles
       </a>
      
-      <a href="#" class="fmenu-link">
+      <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link">
         <i class="fa-solid fa-pen-clip"></i> Submit Issues
       </a>
       <a href="#" class="fmenu-link">
         <i class="fa-solid fa-file-shield"></i> License & Terms
       </a>
+      <div class="fmenu-version" id="fmenu-version">
+        <span class="fmenu-version-number" id="fmenu-version-number"></span>
+        <span class="fmenu-version-name">Wispr Stories</span>
+      </div>
     </div>
   `;
 
@@ -183,4 +210,19 @@
     panel.classList.add("hidden");
     toggle.setAttribute("aria-expanded", "false");
   }, { passive: true });
+
+  // ── Version ──
+  const versionDiv = wrapper.querySelector("#fmenu-version");
+  const versionSpan = wrapper.querySelector("#fmenu-version-number");
+
+  fetch("VERSION_HISTORY.md")
+    .then(r => r.ok ? r.text() : Promise.reject())
+    .then(text => {
+      const match = text.match(/^## v(\d+\.\d+\.\d+)/m);
+      if (match) {
+        versionSpan.textContent = "v" + match[1];
+        versionDiv.classList.add("loaded");
+      }
+    })
+    .catch(() => {});
 })();

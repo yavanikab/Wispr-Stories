@@ -56,8 +56,8 @@ Wispr Stories is an independent fan project — not affiliated, not sponsored. [
 
 - 🎙️ **Speak or type** — record your voice or just type
 - ✨ **AI tone rewriting** — tap a tone (Warm, Bold, Poetic, Playful, Reflective, Honest) and your message is rewritten to match
-- 🎨 **6 color palettes** — Violet, Amber, Crimson, Emerald, Ocean, Rose
-- 📐 **4 aspect ratios** — Instagram, widescreen, universal, Stories
+- 🎨 **10 color palettes** — Violet, Amber, Crimson, Emerald, Ocean, Rose, Orange, Teal, Fuchsia, Indigo
+- 📐 **2:2 square ratio** — optimized for WhatsApp large preview (4:5, 16:9, 3:4, 9:16 designed but not yet built)
 - 🌍 **21 languages** — the app interface and your card both work in your language
 - 📱 **Built for phones** — full mobile-first design with native share
 - 🌙 **Dark mode** — follows your system preference

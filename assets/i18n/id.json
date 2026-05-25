@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "Katakan sekali, bagikan selamanya",
-    "subtitle": "Dikte dengan <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; gaya dengan hati; bagikan dengan cinta.",
+    "subtitle": "Rekam dengan mikrofon atau dikte dengan <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>. Gaya dan bagikan dengan cinta.",
     "quote": "\"Pegang erat kenangan; mereka akan memegang erat Anda.\""
   },
   "sharedCta": "✨ <strong>Anda menerima Wispr Story!</strong> Ketuk <em>Buat kartu saya</em> untuk membuat milik Anda sendiri.",
   "ffNotice": "🌐 Perekaman suara tidak didukung di Firefox. Gunakan Chrome atau Safari — atau tempel teks Anda di bawah.",
   "record": {
-    "label": "Ketuk untuk berbicara",
+    "label": "Suaramu",
     "tip": "Tekan rekam dan berbicaralah secara alami. Kata-kata Anda muncul secara langsung. Ketuk lagi untuk berhenti — kata-kata Anda pindah ke kotak teks siap untuk kartu.",
     "status": "Ketuk untuk berbicara",
     "sub": "Kata-kata Anda muncul saat Anda berhenti",
@@ -73,7 +73,11 @@
     "share": "Bagikan kartu",
     "createTone": "Buat kartu {tone}"
   },
-  "closing": "Suara Anda, dibagikan dengan indah",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "Suara Anda, dibagikan dengan indah",
   "preview": {
     "label": "Pratinjau langsung"
   },
@@ -86,7 +90,7 @@
     "link": "Coba Wispr Flow gratis →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — dibuat untuk <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Proyek independen · Tidak berafiliasi dengan Wispr Flow",
     "copyright": "© 2026"
   },

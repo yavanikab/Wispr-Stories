@@ -103,7 +103,19 @@ function findOccasionMatch(text, triggers) {
 function getUserCountry() {
   var lang = (typeof curLang !== 'undefined' ? curLang : null) ||
              (typeof navigator !== 'undefined' ? navigator.language : 'en-US');
-  var mapping = COUNTRY_MAPPING[lang] || COUNTRY_MAPPING['en-US'];
+  // Normalize short language code (e.g. "hi") to full COUNTRY_MAPPING key (e.g. "hi-IN")
+  var shortToFull = {
+    'af': 'af-ZA', 'ar': 'ar-SA', 'bn': 'bn-IN', 'da': 'da-DK', 'de': 'de-DE',
+    'en': 'en-US', 'es': 'es-ES', 'fa': 'fa-IR', 'fi': 'fi-FI', 'fil': 'fil-PH',
+    'fr': 'fr-FR', 'gu': 'gu-IN', 'he': 'he-IL', 'hi': 'hi-IN', 'hu': 'hu-HU',
+    'id': 'id-ID', 'it': 'it-IT', 'ja': 'ja-JP', 'kn': 'kn-IN', 'ko': 'ko-KR',
+    'ml': 'ml-IN', 'mr': 'mr-IN', 'ms': 'ms-MY', 'nl': 'nl-NL', 'pa': 'pa-IN',
+    'pl': 'pl-PL', 'pt': 'pt-BR', 'ro': 'ro-RO', 'ru': 'ru-RU', 'sv': 'sv-SE',
+    'ta': 'ta-IN', 'te': 'te-IN', 'th': 'th-TH', 'tr': 'tr-TR', 'uk': 'uk-UA',
+    'ur': 'ur-PK', 'vi': 'vi-VN', 'zh': 'zh-CN'
+  };
+  var fullCode = shortToFull[lang] || lang;
+  var mapping = COUNTRY_MAPPING[fullCode] || COUNTRY_MAPPING['en-US'];
   return mapping;
 }
 
@@ -145,8 +157,12 @@ function checkOccasions() {
   var chosen = null;
   var userCountry = getUserCountry();
 
+  var curLangCode = (typeof curLang !== 'undefined' ? curLang : 'en') || 'en';
+
   for (var i = 0; i < OCCASION_TRIGGERS.length; i++) {
     var oc = OCCASION_TRIGGERS[i];
+    // Skip if occasion has language restriction and current language is not included
+    if (oc.languages && oc.languages.indexOf(curLangCode) === -1) continue;
     var pos = findOccasionMatch(raw, oc.triggers);
     if (pos !== -1 && (earliestPos === -1 || pos < earliestPos)) {
       earliestPos = pos;
@@ -188,12 +204,12 @@ function checkOccasions() {
       el.classList.remove('show');
       panel.classList.remove('occasion');
       var img2 = el.querySelector('img');
-      if (img2) img2.src = '';
+      if (img2) { img2.onerror = null; img2.src = ''; }
     }
   } else {
     el.classList.remove('show');
     panel.classList.remove('occasion');
     var img3 = el.querySelector('img');
-    if (img3) img3.src = '';
+    if (img3) { img3.onerror = null; img3.src = ''; }
   }
 }

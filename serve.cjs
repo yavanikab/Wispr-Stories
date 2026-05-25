@@ -43,12 +43,13 @@ const MIME = {
 
 // Handle /api/stt — proxy to Deepgram Nova-3 Multilingual (batch)
 function handleStt(req, res) {
-  // Health check — tells client if Deepgram is configured
+  // Health check — tells client if Deepgram or Whisper is configured
   if (req.method === 'GET') {
-    const available = (!!process.env.DEEPGRAM_API_KEY && !process.env.DEEPGRAM_API_KEY.includes('YOUR_ACTUAL_KEY'))
+    const dgAvailable = (!!process.env.DEEPGRAM_API_KEY && !process.env.DEEPGRAM_API_KEY.includes('YOUR_ACTUAL_KEY'))
       || (!!process.env.DEEPGRAM_API_KEY_ADMIN && !process.env.DEEPGRAM_API_KEY_ADMIN.includes('YOUR_ACTUAL_KEY'));
+    const orAvailable = !!(process.env.OPENROUTER_API_KEY) && !process.env.OPENROUTER_API_KEY.includes('YOUR_ACTUAL_KEY');
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ available }));
+    res.end(JSON.stringify({ available: dgAvailable || orAvailable }));
     return;
   }
 
@@ -63,7 +64,7 @@ function handleStt(req, res) {
   const isAdmin = adminSecret && process.env.ADMIN_API_SECRET && adminSecret === process.env.ADMIN_API_SECRET;
   const apiKey = isAdmin ? process.env.DEEPGRAM_API_KEY_ADMIN : process.env.DEEPGRAM_API_KEY;
 
-  if (!apiKey || apiKey.includes('YOUR_ACTUAL_KEY')) {
+  if ((!apiKey || apiKey.includes('YOUR_ACTUAL_KEY')) && !process.env.OPENROUTER_API_KEY) {
     // Mock mode for local testing — no Deepgram credits consumed
     console.log('[Deepgram] No API key — returning mock transcription');
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -81,9 +82,49 @@ function handleStt(req, res) {
       const { audio, format, language } = JSON.parse(body);
       const audioBuffer = Buffer.from(audio, 'base64');
 
-      // Deepgram batch API — pass language code for non-English
       var dgLang = (language || '').slice(0, 2).toLowerCase();
-      var dgSupported = ['de','es','fr','gu','hi','id','it','ja','kn','ko','pt','ru','sv','ta','te','th','tr','zh'];
+
+      // Whisper-routed languages: CJK/Thai + Deepgram-unsupported Indian languages
+      var whisperLanguages = ['th', 'ja', 'ko', 'zh', 'ml', 'pa'];
+
+      if (whisperLanguages.indexOf(dgLang) !== -1) {
+        var orKey = process.env.OPENROUTER_API_KEY;
+        if (orKey && !orKey.includes('YOUR_ACTUAL_KEY')) {
+          // Sanitize format: "audio/webm;codecs=opus" → "webm"
+          var audioFormat = (format || '').split(';')[0].split('/')[1] || 'webm';
+          var whisperRes = await fetch('https://openrouter.ai/api/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + orKey,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://wisprstories.vercel.app',
+              'X-OpenRouter-Title': 'Wispr Stories',
+            },
+            body: JSON.stringify({
+              model: 'openai/whisper-large-v3-turbo',
+              input_audio: { data: audio, format: audioFormat },
+              language: dgLang,
+            }),
+          });
+          if (!whisperRes.ok) {
+            const errText = await whisperRes.text();
+            console.error('[Whisper] API error:', errText);
+            res.writeHead(502, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Whisper API error', detail: errText }));
+            return;
+          }
+          const whisperData = await whisperRes.json();
+          const text = whisperData.text || '';
+          console.log('[Whisper] Transcription OK:', text.slice(0, 50));
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ text }));
+          return;
+        }
+        console.log('[Whisper] No OPENROUTER_API_KEY — falling back to Deepgram');
+      }
+
+      // Deepgram batch API — pass language code for non-English
+      var dgSupported = ['de','es','fr','gu','hi','id','it','kn','pt','ru','sv','ta','te','tr'];
       var langParam = dgLang && dgSupported.indexOf(dgLang) !== -1 ? '&language=' + dgLang : '';
       const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true' + langParam;
       const deepgramRes = await fetch(url, {
@@ -103,8 +144,8 @@ function handleStt(req, res) {
         return;
       }
 
-      const data = await deepgramRes.json();
-      const text = data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
+      const deepgramData = await deepgramRes.json();
+      const text = deepgramData.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
       console.log('[Deepgram] Transcription OK:', text.slice(0, 50));
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ text }));
@@ -382,6 +423,6 @@ http.createServer((req, res) => {
   console.log(`  http://localhost:${PORT}`);
   console.log(`\n  On your phone (via port forwarding):`);
   console.log(`  http://localhost:${PORT}`);
-  console.log(`\n  API routes handled locally: /api/stt (Deepgram + health check), all others mocked`);
+  console.log(`\n  API routes handled locally: /api/stt (Deepgram + Whisper + health check), all others mocked`);
   console.log(`\n  Press Ctrl+C to stop.\n`);
 });

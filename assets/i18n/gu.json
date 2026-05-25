@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "એક વાર બોલો, હંમેશા શેર કરો",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> સાથે બોલો; કાળજીથી સ્ટાઇલ કરો; પ્રેમથી શેર કરો.",
+    "subtitle": "માઇક વડે રેકોર્ડ કરો અથવા <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> સાથે બોલો. સ્ટાઇલ કરો અને પ્રેમથી શેર કરો.",
     "quote": "\"યાદોને પકડી રાખો; તે તમને પકડી રાખશે.\""
   },
   "sharedCta": "✨ <strong>તમને એક Wispr Story મળી!</strong> તમારા પોતાના બનાવવા માટે <em>મારું કાર્ડ બનાવો</em> ટેપ કરો.",
   "ffNotice": "🌐 Firefoxમાં વૉઇસ રેકોર્ડિંગ સપોર્ટેડ નથી. Chrome અથવા Safari વાપરો — અથવા નીચે તમારો ટેક્સ્ટ પેસ્ટ કરો.",
   "record": {
-    "label": "બોલવા માટે ટેપ કરો",
+    "label": "તમારો અવાજ",
     "tip": "રેકોર્ડ દબાવો અને કુદરતી રીતે બોલો. તમારા શબ્દો લાઇવ દેખાય છે. અટકાવવા માટે ફરી ટેપ કરો — તમારા શબ્દો કાર્ડ માટે તૈયાર ટેક્સ્ટ બોક્સમાં જાય છે.",
     "status": "બોલવા માટે ટેપ કરો",
     "sub": "તમે અટકો ત્યારે શબ્દો દેખાય છે",
@@ -73,7 +73,11 @@
     "share": "કાર્ડ શેર કરો",
     "createTone": "{tone} કાર્ડ બનાવો"
   },
-  "closing": "તમારો અવાજ, સુંદર રીતે શેર કરાયો",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "તમારો અવાજ, સુંદર રીતે શેર કરાયો",
   "preview": {
     "label": "લાઇવ પૂર્વાવલોકન"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flow મફતમાં અજમાવો →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — માટે બનાવેલ <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "સ્વતંત્ર પ્રોજેક્ટ · Wispr Flow સાથે સંલગ્ન નથી",
     "copyright": "© 2026"
   },

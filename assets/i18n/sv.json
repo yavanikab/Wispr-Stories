@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "Säg det en gång, dela det för alltid",
-    "subtitle": "Diktera med <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; styla med omsorg; dela med kärlek.",
+    "subtitle": "Spela in med mikrofonen eller diktera med <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>. Styla och dela med kärlek.",
     "quote": "\"Håll fast vid minnen; de kommer att hålla fast vid dig.\""
   },
   "sharedCta": "✨ <strong>Du fick en Wispr Story!</strong> Tryck på <em>Skapa mitt kort</em> för att göra ditt eget.",
   "ffNotice": "🌐 Inspelning av röst stöds inte i Firefox. Använd Chrome eller Safari — eller klistra in din text nedan.",
   "record": {
-    "label": "Tryck för att tala",
+    "label": "Din röst",
     "tip": "Tryck på spela in och tala naturligt. Dina ord visas live. Tryck igen för att stoppa — dina ord flyttas till textrutan redo för kortet.",
     "status": "Tryck för att tala",
     "sub": "Dina ord visas när du slutar",
@@ -73,7 +73,11 @@
     "share": "Dela kort",
     "createTone": "Skapa {tone}-kort"
   },
-  "closing": "Din röst, vackert delad",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "Din röst, vackert delad",
   "preview": {
     "label": "Live-förhandsgranskning"
   },
@@ -86,7 +90,7 @@
     "link": "Prova Wispr Flow gratis →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — gjord f&ouml;r <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Självständigt projekt · Inte anslutet till Wispr Flow",
     "copyright": "© 2026"
   },

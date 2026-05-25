@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "Dillo una volta, condividilo per sempre",
-    "subtitle": "Detta con <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>; stilizza con cura; condividi con amore.",
+    "subtitle": "Registra con il microfono o detta con <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>. Stilizza e condividi con amore.",
     "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
   },
   "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
   "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari — o incolla il tuo testo qui sotto.",
   "record": {
-    "label": "Tocca per parlare",
+    "label": "La tua voce",
     "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare — le tue parole si spostano nella casella di testo pronte per la card.",
     "status": "Tocca per parlare",
     "sub": "Le tue parole appaiono quando ti fermi",
@@ -73,7 +73,11 @@
     "share": "Condividi card",
     "createTone": "Crea card {tone}"
   },
-  "closing": "La tua voce, magnificamente condivisa",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "La tua voce, magnificamente condivisa",
   "preview": {
     "label": "Anteprima dal vivo"
   },
@@ -86,7 +90,7 @@
     "link": "Prova Wispr Flow gratis →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — fatto per <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Progetto indipendente · Non affiliato con Wispr Flow",
     "copyright": "© 2026"
   },

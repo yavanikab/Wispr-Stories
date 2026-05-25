@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "한 번 말하고, 영원히 공유하세요",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>로 받아쓰기; 정성으로 스타일링; 사랑으로 공유하기.",
+    "subtitle": "마이크로 녹음하거나 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>로 받아쓰기. 스타일링하고 사랑으로 공유하기.",
     "quote": "\"기억을 붙잡으세요; 기억이 당신을 붙잡아 줄 것입니다.\""
   },
   "sharedCta": "✨ <strong>Wispr Story를 받았습니다!</strong> <em>내 카드 만들기</em>를 탭하여 자신만의 카드를 만드세요.",
   "ffNotice": "🌐 Firefox에서는 음성 녹음이 지원되지 않습니다. Chrome이나 Safari를 사용하세요 — 또는 아래에 텍스트를 붙여넣으세요.",
   "record": {
-    "label": "탭하여 말하기",
+    "label": "당신의 목소리",
     "tip": "녹음을 누르고 자연스럽게 말하세요. 단어가 실시간으로 표시됩니다. 다시 탭하여 중지 — 단어가 카드 준비를 위해 텍스트 상자로 이동합니다.",
     "status": "탭하여 말하기",
     "sub": "멈추면 단어가 표시됩니다",
@@ -73,7 +73,11 @@
     "share": "카드 공유",
     "createTone": "{tone} 톤으로 카드 만들기"
   },
-  "closing": "당신의 목소리, 아름답게 공유되었습니다",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "당신의 목소리, 아름답게 공유되었습니다",
   "preview": {
     "label": "실시간 미리보기"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flow를 무료로 사용해 보세요 →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — 를 위해 만든 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "독립 프로젝트 · Wispr Flow와 제휴하지 않음",
     "copyright": "© 2026"
   },

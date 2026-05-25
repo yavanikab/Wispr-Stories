@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "ஒருமுறை சொல்லு, எப்போதும் பகிர்",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> உடன் சொல்; அக்கறையுடன் வடிவமை; அன்புடன் பகிர்.",
+    "subtitle": "மைக்ரோஃபோனில் பதிவு செய்யவும் அல்லது <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> உடன் சொல். ஸ்டைல் செய்து அன்புடன் பகிர்.",
     "quote": "\"நினைவுகளைப் பிடித்துக்கொள்; அவை உன்னைப் பிடித்துக்கொள்ளும்.\""
   },
   "sharedCta": "✨ <strong>உங்களுக்கு ஒரு Wispr Story கிடைத்தது!</strong> உங்கள் சொந்தத்தை உருவாக்க <em>எனது கார்டை உருவாக்கு</em> தட்டவும்.",
   "ffNotice": "🌐 Firefoxஇல் குரல் பதிவு ஆதரவு இல்லை. Chrome அல்லது Safari பயன்படுத்தவும் — அல்லது உங்கள் உரையை கீழே ஒட்டவும்.",
   "record": {
-    "label": "பேச தட்டவும்",
+    "label": "உங்கள் குரல்",
     "tip": "பதிவு அழுத்தி இயற்கையாக பேசுங்கள். உங்கள் வார்த்தைகள் நேரடியாக தோன்றும். நிறுத்த மீண்டும் தட்டவும் — உங்கள் வார்த்தைகள் கார்டுக்கு தயாராக டெக்ஸ்ட் பெட்டிக்கு செல்லும்.",
     "status": "பேச தட்டவும்",
     "sub": "நீங்கள் நிறுத்தும்போது வார்த்தைகள் தோன்றும்",
@@ -73,7 +73,11 @@
     "share": "கார்டு பகிர்",
     "createTone": "{tone} கார்டை உருவாக்கு"
   },
-  "closing": "உங்கள் குரல், அழகாக பகிரப்பட்டது",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "உங்கள் குரல், அழகாக பகிரப்பட்டது",
   "preview": {
     "label": "நேரடி முன்னோட்டம்"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flow-ஐ இலவசமாக முயற்சிக்கவும் →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — இதற்காக உருவாக்கப்பட்டது <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "சுயாதீன திட்டம் · Wispr Flow உடன் இணைக்கப்படவில்லை",
     "copyright": "© 2026"
   },

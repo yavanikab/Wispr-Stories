@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "ఒకసారి చెప్పండి, ఎప్పటికీ పంచుకోండి",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>తో డిక్టేట్ చేయండి; శ్రద్ధతో స్టైల్ చేయండి; ప్రేమతో పంచుకోండి.",
+    "subtitle": "మైక్‌తో రికార్డ్ చేయండి లేదా <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>తో డిక్టేట్ చేయండి. స్టైల్ చేయండి మరియు ప్రేమతో పంచుకోండి.",
     "quote": "\"జ్ఞాపకాలను పట్టుకోండి; అవి మిమ్మల్ని పట్టుకుంటాయి.\""
   },
   "sharedCta": "✨ <strong>మీకు Wispr Story వచ్చింది!</strong> మీ సొంతం చేసుకోవడానికి <em>నా కార్డ్ సృష్టించండి</em> ట్యాప్ చేయండి.",
   "ffNotice": "🌐 Firefoxలో వాయిస్ రికార్డింగ్ మద్దతు లేదు. Chrome లేదా Safari ఉపయోగించండి — లేదా మీ టెక్స్ట్ క్రింద పేస్ట్ చేయండి.",
   "record": {
-    "label": "మాట్లాడటానికి ట్యాప్ చేయండి",
+    "label": "మీ స్వరం",
     "tip": "రికార్డ్ నొక్కి సహజంగా మాట్లాడండి. మీ పదాలు లైవ్గా కనిపిస్తాయి. ఆపడానికి మళ్లీ ట్యాప్ చేయండి — మీ పదాలు కార్డ్ కోసం సిద్ధంగా టెక్స్ట్ బాక్స్‌కు వెళ్తాయి.",
     "status": "మాట్లాడటానికి ట్యాప్ చేయండి",
     "sub": "మీరు ఆపినప్పుడు పదాలు కనిపిస్తాయి",
@@ -73,7 +73,11 @@
     "share": "కార్డ్ పంచుకోండి",
     "createTone": "{tone} కార్డ్ సృష్టించండి"
   },
-  "closing": "మీ గాత్రం, అందంగా పంచుకోబడింది",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "మీ గాత్రం, అందంగా పంచుకోబడింది",
   "preview": {
     "label": "లైవ్ ప్రివ్యూ"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flowను ఉచితంగా ప్రయత్నించండి →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — కోసం తయారు చేయబడింది <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "స్వతంత్ర ప్రాజెక్ట్ · Wispr Flowతో అనుబంధం లేదు",
     "copyright": "© 2026"
   },

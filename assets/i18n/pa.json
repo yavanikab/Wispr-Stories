@@ -6,13 +6,13 @@
   },
   "hero": {
     "title": "ਇੱਕ ਵਾਰ ਬੋਲੋ, ਹਮੇਸ਼ਾ ਲਈ ਸਾਂਝਾ ਕਰੋ",
-    "subtitle": "<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> ਨਾਲ ਬੋਲੋ; ਧਿਆਨ ਨਾਲ ਸਟਾਈਲ ਕਰੋ; ਪਿਆਰ ਨਾਲ ਸਾਂਝਾ ਕਰੋ।",
+    "subtitle": "ਮਾਈਕ ਨਾਲ ਰਿਕਾਰਡ ਕਰੋ ਜਾਂ <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a> ਨਾਲ ਬੋਲੋ। ਸਟਾਈਲ ਕਰੋ ਅਤੇ ਪਿਆਰ ਨਾਲ ਸਾਂਝਾ ਕਰੋ।",
     "quote": "\"ਯਾਦਾਂ ਨੂੰ ਫੜੀ ਰੱਖੋ; ਉਹ ਤੁਹਾਨੂੰ ਫੜੀ ਰੱਖਣਗੀਆਂ।\""
   },
   "sharedCta": "✨ <strong>ਤੁਹਾਨੂੰ ਇੱਕ Wispr Story ਮਿਲੀ!</strong> ਆਪਣੀ ਬਣਾਉਣ ਲਈ <em>ਮੇਰਾ ਕਾਰਡ ਬਣਾਓ</em> ਟੈਪ ਕਰੋ।",
   "ffNotice": "🌐 Firefox ਵਿੱਚ ਵੌਇਸ ਰਿਕਾਰਡਿੰਗ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ। Chrome ਜਾਂ Safari ਵਰਤੋ — ਜਾਂ ਹੇਠਾਂ ਆਪਣਾ ਟੈਕਸਟ ਪੇਸਟ ਕਰੋ।",
   "record": {
-    "label": "ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ",
+    "label": "ਤੁਹਾਡੀ ਆਵਾਜ਼",
     "tip": "ਰਿਕਾਰਡ ਦਬਾਓ ਅਤੇ ਕੁਦਰਤੀ ਤੌਰ 'ਤੇ ਬੋਲੋ। ਤੁਹਾਡੇ ਸ਼ਬਦ ਲਾਈਵ ਦਿਖਾਈ ਦਿੰਦੇ ਹਨ। ਰੋਕਣ ਲਈ ਦੁਬਾਰਾ ਟੈਪ ਕਰੋ — ਤੁਹਾਡੇ ਸ਼ਬਦ ਕਾਰਡ ਲਈ ਤਿਆਰ ਟੈਕਸਟ ਬਾਕਸ ਵਿੱਚ ਚਲੇ ਜਾਂਦੇ ਹਨ।",
     "status": "ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ",
     "sub": "ਤੁਸੀਂ ਰੁਕਦੇ ਹੋ ਤਾਂ ਸ਼ਬਦ ਦਿਖਾਈ ਦਿੰਦੇ ਹਨ",
@@ -73,7 +73,11 @@
     "share": "ਕਾਰਡ ਸਾਂਝਾ ਕਰੋ",
     "createTone": "{tone} ਕਾਰਡ ਬਣਾਓ"
   },
-  "closing": "ਤੁਹਾਡੀ ਆਵਾਜ਼, ਖੂਬਸੂਰਤੀ ਨਾਲ ਸਾਂਝੀ ਕੀਤੀ",
+    "rewrite": {
+    "left": "{n} {tone} rewrite left today",
+    "plural": "{n} {tone} rewrites left today",
+    "exhausted": "0 {tone} rewrites left today — try another tone"
+  },"closing": "ਤੁਹਾਡੀ ਆਵਾਜ਼, ਖੂਬਸੂਰਤੀ ਨਾਲ ਸਾਂਝੀ ਕੀਤੀ",
   "preview": {
     "label": "ਲਾਈਵ ਝਲਕ"
   },
@@ -86,7 +90,7 @@
     "link": "Wispr Flow ਮੁਫ਼ਤ ਅਜ਼ਮਾਓ →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — ਲਈ ਬਣਾਇਆ ਗਿਆ <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "ਸੁਤੰਤਰ ਪ੍ਰੋਜੈਕਟ · Wispr Flow ਨਾਲ ਸੰਬੰਧਿਤ ਨਹੀਂ",
     "copyright": "© 2026"
   },

@@ -1,103 +1,86 @@
 # Changelog
 
-## [Unreleased] — 2026-05-23
+## [v0.9.6] — 2026-05-24
+
+### Added
+- **Hero subtitle i18n** — Updated all 21 locale files + HTML fallback to new copy: "Record with the mic or dictate with Wispr Flow. Style and share with love." Native-script translations for all 20 non-English locales.
+- **Republic Day** — Added to `date-occasions.json` (India only, Jan 26, country-flag display matching Independence Day pattern).
+- **Speech-lang modal i18n** — Added `data-i18n` attributes to modal title and subtitle, plus `speechLang.title`/`speechLang.sub` keys in `en.json`.
+- **2026 & 2027 dates** — Added date tables to `C_occasions-list.md` for all date-specific occasions.
+- **Missing env vars** — Documented `OPENROUTER_API_KEY`, `CRON_SECRET`, `BLOB_READ_WRITE_TOKEN` in `docs/admin-setup.md`.
+- **Language filter** — Added `languages` field support to `occasions.js` for per-occasion language restrictions (India-only/country-specific festivals).
+
+### Changed
+- **Hero subtitle** — New text across all 21 locales: "Record with the mic or dictate with Wispr Flow. Style and share with love."
+- **All occasion images removed** — 12 WebP files converted to PNG; 53 image files renamed to lowercase-with-hyphens convention; `occasions.json` paths updated to `.png`.
+- **`country-mapping.json` normalization** — `getUserCountry()` now maps short language codes (e.g., "hi") to full locale keys (e.g., "hi-IN") for correct Independence Day country detection.
 
 ### Fixed
-- **Rewrite API: all non-English languages returned English** — `openai/gpt-oss-120b:free` was the primary model and reliably ignored LANGUAGE RULE instructions for non-Latin scripts, translating Korean, Tamil, Telugu, Arabic, Japanese, Hindi, etc. into English regardless of how the prompt was worded. Root cause: the model's multilingual instruction-following is too weak. Fix:
-  1. Switched primary model to `qwen/qwen3-14b:free` — a purpose-built multilingual model that correctly follows language-preservation instructions.
-  2. Added `isLanguageMismatch()` output validator: after each model responds, the API checks whether a non-Latin input produced a Latin-only output (i.e., the model translated instead of rewrote). If it detects a mismatch, it falls through to the paid fallback rather than returning the bad translation.
-  3. Enabled `inclusionai/ling-2.6-flash` as paid fallback, triggering on **both** HTTP 429 (rate-limit) and language mismatch (not just 429 as before).
-  4. Bumped `PROMPT_VERSION` to `v3` so any wrong-language responses that were cached under `v2` are bypassed immediately — no manual Redis flush needed.
+- **3 stale `[Deepgram]` console labels** → `[STT]` at `wisprstories.js:815,818,823` (engine-agnostic diagnostics).
+- **Web Speech restart `curLang`** → `speechLang` so restart honors speech language (not page display language).
+- **`serve.cjs` Deepgram key check** — No longer blocks the Whisper path when `OPENROUTER_API_KEY` is set but `DEEPGRAM_API_KEY` is a placeholder.
+- **`api/stt.js` health check** — Now validates placeholder keys (`YOUR_ACTUAL_KEY`) so dev environment correctly reports `available: false`.
+- **Reset button resource leak** — Web Speech/Deepgram stop + timer + stream cleanup on reset; `reportRecordingDuration()` added to all stop paths (spacebar, reset button).
+- **Duplicate font stack in `base.css`** — Removed; `fonts.css` is the single source. Hebrew dead fonts removed from font stacks.
+- **`PENDING.md` typo** — `sankranthi` → `sankranti`.
+
+### Known issues
+- **`shareModal.generating` vs `record.generating` key mismatch** — Still unfixed. Tracks with existing entry.
+
+## [v0.9.5] — 2026-05-24
+
+### Added
+- **Hybrid STT routing: Deepgram + OpenRouter Whisper** — Western + Indian languages (14) use Deepgram Nova-3 (free $200 credits). CJK/Thai + Malayalam/Punjabi (6 languages: `th, ja, ko, zh, ml, pa`) use OpenRouter `openai/whisper-large-v3-turbo` via `/api/v1/audio/transcriptions`. Health check returns `available: true` if either API key is configured. Format sanitizer strips MIME parameters (`audio/webm;codecs=opus` → `webm`) for OpenRouter compatibility.
+- **Malayalam/Punjabi now server-transcribed** — Removed the Web Speech API bypass in `startRec()`. ml/pa audio is sent to the server and routed to OpenRouter Whisper like other languages. The ml/pa disclaimer toast is removed since there's nothing special about them anymore.
+- **Initial recording timer display** — `recSub` now shows "15s remaining" (or "30s" for Pro) immediately when recording starts, instead of waiting 1 second for the first timer tick.
+
+### Changed
+- **Speech-language trigger border-radius** — Changed `20px` (full pill) → `6px` to match the nav language button styling for visual consistency.
+- **Client STT error label** — Changed `[Deepgram] API error` → `[STT] API error` to avoid misleading logs when OpenRouter Whisper produces the error.
+
+### Fixed
+- **Recording timer started at 14s instead of 15s** — `setInterval(fn, 1000)` fires first after ~1s, so `elapsed = 1` on the first tick. Displayed "14s remaining" instead of "15s". Fixed by showing `recMaxDuration + "s remaining"` before the interval starts. Both Deepgram and Web Speech paths fixed.
+- **OpenRouter Whisper 400 error** — `format` was sent as the full MIME type (`audio/webm;codecs=opus`) instead of the simple extension (`webm`). Added `(format || '').split(';')[0].split('/')[1] || 'webm'` sanitization in both `serve.cjs` and `api/stt.js`.
+
+### Known issues
+- **`shareModal.generating` vs `record.generating` key mismatch** — `wisprstories.js:1845` looks up `shareModal.generating` but every locale defines `record.generating`. Falls back to English "Generating…" in all locales. Two-line fix deferred.
 
 ---
 
-## [Unreleased] — 2026-05-22
+## [v0.9.4] — 2026-05-23
 
 ### Added
 - **i18n loader: synchronous lookup helper** — Added `window.getI18nSync(key)` in `assets/i18n/i18n.js`. Returns the current-language string for a dot-path key, falls back to English when a key is missing from the active locale, returns `undefined` when neither cache has loaded yet. Used by call sites that need to insert a localized value into freshly-created elements outside the `data-i18n` flow (Style chip summary, record-button status text, rewrite/generate spinner labels, `actions.createTone` interpolation, `record.status` / `record.sub` reset).
 - **Unified notice system** — New `showNotice(type)` / `dismissNotice()` in `wisprstories.js`. One DOM slot (`#notice` / `#noticeText` / `#noticeDismiss`), one message at a time, priority order: `firefox` (functional/blocking) beats `shared` (informational CTA). Dismissal persists per-type in `localStorage` under `noticeDismissed:<type>` so users don't see the same banner twice across sessions. Re-localizes on `languagesReady` event. Replaces the prior unconditional `.ffNotice` element and the inline shared-link banner.
-- **Style chip summary** — New `updateStyleChipSummary()` in `wisprstories.js` populates `#czChipTone` / `#czChipSwatch` / `#czChipColorName` / `#czChipShape` so the collapsed Style accordion header reflects the user's current tone / color / shape selections. Wired into `applyTone()`, `applyPal()`, the roundness click handler, and the language-change handler so it re-localizes when the page language changes. Removing this function plus its four call sites restores the prior static "Tone · color · shape" hint.
-- **Theme toggle screen-reader state** — `setTheme()` now sets `aria-pressed="true"` on `#themeToggle` when dark mode is on, `"false"` when light. Assistive tech now announces the toggle state correctly.
-- **`assets/i18n/NATIVE-REVIEW.md`** — Per-locale review doc for Thai / Korean / Japanese (and a documented systematic-issue note for other locales) listing English source, current translation, my confidence, and the specific question to ask a native speaker. Designed to be handed to a HelloTalk / r/learnthai / r/Korean / r/LearnJapanese contact whole.
+- **Style chip summary** — New `updateStyleChipSummary()` in `wisprstories.js` populates `#czChipTone` / `#czChipSwatch` / `#czChipColorName` / `#czChipShape` so the collapsed Style accordion header reflects the user's current tone / color / shape selections. Wired into `applyTone()`, `applyPal()`, the roundness click handler, and the language-change handler so it re-localizes when the page language changes.
+- **Theme toggle screen-reader state** — `setTheme()` now sets `aria-pressed="true"` on `#themeToggle` when dark mode is on, `"false"` when light.
+- **`assets/i18n/NATIVE-REVIEW.md`** — Per-locale review doc for Thai / Korean / Japanese with confidence levels and per-string questions for native speakers.
+- **Remotion demo project** — Isolated `remotion-demo/` React/Remotion project with `WisprStoriesPromo` (24s, 1080×1080) and two audio-led variants: social (19.5s, `electronic-bass.mp3`) and warm (26s, `warm-vinyl.mp3`).
 
 ### Changed
-- **i18n: page is no longer hidden during translation load** — Removed the 3-second `_showTimeout` reveal in `assets/i18n/i18n.js` and the matching post-`applyI18n` reveal. English defaults render on first paint; translations swap in when ready. Eliminates the white-flash + delayed-reveal that affected slow connections.
-- **Name input: accepts spaces, hyphens, underscores; cap raised 10 → 18** — `wisprstories.js` regex changed from `/[^\p{L}]/gu` (letters-only) to `/[^\p{L} _-]/gu` across the input handler, the `loadDraft` restorer, and the `location.hash` shared-link parser. Names like "Lola Maria", "Mary-Anne", and "lola_maria" now pass through; digits, punctuation, and symbols are still stripped. Maximum length raised from 10 to 18 characters.
-- **Record-button status text is now translatable** — `finishRec()` and the reset handler now read `record.status` / `record.sub` from i18n via `getI18nSync()` instead of hardcoded English ("Tap to speak" / "Your words appear live as you talk"). English remains the fallback when i18n hasn't loaded.
-- **Style/inputs/card CSS refresh** — ~700 lines added across `global/styles/{actions,base,card,components,inputs,layout,main,responsive,tooltips,typography}.css` supporting the unified notice slot, the Style chip summary header, and the expanded name input. Largest deltas: `inputs.css` (+253), `card.css` (+181), `typography.css` (+64), `actions.css` (+53). `wisprstories.html` updated with 168 lines of corresponding markup changes (notice slot, Style chip header, name input width).
-- **README structure path** — Project-structure block corrected from `fonts.js` to `global/fonts.js` (matches the move done in commit `23d46ba`).
+- **i18n: page is no longer hidden during translation load** — Removed the 3-second `_showTimeout` reveal. English defaults render on first paint; translations swap in when ready. Eliminates white-flash + delayed-reveal.
+- **Name input: accepts spaces, hyphens, underscores; cap raised 10 → 18** — Regex changed from `/[^\p{L}]/gu` to `/[^\p{L} _-]/gu`. Names like "Lola Maria", "Mary-Anne" are now valid.
+- **Record-button status text is now translatable** — `finishRec()` and reset handler read `record.status` / `record.sub` from i18n via `getI18nSync()` instead of hardcoded English.
+- **Style/inputs/card CSS refresh** — ~700 lines added across 11 style modules supporting notice slot, Style chip header, expanded name input.
+- **Remotion promo:** Compact card-forward visual direction, real logo, logo-first intro, blurred glow backgrounds, clean final CTA screen, social audio timing trim.
+- **Doc audit and factual corrections** — All stale docs updated: `42`→`21` language count, tone icon mapping fixed, rewrite limit `10`→`5`, serverless functions status `Planned`→`Built`, "no backend" claims corrected, AssemblyAI references replaced with Deepgram, palette count `6`→`10`, section numbering deduplicated, `WISPR_STORIES_CANONICAL_BLUEPRINT.md` updated with current file structure and missing features (occasions, PWA, script fonts). Deleted 3 duplicate HTML doc files.
 
 ### Fixed
-- **i18n: removed English leaks in 20 non-English locales** — Every non-English locale file had four strings still in English:
-  - `tone.tip` started with the literal prefix `"Original: your exact words, unlimited."` *and* the surrounding wording was out of sync with the new English description ("Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: ...")
-  - `tone.rewriting`: `"Rewriting..."` (visible on the card during AI rewrite — `wisprstories.js:1170`)
-  - `actions.createTone`: `"Create {tone} card"` (interpolated into the Create button label — `wisprstories.js:503`)
-  - `record.generating`: `"Generating…"` (defined per-locale but currently dead — see Known issues below)
-  All four strings translated across `de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh` and `tone.tip` brought in sync with the new English wording in every locale. JSON parse-validated. CJK / Indic / Thai / Korean / Indonesian locales additionally tracked in `assets/i18n/NATIVE-REVIEW.md` with confidence levels and per-string review questions.
-- **`actions.createTone` placeholder grammar** — Picked a phrasing per locale that produces grammatically-safe output when the localized tone label is interpolated: `{tone}e Karte erstellen` (DE, exploits feminine `-e` declension); `Skapa {tone}-kort` (SV, native hyphenated compound); `Создать карточку в тоне «{tone}»` (RU, sidesteps adjective case agreement); `{tone}トーンのカード` (JA) and `{tone} 톤으로 카드 만들기` (KO) using "tone" as a noun connector so noun-form labels don't clash with the noun.
-
-### Fixed
-- **Remotion demo: WebP alpha-channel card backgrounds caused frame flicker in social variant** — Card background images (`card-bgs/*.webp`) had `yuva420p` alpha channels, causing Remotion to decode them as video streams and produce inconsistent output on alternating frames. YAVG brightness jumped 15-28 points between consecutive frames in the card scene. Converted all three files to PNG (`rgba`). PSNR between consecutive card-scene frames improved from 12.99 to 47.08.
-- **FinalFrame transition: instant cut replaces 18-frame fade** — The final CTA panel previously used an 18-frame fade-in over the share scene, creating a cream wash. Reduced to a 1-frame instant cut (`[revealStart - 1, revealStart] → [0, 1]`) so the FinalFrame transitions cleanly.
-
-### Rendering artifacts
-- `remotion-demo/out/wispr-stories-promo-social-v2.mp4` — Re-rendered after PNG fix (3.7 MB, no flicker)
-
-### Known issues (discovered, not fixed)
-- **`shareModal.generating` vs `record.generating` key mismatch** — `wisprstories.js:1845` looks up the share-button spinner label via `getI18nSync("shareModal.generating")`, but every locale defines the key as `record.generating`. The lookup always misses and falls back to the hardcoded English `"Generating…"` in all 21 locales including English. Two-line fix: either rename the i18n key everywhere to `shareModal.generating`, or change the JS lookup to `record.generating`. Documented in `assets/i18n/NATIVE-REVIEW.md`. Deferred from this pass to avoid mixing schema changes into a translation fix.
+- **Rewrite API: all non-English languages returned English** — Switched primary model to `qwen/qwen3-14b:free` (multilingual); added `isLanguageMismatch()` output validator; enabled `inclusionai/ling-2.6-flash` as paid fallback on rate-limit OR language mismatch; bumped `PROMPT_VERSION` to `v3` to bypass cached wrong-language responses.
+- **i18n: removed English leaks in 20 non-English locales** — `tone.tip`, `tone.rewriting`, `actions.createTone`, `record.generating` all translated. `tone.tip` synced with new English wording.
+- **`actions.createTone` placeholder grammar** — Grammatically-safe phrasing per locale (DE: `{tone}e Karte erstellen`, RU: `Создать карточку в тоне «{tone}»`, etc.)
+- **Remotion demo: WebP alpha-channel card backgrounds caused frame flicker** — Converted from WebP (`yuva420p`) to PNG (`rgba`); PSNR improved from 12.99 to 47.08.
+- **FinalFrame transition: instant cut replaces 18-frame fade** — Eliminated cream-wash effect during CTA reveal.
+- **Rewrite cache no longer replays bad outputs** — Added `PROMPT_VERSION` constant to Redis cache key; old entries expire on their own 24h TTL.
+- **Rewrite no longer aborts on slow free-model responses** — Client timeout raised from 15s → 25s (server timeout is 20s).
+- **Page UI no longer flips to example sentence's language** — Removed two leaks: `autoDetectLangFromText()` no longer writes `localStorage.wsLang`; `loadDraft()` no longer calls `setLanguageByCode()`.
 
 ### Decisions
-- **No Arabic (`ar.json`) or Urdu (`ur.json`) UI locale files** — Confirmed not needed for this release despite earlier roadmap mentions. The RTL infrastructure (`dir="rtl"` auto-set in `i18n.js`, RTL-aware CSS) remains in place for future re-enablement, but no `ar.json` or `ur.json` ships and the language selector no longer offers them.
-- **Total UI locales: 20** (was claimed as 23 in older docs). Source-of-truth: `assets/i18n/*.json` minus `en.json` = `de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh`.
+- **No Arabic (`ar.json`) or Urdu (`ur.json`) UI locale files** — RTL infrastructure remains in place; 20 UI locales confirmed.
+- **Total UI locales: 20** (`de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh`).
 
----
-
-## [Unreleased] — 2026-05-21
-
-### Added
-- **Remotion demo project** — Added isolated `remotion-demo/` React/Remotion project with `WisprStoriesPromo`, a 24-second 1080x1080 product-promo video showing voice capture, story rewrite, visual card creation, and share-ready closing.
-- **Demo verification artifacts** — Rendered `remotion-demo/out/wispr-stories-promo-frame.png` and `remotion-demo/out/wispr-stories-promo.mp4` (H.264, scale 0.75, ~3.6 MB). Remotion Studio responds at `http://localhost:3001` when started.
-- **Demo planning docs** — Added `docs/superpowers/specs/2026-05-21-remotion-wispr-stories-promo-design.md` and `docs/superpowers/plans/2026-05-21-remotion-wispr-stories-promo.md`.
-- **Two audio-led Remotion variants** — Added editable variant config in `remotion-demo/src/demoVariants.js` with `WisprStoriesPromoSocial` (19.5s, `electronic-bass.mp3`) and `WisprStoriesPromoWarm` (26s, `warm-vinyl.mp3`). The default `WisprStoriesPromo` route now points at the warm variant for the existing Studio URL.
-- **Final Remotion exports** — Rendered `remotion-demo/out/wispr-stories-promo-social.mp4` (H.264/AAC, 1080x1080, 19.5s, 4,016,343 bytes) and `remotion-demo/out/wispr-stories-promo-warm.mp4` (H.264/AAC, 1080x1080, 26s, 4,722,259 bytes).
-
-### Changed
-- **Git ignore exception** — Kept the existing broad `docs/` ignore behavior, but unignored the new Remotion demo spec and plan so they can be included in normal review/commit workflows.
-- **Remotion brand mark** — Replaced the temporary gradient square in the promo header with a cropped Wispr Stories logo asset at `remotion-demo/public/brand/ws-logo-mark-dark.png`.
-- **Remotion promo visual direction** — Reworked the demo from a generic promo layout into an app-faithful light-mode product walkthrough using the Wispr Stories cream/ink/amber palette, compact nav, left-side creation controls, right-side card preview, app-style CTA, and stronger final action frame.
-- **Remotion scripts** — Added separate render/still scripts for social and warm variants while keeping `npm run render` pointed at the warm composition.
-- **Remotion compact promo correction** — Reverted away from the full app-page walkthrough after review. The promo now returns to the earlier compact card-forward concept: a polished card visual, concise scene copy, Wispr Stories light-mode cream/ink/amber styling, real logo, and social/warm audio variants without trying to show every app control in a 1:1 frame.
-- **Social audio start timing** — Updated `WisprStoriesPromoSocial` so `electronic-bass.mp3` starts at the audible section using a `1.60s` trim (48 frames at 30fps). Removed the music fade-in and kept the end fade-out.
-- **Remotion final-frame polish** — Softened the background circles into heavily blurred glows, removed the variant label under the Wispr Stories logo, and added a clean final CTA screen with logo, closing headline, support line, and large action button.
-- **Social share-scene hold** — Preserved the longer "Share ready" section while adding the intro. The social variant now runs 19.5s, the share scene remains 198 frames long, and the final CTA starts at frame 503 instead of interrupting the share scene too early.
-- **Remotion audio config cleanup** — Removed a duplicate `trimBefore` line from the warm audio config; behavior is unchanged because the later `10.50s` trim was already the active value.
-- **Remotion branded intro** — Added a short logo-first intro to the social and warm promo variants so the video no longer starts abruptly. Existing story scenes keep their duration, the social variant now runs 19.5s, and the fast scene fades are slightly smoother.
-
-### Verified
-- `node --test test/storyPlan.test.mjs` from `remotion-demo/` passes 11 tests.
-- `node node_modules\@remotion\cli\remotion-cli.js versions` reports Remotion `4.0.464` and all Remotion packages on the correct version.
-- `node node_modules\@remotion\cli\remotion-cli.js still src\index.jsx WisprStoriesPromo out\wispr-stories-promo-frame.png --frame=360 --scale=0.5` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js render src\index.jsx WisprStoriesPromo out\wispr-stories-promo.mp4 --scale=0.75` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js compositions src\index.jsx` lists `WisprStoriesPromo`, `WisprStoriesPromoSocial`, and `WisprStoriesPromoWarm`.
-- `node node_modules\@remotion\cli\remotion-cli.js still src\index.jsx WisprStoriesPromoSocial out\wispr-stories-promo-social-frame.png --frame=300 --scale=0.5` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js still src\index.jsx WisprStoriesPromoWarm out\wispr-stories-promo-warm-frame.png --frame=450 --scale=0.5` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js still src\index.jsx WisprStoriesPromoSocial out\wispr-stories-promo-social-final.png --frame=430 --scale=0.5` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js still src\index.jsx WisprStoriesPromoWarm out\wispr-stories-promo-warm-final.png --frame=690 --scale=0.5` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js render src\index.jsx WisprStoriesPromoSocial out\wispr-stories-promo-social.mp4` succeeds.
-- `node node_modules\@remotion\cli\remotion-cli.js render src\index.jsx WisprStoriesPromoWarm out\wispr-stories-promo-warm.mp4` succeeds.
-- Updated `WisprStoriesPromoSocial` MP4 render completed at `out\wispr-stories-promo-social.mp4` with a 4,016,343-byte output file; updated `WisprStoriesPromoWarm` render completed at `out\wispr-stories-promo-warm.mp4` with a 4,722,259-byte output file.
-- Social timing config check confirms duration `585` frames, intro scene `0-45`, share scene `387-585`, and final CTA start frame `503` (`16.77s`).
-- `Invoke-WebRequest http://localhost:3001/WisprStoriesPromoSocial` returns HTTP 200 from Remotion Studio.
-- Social audio config check confirms `trimBefore=48`, `fadeInFrames=0`, `fadeOutFrames=45`, start volume `0.50`, and end volume `0`.
-- Audio trim/fade config was unchanged by the intro update; `ffprobe` is not available on PATH in this shell, so the updated social duration is verified from Remotion composition metadata (`585` frames at `30fps`).
-- Corrected compact promo stills were visually checked at `out\wispr-stories-promo-social-frame.png`, `out\wispr-stories-promo-warm-frame.png`, `out\wispr-stories-promo-social-final.png`, and `out\wispr-stories-promo-warm-final.png` to avoid the previous app-page recreation and closing-frame overlap.
-- Final polish stills were visually checked at `out\wispr-stories-promo-social-polish-frame.png` and `out\wispr-stories-promo-social-final-polish.png` to confirm the blurred glow treatment, removed variant label, and clean final CTA frame.
-- Intro and updated social flow stills were visually checked at `out\wispr-stories-promo-social-intro.png` (frame 24), `out\wispr-stories-promo-social-voice-after-intro.png` (frame 72), `out\wispr-stories-promo-social-share-after-intro.png` (frame 475), and `out\wispr-stories-promo-social-final-after-intro.png` (frame 545). The final-frame layering issue found during this check was fixed by putting the final CTA above the story stage.
-
-### Notes
-- The normal `npm run` wrapper is broken in this shell because global npm points to a missing `npm-cli.js`; direct `node node_modules\@remotion\cli\remotion-cli.js ...` commands work.
-- The first still render timed out while connecting to Chrome immediately after Remotion downloaded Chrome Headless Shell; rerunning the same render after the download succeeded.
-- `agsync` / `@agsync` are not available in this shell, so `AGENTS.md` and `CHANGELOG.md` were updated manually for the Remotion intro session.
+### Known issues
+- **`shareModal.generating` vs `record.generating` key mismatch** — `wisprstories.js:1845` looks up `shareModal.generating` but every locale defines `record.generating`. Falls back to English "Generating…" in all locales. Two-line fix deferred.
 
 ---
 
