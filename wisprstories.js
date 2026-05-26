@@ -74,15 +74,28 @@ const SCRIPT_TO_LANG = {
 };
 
 function autoDetectLangFromText(text) {
-  if (!text || !text.trim()) return;
+  if (!text || !text.trim()) return null;
   const script = typeof detectScript === "function" ? detectScript(text) : "dev";
+  // Latin/default script covers English, Italian, Spanish, French, etc.
+  // We can't distinguish them by script alone, so don't override the page language.
+  if (script === "dev") return null;
   const detectedCode = SCRIPT_TO_LANG[script];
-  if (!detectedCode || detectedCode === curLang) return;
+  if (!detectedCode) {
+    // Script detected but language not in our supported list — auto-set to Native
+    if (!speechLang) {
+      speechLang = "__native__";
+      try { localStorage.setItem('wsSpeechLang', '__native__'); } catch(_e){}
+      updateSlTrigger();
+    }
+    return null;
+  }
+  if (detectedCode === curLang) return null;
   // Only update curLang for the card label — DO NOT change page UI language
   // and DO NOT persist to wsLang. wsLang is owned by the language dropdown;
   // writing here would cause the UI to flip to the example's language on the
   // next page load.
   curLang = detectedCode;
+  return detectedCode;
 }
 
 function getLanguageName(code) {
@@ -99,7 +112,8 @@ let curP = 0,
   curLang = localStorage.getItem("wsLang") || "en",
   isRTL = false,
   useRounded = true,
-  inputSource = "story";
+  inputSource = "story",
+  userOverride = false;
 let recog = null,
   isRec = false,
   fullTx = "";
@@ -111,7 +125,8 @@ const FREE_MAX_RECORDING_SEC = 15;
 const PRO_MAX_RECORDING_SEC = 30;
 let recStartTime = null,
   recMaxDuration = FREE_MAX_RECORDING_SEC,
-  recDurationTimer = null;
+  recDurationTimer = null,
+  recGraceTimer = null;
 const isSafari =
   navigator.vendor === "Apple Computer, Inc." &&
   !navigator.userAgent.includes("CriOS");
@@ -120,6 +135,24 @@ let usingDeepgram = false,
   mediaRec = null,
   audioChunks = [],
   deepgramStartTime = null;
+
+let audioBlob = null;
+let voiceAttached = false;
+let webmCodecString = null;
+let audioDurationSec = 0;
+
+function detectWebmCodec() {
+  var codecs = [
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ];
+  for (var i = 0; i < codecs.length; i++) {
+    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(codecs[i])) return codecs[i];
+  }
+  return null;
+}
+webmCodecString = detectWebmCodec();
 
 // Unified notice system — one slot, one message at a time, dismissable.
 // Priority: Firefox warning beats shared-link CTA (the functional/blocking
@@ -177,6 +210,7 @@ function saveDraft() {
       isRTL: isRTL,
       rounded: useRounded,
       cardReady: cardReady,
+      voiceAttached: voiceAttached,
     };
     sessionStorage.setItem("wisprDraft", JSON.stringify(draft));
   } catch (e) { /* storage unavailable */ }
@@ -214,7 +248,12 @@ function loadDraft() {
         r.classList.toggle("on", r.dataset.rounded === String(draft.rounded));
       });
     }
+    // Restore voice toggle intent if previously ON (disabled since no audio blob)
+    voiceAttached = draft.voiceAttached && inputSource === "voice" ? true : false;
     updateCard();
+    updateSlNudge();
+    updateMicState();
+    updateVoiceBar();
     return true;
   } catch (e) { return false; }
 }
@@ -357,6 +396,16 @@ function countCard() {
   if (d.date !== today) { d.date = today; d.counts = {}; }
   d.counts[curTone] = (d.counts[curTone] || 0) + 1;
   localStorage.setItem("wsToneCounts", JSON.stringify(d));
+}
+
+function trackCardUsage() {
+  var lang = speechLang || (typeof autoDetectLangFromText === "function" ? autoDetectLangFromText(document.getElementById("sta").value) : null) || (typeof curLang !== "undefined" ? curLang : null) || "en";
+  var source = inputSource || "story";
+  fetch("/api/track-usage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lang: lang, source: source })
+  }).catch(function(){});
 }
 
 function isSupporter() {
@@ -562,6 +611,35 @@ function updateSourceLabel() {
   }
 }
 
+function formatDuration(sec) {
+  var m = Math.floor(sec / 60);
+  var s = sec % 60;
+  return m > 0 ? m + ":" + String(s).padStart(2, "0") : "0:" + String(s).padStart(2, "0");
+}
+function updateVoiceBar() {
+  var bar = document.getElementById("voiceBar");
+  var toggle = document.getElementById("voiceToggle");
+  var info = document.getElementById("voiceToggleInfo");
+  var durLabel = document.getElementById("voiceDurationLabel");
+  if (!bar || !toggle) return;
+  if (inputSource === "voice" && audioBlob && webmCodecString) {
+    bar.style.display = "flex";
+    toggle.disabled = false;
+    info.style.display = audioDurationSec > 0 ? "flex" : "none";
+    if (audioDurationSec > 0) durLabel.textContent = formatDuration(audioDurationSec);
+  } else if (inputSource === "voice" && !audioBlob) {
+    bar.style.display = "flex";
+    toggle.disabled = true;
+    toggle.checked = false;
+    voiceAttached = false;
+    info.style.display = "none";
+  } else {
+    bar.style.display = "none";
+    toggle.checked = false;
+    voiceAttached = false;
+  }
+}
+
 // Rewrite preview bar — shows Accept/Cancel after tone rewrite
 function showRewritePreview(originalText, rewrittenText, tone) {
   const bar = document.getElementById("rewritePreviewBar");
@@ -622,6 +700,7 @@ function updateCard(preserveText) {
     card.classList.remove("card-empty");
     document.querySelector('.shell')?.classList.add('has-card');
     const t = TONES[curTone];
+    document.getElementById("cardGhost").innerHTML = '<i class="' + t.g + '"></i>';
     const displayText = raw.length > 150 ? raw.slice(0, 150) + "..." : raw;
     tx.classList.remove("mt");
     if (!preserveText) {
@@ -630,9 +709,16 @@ function updateCard(preserveText) {
     tx.style.fontStyle = t.fi;
     tx.style.fontWeight = t.fw;
     tx.style.letterSpacing = t.ls;
-    // Auto-detect language from text content
-    autoDetectLangFromText(raw);
-    const langName = getLanguageName(curLang);
+    // Auto-detect language from text content — always wins over speechLang
+    var detected = autoDetectLangFromText(raw);
+    var langName;
+    if (detected) {
+      langName = getLanguageName(detected) || detected;
+    } else if (speechLang === "__native__") {
+      langName = "Native";
+    } else {
+      langName = getLanguageName(speechLang || curLang);
+    }
     lbl.textContent = name ? name + " \u00b7 " + langName : langName;
   } else {
     card.classList.add("card-empty");
@@ -650,6 +736,7 @@ function updateCard(preserveText) {
   updateSourceLabel();
   wave(raw);
   checkOccasions();
+  updateVoiceBar();
 }
 
 // Card is fixed at 2:2 (square) so the share preview reliably renders as the
@@ -666,12 +753,6 @@ function applySize() {
   applyPal(curP);
 }
 
-// Silence detection state
-let silenceAnalyser = null, silenceCheckInterval = null;
-let silenceRmsSamples = [];
-const SILENCE_RMS_THRESHOLD = 0.01;
-const SILENCE_SAMPLE_INTERVAL_MS = 500;
-const SILENCE_MIN_DURATION_MS = 2000;
 
 async function startDeepgramRecording() {
   try {
@@ -686,30 +767,15 @@ async function startDeepgramRecording() {
     mediaRec.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.push(e.data);
     };
-
-    // Set up silence detection via Web Audio API
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaStreamSource(stream);
-      silenceAnalyser = audioCtx.createAnalyser();
-      silenceAnalyser.fftSize = 2048;
-      source.connect(silenceAnalyser);
-      silenceRmsSamples = [];
-      silenceCheckInterval = setInterval(() => {
-        if (!silenceAnalyser) return;
-        const data = new Float32Array(silenceAnalyser.fftSize);
-        silenceAnalyser.getFloatTimeDomainData(data);
-        let sumSquares = 0;
-        for (let i = 0; i < data.length; i++) sumSquares += data[i] * data[i];
-        const rms = Math.sqrt(sumSquares / data.length);
-        silenceRmsSamples.push({ time: Date.now(), rms });
-        // Keep only last 5 seconds of samples
-        const cutoff = Date.now() - 5000;
-        silenceRmsSamples = silenceRmsSamples.filter(s => s.time >= cutoff);
-      }, SILENCE_SAMPLE_INTERVAL_MS);
-    } catch (e) {
-      console.warn("[Silence] Analyser setup failed:", e.message);
-    }
+    // Surface stream errors — without this, Bluetooth dropouts kill MediaRecorder silently
+    mediaRec.onerror = (e) => {
+      console.error("[Rec] MediaRecorder error:", e.error && e.error.message ? e.error.message : e);
+      isRec = false;
+      if (recDurationTimer) { clearInterval(recDurationTimer); recDurationTimer = null; }
+      stream.getTracks().forEach((t) => t.stop());
+      showToast("Recording stopped — check your mic connection");
+      finishRec();
+    };
 
     // Show initial max duration before first timer tick
     document.getElementById("recSub").textContent = recMaxDuration + "s remaining";
@@ -721,9 +787,13 @@ async function startDeepgramRecording() {
         recDurationTimer = null;
         isRec = false;
         showToast("Max recording time reached (" + recMaxDuration + "s)");
+        console.log("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
         if (mediaRec && mediaRec.state !== "inactive") {
           stopDeepgramRecording().then(function(result) {
             fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+            var preview = (result.text || "").slice(0, 30) + ((result.text || "").length > 30 ? "..." : "");
+            console.log("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
+            if (!fullTx) showToast("We didn’t catch that — check your mic and try again");
             var actualDuration = finishRec();
             reportRecordingDuration(actualDuration || result.duration);
           });
@@ -741,30 +811,10 @@ async function startDeepgramRecording() {
   }
 }
 
-function isSilentRecording() {
-  if (silenceRmsSamples.length < SILENCE_MIN_DURATION_MS / SILENCE_SAMPLE_INTERVAL_MS) return false;
-  const recent = silenceRmsSamples.filter(s => s.time >= Date.now() - SILENCE_MIN_DURATION_MS);
-  if (recent.length < 2) return false;
-  const avgRms = recent.reduce((sum, s) => sum + s.rms, 0) / recent.length;
-  return avgRms < SILENCE_RMS_THRESHOLD;
-}
-
-function cleanupSilenceDetection() {
-  if (silenceCheckInterval) {
-    clearInterval(silenceCheckInterval);
-    silenceCheckInterval = null;
-  }
-  if (silenceAnalyser) {
-    try { silenceAnalyser.context.close(); } catch (e) {}
-    silenceAnalyser = null;
-  }
-  silenceRmsSamples = [];
-}
 
 function stopDeepgramRecording() {
   return new Promise((resolve) => {
     if (!mediaRec || mediaRec.state === "inactive") {
-      cleanupSilenceDetection();
       if (recDurationTimer) {
         clearInterval(recDurationTimer);
         recDurationTimer = null;
@@ -774,25 +824,19 @@ function stopDeepgramRecording() {
       resolve({ text: "", duration });
       return;
     }
-    mediaRec.onstop = () => {
-      mediaRec.stream.getTracks().forEach((t) => t.stop());
-      cleanupSilenceDetection();
-      if (recDurationTimer) {
-        clearInterval(recDurationTimer);
-        recDurationTimer = null;
-      }
-      const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
-      deepgramStartTime = null;
-      const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
-      audioChunks = [];
-
-      // Check for silence before sending to Deepgram
-      if (isSilentRecording()) {
-        console.log("[Silence] Recording detected as silent — skipping STT");
-        showToast("We didn't catch that \u2014 try speaking louder");
-        resolve({ text: "", duration });
-        return;
-      }
+      mediaRec.onstop = () => {
+        mediaRec.stream.getTracks().forEach((t) => t.stop());
+        if (recDurationTimer) {
+          clearInterval(recDurationTimer);
+          recDurationTimer = null;
+        }
+        const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
+        deepgramStartTime = null;
+        const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
+        console.log("[Rec] Onstop: chunks=" + audioChunks.length + ", blobSize=" + blob.size + ", duration=" + duration);
+        audioChunks = [];
+        audioBlob = blob;
+        audioDurationSec = duration;
 
       const reader = new FileReader();
       reader.onloadend = async () => {
@@ -800,14 +844,16 @@ function stopDeepgramRecording() {
           const base64 = reader.result.split(",")[1];
           var controller = new AbortController();
           var sttTimeout = setTimeout(function() { controller.abort(); }, 10000);
-          try {
+            try {
+            console.log("[STT] Sending request, base64Len=" + base64.length + ", lang=" + (speechLang === "__native__" ? "" : speechLang));
             const res = await fetch("/api/stt", {
               method: "POST",
               headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
-              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: speechLang, sessionId: localStorage.getItem("wsSessionId") || null }),
+              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: speechLang === "__native__" ? "" : speechLang, sessionId: localStorage.getItem("wsSessionId") || null }),
               signal: controller.signal,
             });
             clearTimeout(sttTimeout);
+            console.log("[STT] Response status=" + res.status);
             if (!res.ok) {
               const err = await res.text();
               console.error("[STT] API error:", err);
@@ -824,11 +870,13 @@ function stopDeepgramRecording() {
               showToast("Transcription timed out \u2014 tap record to try again");
             } else {
               console.error("[STT] Error:", e);
+              showToast("Transcription failed \u2014 tap record to try again");
             }
             resolve({ text: "", duration });
           }
         } catch (e) {
           console.error("[STT] Error:", e);
+          showToast("Transcription failed \u2014 tap record to try again");
           resolve({ text: "", duration });
         }
       };
@@ -900,7 +948,7 @@ function startWebSpeechAPI() {
   recog = new SR();
   recog.continuous = false;
   recog.interimResults = true;
-  var _wsLocales = { de:'de-DE', es:'es-ES', fr:'fr-FR', gu:'gu-IN', hi:'hi-IN', id:'id-ID', it:'it-IT', ja:'ja-JP', kn:'kn-IN', ko:'ko-KR', ml:'ml-IN', pa:'pa-IN', pt:'pt-BR', ru:'ru-RU', sv:'sv-SE', ta:'ta-IN', te:'te-IN', th:'th-TH', tr:'tr-TR', zh:'zh-CN' };
+  var _wsLocales = { ca:'ca-ES', cs:'cs-CZ', de:'de-DE', el:'el-GR', es:'es-ES', fr:'fr-FR', gu:'gu-IN', hi:'hi-IN', id:'id-ID', it:'it-IT', ja:'ja-JP', jw:'jv-ID', kn:'kn-IN', ko:'ko-KR', ml:'ml-IN', my:'my-MM', ne:'ne-NP', pa:'pa-IN', pt:'pt-BR', ru:'ru-RU', si:'si-LK', sv:'sv-SE', ta:'ta-IN', te:'te-IN', th:'th-TH', tr:'tr-TR', uz:'uz-UZ', zh:'zh-CN', ar:'ar-SA', bn:'bn-BD', da:'da-DK', fa:'fa-IR', fi:'fi-FI', he:'he-IL', hu:'hu-HU', mr:'mr-IN', ms:'ms-MY', nl:'nl-NL', pl:'pl-PL', tl:'tl-PH', uk:'uk-UA', ur:'ur-PK', vi:'vi-VN' };
   recog.lang = _wsLocales[speechLang] || _wsLocales[curLang] || 'en-US';
   if (isSafari && curLang !== "en-US") {
     showToast(
@@ -978,7 +1026,7 @@ function startWebSpeechAPI() {
       setTimeout(() => {
         if (!isRec) return;
         try {
-          recog.lang = speechLang;
+          recog.lang = _wsLocales[speechLang] || _wsLocales[curLang] || 'en-US';
           recog.start();
           console.log(
             "[Speech] Restarted (attempt " + recogRestartCount + ")"
@@ -1029,9 +1077,10 @@ function startWebSpeechAPI() {
 }
 
 function finishRec() {
+  console.warn("[Rec] finishRec() called, fullTx='" + (fullTx || "").slice(0, 40) + "', recStartTime=" + recStartTime + ", usingDeepgram=" + usingDeepgram);
   if (recDurationTimer) {
-    clearInterval(recDurationTimer);
-    recDurationTimer = null;
+    clearTimeout(recGraceTimer);
+    recGraceTimer = null;
   }
   const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
   recStartTime = null;
@@ -1045,6 +1094,7 @@ function finishRec() {
   if (fullTx.trim()) {
     document.getElementById("sta").value = fullTx.trim().slice(0, 150);
     inputSource = "voice";
+    userOverride = false;
     setTimeout(
       () => document.getElementById("liveBox").classList.remove("show"),
       500,
@@ -1054,6 +1104,9 @@ function finishRec() {
     showToast("Done \u2014 review your words then tap Create");
     fullTx = "";
   }
+  updateSlNudge();
+  updateMicState();
+  updateVoiceBar();
   return actualDuration;
 }
 
@@ -1064,9 +1117,14 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       clearInterval(recDurationTimer);
       recDurationTimer = null;
     }
+    if (recGraceTimer) {
+      clearTimeout(recGraceTimer);
+      recGraceTimer = null;
+    }
     if (usingDeepgram) {
       const result = await stopDeepgramRecording();
       fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+      if (!fullTx) showToast("We didn't catch that — check your mic and try again");
       const actualDuration = finishRec();
       await reportRecordingDuration(actualDuration || result.duration);
       return;
@@ -1078,6 +1136,16 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     if (recog) recog.stop();
     const actualDuration = finishRec();
     await reportRecordingDuration(actualDuration);
+    return;
+  }
+
+  // Speech language guard — don't record when no valid speech language
+  if (!speechLang) {
+    showToast("Select a language first");
+    return;
+  }
+  if (speechLang === "__native__") {
+    showToast("This language isn't supported for speech yet. Type your words below.");
     return;
   }
 
@@ -1170,12 +1238,65 @@ function updateSlTrigger() {
   var t = document.getElementById('speechLangTrigger');
   if (!t) return;
   if (!speechLang) {
-    t.innerHTML = '<i class="fi fi-us"></i> <span>Auto-detect</span> <span class="sl-arr"></span>';
+    t.innerHTML = '<span class="sl-nudge-label">' + ((typeof getI18nSync === 'function' && getI18nSync('speechLang.triggerLabel')) || 'Set language') + '</span> <span class="sl-arr"></span>';
+    updateSlNudge();
+    updateMicState();
+    return;
+  }
+  t.classList.remove('sl-nudge');
+  if (speechLang === "__native__") {
+    t.innerHTML = '<i class="fi fi-xx"></i> <span>Native</span> <span class="sl-arr"></span>';
+    updateMicState();
     return;
   }
   var lang = allLanguages.find(function(l){ return l.code === speechLang; });
   if (lang) {
     t.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i> <span>' + lang.label + '</span> <span class="sl-arr"></span>';
+  }
+  updateMicState();
+}
+function updateSlNudge() {
+  var t = document.getElementById('speechLangTrigger');
+  var sta = document.getElementById('sta');
+  if (!t) return;
+  if (!speechLang && sta && sta.value.trim().length > 0) {
+    t.classList.add('sl-nudge');
+  } else {
+    t.classList.remove('sl-nudge');
+  }
+}
+function updateMicState() {
+  var b = document.getElementById('recBtn');
+  var r = document.getElementById('langReminder');
+  var s = document.getElementById('recSt');
+  var sub = document.getElementById('recSub');
+  if (!b) return;
+  if (!speechLang) {
+    b.classList.add('disabled');
+    b.title = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.tooltipNoLang')) || 'Select a language to enable the mic');
+    if (s) s.textContent = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.micDisabledNoLang')) || 'Mic disabled');
+    if (sub) sub.textContent = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.subNoLang')) || 'Select a language to enable the mic');
+    if (r) {
+      r.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + ((typeof getI18nSync === 'function' && getI18nSync('speechLang.reminderEmpty')) || 'Select a language for speech detection');
+      r.classList.add('show');
+    }
+  } else if (speechLang === "__native__") {
+    b.classList.add('disabled');
+    b.title = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.tooltipNative')) || 'Mic is currently disabled for native language');
+    if (s) s.textContent = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.micDisabledNative')) || 'Mic disabled');
+    if (sub) sub.textContent = ((typeof getI18nSync === 'function' && getI18nSync('speechLang.subNative')) || 'Choose a different language to speak');
+    if (r) {
+      r.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + ((typeof getI18nSync === 'function' && getI18nSync('speechLang.reminderNative')) || 'Unsupported languages are treated as the native language');
+      r.classList.add('show');
+    }
+  } else {
+    b.classList.remove('disabled');
+    b.title = '';
+    if (s) s.textContent = (typeof getI18nSync === 'function' && getI18nSync('record.status')) || 'Tap to speak';
+    if (sub) sub.textContent = '';
+    if (r) {
+      r.classList.remove('show');
+    }
   }
 }
 function openSlModal() {
@@ -1195,29 +1316,94 @@ function populateSlGrid() {
   var g = document.getElementById('slGrid');
   if (!g) return;
   g.innerHTML = '';
-  var items = [{ code:'', label:'Auto-detect (English)', native:'', flagCode:'us' }];
+  var items = [];
   allLanguages.forEach(function(l){ items.push(l); });
+  // Sort: English first, then by flagCode + label
+  var countryNames = {
+    'br':'Brazil','cn':'China','cz':'Czechia','de':'Germany','dk':'Denmark',
+    'es':'Spain','fi':'Finland','fr':'France','gr':'Greece','hu':'Hungary',
+    'id':'Indonesia','il':'Israel','in':'India','ir':'Iran','it':'Italy',
+    'jp':'Japan','kr':'South Korea','lk':'Sri Lanka','mm':'Myanmar',
+    'my':'Malaysia','nl':'Netherlands','np':'Nepal','ph':'Philippines',
+    'pk':'Pakistan','pl':'Poland','ru':'Russia','sa':'Saudi Arabia',
+    'se':'Sweden','th':'Thailand','tr':'Turkey','ua':'Ukraine',
+    'us':'United States','uz':'Uzbekistan','vn':'Vietnam'
+  };
+  items.sort(function(a, b) {
+    if (a.code === 'en') return -1;
+    if (b.code === 'en') return 1;
+    var ca = countryNames[a.flagCode] || a.flagCode;
+    var cb = countryNames[b.flagCode] || b.flagCode;
+    var cc = ca.localeCompare(cb);
+    if (cc !== 0) return cc;
+    return a.label.localeCompare(b.label);
+  });
   items.forEach(function(l){
     var d = document.createElement('div');
     d.className = 'sl-modal-item' + (speechLang === l.code ? ' selected' : '');
     d.dataset.code = l.code || '';
     var flag = (l.flagCode || 'us').toLowerCase();
-    d.innerHTML = '<span class="fi fi-' + flag + '"></span><span class="sl-label"><span class="sl-en">' + l.label + '</span>' + (l.code && l.nativeName && l.nativeName !== l.label ? '<span class="sl-native">' + l.nativeName + '</span>' : '<span class="sl-native">' + (l.code ? l.label : 'Auto') + '</span>') + '</span>';
+    var nativeHtml = '';
+    if (l.code === 'en') {
+      nativeHtml = '<span class="sl-native">International</span>';
+    } else if (l.code === 'tl' || (l.nativeName && l.nativeName !== l.label)) {
+      nativeHtml = '<span class="sl-native">' + l.nativeName + '</span>';
+    }
+    d.innerHTML = '<span class="fi fi-' + flag + '"></span><span class="sl-label"><span class="sl-en">' + l.label + '</span>' + nativeHtml + '</span>';
     d.addEventListener('click', function(){
+      if (this.dataset.code === speechLang) {
+        speechLang = "";
+        try { localStorage.removeItem('wsSpeechLang'); } catch(_e){}
+        updateSlTrigger();
+        closeSlModal();
+        updateCard();
+        saveDraft();
+        return;
+      }
       speechLang = this.dataset.code;
       try { localStorage.setItem('wsSpeechLang', speechLang); } catch(_e){}
       updateSlTrigger();
       closeSlModal();
+      updateCard();
+      saveDraft();
     });
     g.appendChild(d);
   });
+  // Native (unsupported languages) item — insert after English (first child)
+  var nd = document.createElement('div');
+  nd.className = 'sl-modal-item' + (speechLang === '__native__' ? ' selected' : '');
+  nd.dataset.code = '__native__';
+  nd.innerHTML = '<i class="fi fi-xx"></i><span class="sl-label"><span class="sl-en">Native</span><span class="sl-native">Unsupported</span></span>';
+  nd.addEventListener('click', function(){
+    if (speechLang === '__native__') {
+      speechLang = "";
+      try { localStorage.removeItem('wsSpeechLang'); } catch(_e){}
+      updateSlTrigger();
+      closeSlModal();
+      updateCard();
+      saveDraft();
+      return;
+    }
+    speechLang = '__native__';
+    try { localStorage.setItem('wsSpeechLang', '__native__'); } catch(_e){}
+    updateSlTrigger();
+    closeSlModal();
+    updateCard();
+    saveDraft();
+  });
+  var first = g.firstChild;
+  if (first && first.nextSibling) {
+    g.insertBefore(nd, first.nextSibling);
+  } else {
+    g.appendChild(nd);
+  }
 }
 document.getElementById('speechLangTrigger').addEventListener('click', function(){ openSlModal(); });
 document.getElementById('slClose').addEventListener('click', function(){ closeSlModal(); });
 document.getElementById('slBackdrop').addEventListener('click', function(){ closeSlModal(); });
 // init trigger
-if (typeof allLanguages !== 'undefined' && allLanguages.length) updateSlTrigger();
-document.addEventListener('languagesReady', function(){ updateSlTrigger(); });
+if (typeof allLanguages !== 'undefined' && allLanguages.length) { updateSlTrigger(); updateMicState(); }
+document.addEventListener('languagesReady', function(){ updateSlTrigger(); updateMicState(); });
 
 document.getElementById("toneRow").addEventListener("click", async (e) => {
   const c = e.target.closest(".tc");
@@ -1394,16 +1580,28 @@ document.getElementById("roundnessRow").addEventListener("click", (e) => {
   applyPal(curP);
 });
 let _dc;
-document.getElementById("sta").addEventListener("input", () => {
+document.getElementById("sta").addEventListener("input", (e) => {
   rewriteCache = {};
-  inputSource = "story";
+  if (!userOverride) {
+    var _len = (e.data || "").length;
+    if (_len >= 4) {
+      inputSource = "voice";
+    }
+  }
+  if (voiceAttached && (e.data || "").length > 0) {
+    voiceAttached = false;
+    var vt = document.getElementById("voiceToggle");
+    if (vt) vt.checked = false;
+    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.textChanged") : "Text changed \u2014 voice detached. Re-record to attach.");
+    updateVoiceBar();
+  }
   clearTimeout(_dc);
-  _dc = setTimeout(function() { updateCard(); saveDraft(); }, 50);
+  _dc = setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
 });
 document.getElementById("sta").addEventListener("paste", () => {
   rewriteCache = {};
   inputSource = "story";
-  setTimeout(function() { updateCard(); saveDraft(); }, 50);
+  setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
 });
 document.getElementById("nin").addEventListener("input", function() {
   this.value = [...this.value].slice(0, 18).join("");
@@ -1417,6 +1615,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+        if (!fullTx) showToast("We didn't catch that — check your mic and try again");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
@@ -1441,7 +1640,11 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   document.getElementById("sta").value = "";
   document.getElementById("nin").value = "";
   inputSource = "story";
+  userOverride = false;
   // Do NOT reset language — keep user's selection
+  audioBlob = null;
+  voiceAttached = false;
+  audioDurationSec = 0;
   cardReady = false;
   sessionStorage.removeItem("wisprDraft");
   document.getElementById("btnS").disabled = true;
@@ -1458,10 +1661,66 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   applySize();
   document.getElementById("cardGhost").innerHTML = '\u201C';
   updateCard();
+  updateSlNudge();
+  updateMicState();
   updateMobileBar();
+  updateVoiceBar();
+});
+// Voice toggle
+document.getElementById("voiceToggle").addEventListener("change", function() {
+  voiceAttached = this.checked;
+  updateCard();
+  saveDraft();
+  showToast(voiceAttached ? (typeof getI18nSync === "function" ? getI18nSync("voice.attached") : "Voice will be attached") : (typeof getI18nSync === "function" ? getI18nSync("voice.detached") : "Voice removed from card"));
+});
+// Voice play button
+document.getElementById("voicePlayBtn").addEventListener("click", function() {
+  if (!audioBlob) return;
+  if (this.classList.contains("playing")) {
+    this.classList.remove("playing");
+    this.textContent = "\u25B6";
+    if (window._voiceAudio) { window._voiceAudio.pause(); window._voiceAudio = null; }
+    return;
+  }
+  var url = URL.createObjectURL(audioBlob);
+  var audio = new Audio(url);
+  window._voiceAudio = audio;
+  audio.onended = function() {
+    this.classList.remove("playing");
+    this.textContent = "\u25B6";
+    URL.revokeObjectURL(url);
+    window._voiceAudio = null;
+  }.bind(this);
+  audio.onerror = function() {
+    this.classList.remove("playing");
+    this.textContent = "\u25B6";
+    showToast("Playback failed");
+  }.bind(this);
+  audio.play().then(function() {
+    this.classList.add("playing");
+    this.textContent = "\u23F8";
+  }.bind(this)).catch(function() {
+    showToast("Tap again to play");
+    this.classList.remove("playing");
+    this.textContent = "\u25B6";
+  }.bind(this));
 });
 // Restore card from draft or shared URL
 var restored = false;
+// Tap source label to toggle between Voice and Story
+document.getElementById("voiceLabel").addEventListener("click", function() {
+  inputSource = (inputSource === "voice") ? "story" : "voice";
+  userOverride = true;
+  if (inputSource === "story" && voiceAttached) {
+    voiceAttached = false;
+    var vt = document.getElementById("voiceToggle");
+    if (vt) vt.checked = false;
+  }
+  updateSourceLabel();
+  updateVoiceBar();
+  updateCard();
+  saveDraft();
+});
 if (location.hash && location.hash.length > 1) {
   var params = new URLSearchParams(location.hash.slice(1));
   var hText = params.get("text");
@@ -1474,6 +1733,8 @@ if (location.hash && location.hash.length > 1) {
   if (hTone) applyTone(hTone);
   if (hP != null) applyPal(parseInt(hP));
   if (hText) { updateCard(); cardReady = true; document.getElementById("btnS").disabled = false; document.getElementById("wcta").classList.add("show"); document.getElementById("dlBtn").style.display = "block"; restored = true; }
+  updateSlNudge();
+  updateMicState();
 }
 if (!restored) {
   if (loadDraft()) restored = true;
@@ -1710,6 +1971,14 @@ document.querySelector(".nav-brand")?.addEventListener("click", (e) => {
     document.getElementById("card").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 });
+document.getElementById("themeToggle")?.addEventListener("click", function() {
+  document.documentElement.classList.toggle("dark");
+  var isDark = document.documentElement.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  this.setAttribute("aria-pressed", isDark ? "true" : "false");
+  this.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+});
+
 const prefersReducedMotion =
   window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1802,50 +2071,10 @@ window.addEventListener("resize", () => {
   _wavePrevMobile = _nowMobile;
 });
 
-// Theme toggle
-function setTheme(dark, animate) {
-  const html = document.documentElement;
-  const toggle = document.getElementById('themeToggle');
-  const icon = toggle.querySelector('i');
-  icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-  // Keep screen-reader pressed-state in sync with the visual toggle so
-  // assistive tech announces "pressed" (dark on) or "not pressed" (light).
-  toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
-  document.querySelector('meta[name="theme-color"]').content = dark ? '#1a1a1a' : '#ffffeb';
-  document.querySelector('meta[name="color-scheme"]').content = dark ? 'dark' : 'light';
-  const logo = document.querySelector('.nav-logo');
-  if (logo) logo.src = dark ? 'assets/ws-logo-wh.png' : 'assets/ws-logo-bl.png';
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  if (animate) {
-    html.classList.add('theme-transitioning');
-    html.classList.toggle('dark', dark);
-    setTimeout(function() { html.classList.remove('theme-transitioning'); }, 300);
-  } else {
-    html.classList.toggle('dark', dark);
-  }
-}
-function initTheme() {
-  const saved = localStorage.getItem('theme');
-  const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-  setTheme(dark, false);
-}
-initTheme();
-document.getElementById('themeToggle').addEventListener('click', function() {
-  setTheme(!document.documentElement.classList.contains('dark'), true);
-});
-
-// Upgrade modal
-document.getElementById("upgradeBtn").addEventListener("click", openUpgradeModal);
-document.getElementById("mobileBtnUpgrade")?.addEventListener("click", openUpgradeModal);
-document.getElementById("upgradeClose").addEventListener("click", closeUpgradeModal);
-document.getElementById("upgradeBackdrop").addEventListener("click", closeUpgradeModal);
-document.getElementById("upgradeKeyGo").addEventListener("click", handleUpgradeKey);
-document.getElementById("upgradeEmailGo").addEventListener("click", handleUpgradeEmail);
-document.getElementById("upgradeKeyInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") handleUpgradeKey();
-});
-document.getElementById("upgradeEmailInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") handleUpgradeEmail();
+// Re-localize dynamic speech-lang trigger + mic state when page language changes
+window.addEventListener("i18nApplied", function() {
+  updateSlTrigger();
+  updateMicState();
 });
 
 // Examples
@@ -1874,6 +2103,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
     isRTL = false;
   }
   updateCard();
+  updateMicState();
   cardReady = true;
   document.getElementById("btnS").disabled = false;
   document.getElementById("wcta").classList.add("show");
@@ -1907,6 +2137,7 @@ document.getElementById("btnC").addEventListener("click", () => {
     return;
   }
   countCard();
+  trackCardUsage();
   updateCard();
   const card = document.getElementById("card");
   card.style.transition =
@@ -1941,13 +2172,31 @@ document.getElementById("dlBtn").addEventListener("click", async () => {
   try {
     await window.ensureHtml2canvas();
     await document.fonts.ready;
-    const blob = await generateBlobWithProgress();
-    const a = document.createElement("a");
+    const pngBlob = await generateBlobWithProgress();
+    var a = document.createElement("a");
     a.download = "wispr-story.png";
-    a.href = URL.createObjectURL(blob);
+    a.href = URL.createObjectURL(pngBlob);
     a.click();
-    btn.innerHTML = '<i class="fas fa-download"></i> Download card';
+    URL.revokeObjectURL(a.href);
     showToast("Downloaded!");
+    if (voiceAttached && audioBlob && webmCodecString) {
+      showExportProgress();
+      try {
+        var webmBlob = await generateWebm();
+        var v = document.createElement("a");
+        v.download = "wispr-story.webm";
+        v.href = URL.createObjectURL(webmBlob);
+        v.click();
+        URL.revokeObjectURL(v.href);
+        showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice also downloaded");
+      } catch (webmErr) {
+        console.error("[WebM]", webmErr);
+        showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed \u2014 PNG downloaded");
+      } finally {
+        hideExportProgress();
+      }
+    }
+    btn.innerHTML = '<i class="fas fa-download"></i> Download card';
   } catch (e) {
     btn.innerHTML = '<i class="fas fa-download"></i> Download card';
     showToast("Export failed \u2014 try again");
@@ -2000,9 +2249,12 @@ document.getElementById("shareNative").addEventListener("click", async function 
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png" } });
+    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
     if (!res.ok) throw new Error("Upload failed");
     var data = await res.json();
+    if (voiceAttached && audioBlob) {
+      try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": data.shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+    }
     var shareUrl = "https://wisprstories.vercel.app/c/" + data.shortId;
     var sharerName = document.getElementById("nin").value || "";
     var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
@@ -2013,13 +2265,26 @@ document.getElementById("shareNative").addEventListener("click", async function 
   btn.innerHTML = origHTML;
   btn.disabled = false;
 });
-document.getElementById("shareDownload").addEventListener("click", function () {
+document.getElementById("shareDownload").addEventListener("click", async function () {
   if (!_shareBlob) return;
   var a = document.createElement("a");
   a.download = "wispr-story.png";
   a.href = URL.createObjectURL(_shareBlob);
   a.click();
   showToast("Downloaded!");
+  if (voiceAttached && audioBlob && webmCodecString) {
+    try {
+      var webmBlob = await generateWebm();
+      var v = document.createElement("a");
+      v.download = "wispr-story.webm";
+      v.href = URL.createObjectURL(webmBlob);
+      v.click();
+      URL.revokeObjectURL(v.href);
+      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice also downloaded");
+    } catch (e) {
+      console.error("[WebM] Share download failed:", e);
+    }
+  }
 });
 document.getElementById("shareCopyLink").addEventListener("click", async function () {
   if (!_shareBlob) return;
@@ -2028,9 +2293,12 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png" } });
+    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
     if (!res.ok) throw new Error("Upload failed");
     var data = await res.json();
+    if (voiceAttached && audioBlob) {
+      try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": data.shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+    }
     var url = "https://wisprstories.vercel.app/c/" + data.shortId;
     navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
   } catch (e) {
@@ -2249,6 +2517,68 @@ async function generateBlob() {
   });
 }
 
+async function generateWebm() {
+  if (!audioBlob || !webmCodecString) throw new Error("No audio or unsupported browser");
+  await window.ensureHtml2canvas();
+  if (!window.html2canvas) throw new Error("html2canvas not loaded");
+  await document.fonts.ready;
+  var card = document.getElementById("card");
+  var cw = card.offsetWidth;
+  var ch = card.offsetHeight;
+  var bgUrl = getCardBgImage();
+  var canvas = await html2canvas(card, {
+    backgroundColor: null,
+    scale: 1,
+    logging: false,
+    useCORS: true,
+    x: 0, y: 0, width: cw, height: ch,
+    onclone: function(doc) {
+      var c = doc.getElementById("card");
+      if (c) {
+        c.style.backgroundImage = "url(" + bgUrl + ")";
+        c.style.backgroundSize = "100% 100%";
+      }
+      var bg = doc.getElementById("cardBg");
+      if (bg) bg.style.display = "none";
+    }
+  });
+  var videoStream = canvas.captureStream(1);
+  var videoTrack = videoStream.getVideoTracks()[0];
+  var audioCtx = new AudioContext();
+  var arrayBuffer = await audioBlob.arrayBuffer();
+  var audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+  var dest = audioCtx.createMediaStreamDestination();
+  var source = audioCtx.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(dest);
+  var combinedStream = new MediaStream([
+    videoTrack,
+    dest.stream.getAudioTracks()[0]
+  ]);
+  return new Promise(function(resolve, reject) {
+    var chunks = [];
+    var recorder = new MediaRecorder(combinedStream, { mimeType: webmCodecString });
+    recorder.ondataavailable = function(e) {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+    recorder.onstop = function() {
+      audioCtx.close();
+      videoTrack.stop();
+      resolve(new Blob(chunks, { type: "video/webm" }));
+    };
+    recorder.onerror = function(e) {
+      audioCtx.close();
+      videoTrack.stop();
+      reject(e);
+    };
+    recorder.start();
+    source.start(0);
+    source.onended = function() {
+      if (recorder.state !== "inactive") recorder.stop();
+    };
+  });
+}
+
 // Spacebar record toggle
 document.addEventListener("keydown", (e) => {
   if (e.key !== " " && e.key !== "Spacebar") return;
@@ -2261,6 +2591,7 @@ document.addEventListener("keydown", (e) => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+        if (!fullTx) showToast("We didn't catch that — check your mic and try again");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
