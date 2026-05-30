@@ -95,6 +95,21 @@
   background-color: var(--cream2);
 }
 
+.lang-dropdown-item.selected {
+  color: #f59e0b;
+}
+
+.lang-dropdown-item.selected .ldi-en {
+  color: #f59e0b;
+}
+
+.lang-dropdown-item.selected::after {
+  content: '\2713';
+  color: #f59e0b;
+  font-weight: 700;
+  margin-left: auto;
+}
+
 .ldi-native {
   font-weight: 600;
   flex-shrink: 0;

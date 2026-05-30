@@ -18,6 +18,20 @@
     "sub": "停止すると文字が表示されます",
     "generating": "生成中…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "言語設定",
+    "reminderEmpty": "音声認識の言語を選択",
+    "reminderNative": "非対応の言語は母語として扱われます",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "または言葉を入力または貼り付け",
   "textarea": {
     "label": "あなたの言葉",
@@ -109,10 +123,10 @@
     "or": "— または —",
     "haveKey": "すでにサポーターキーをお持ちですか？",
     "keyPlaceholder": "キーを貼り付け...",
-    "go": "GO",
+    "continue": "続行",
     "lostKey": "キーを紛失しましたか？",
     "emailPlaceholder": "メールを入力",
-    "emailSend": "復旧メールを送信",
+    "emailSend": "送信",
     "disclaimer": "Wispr Stories — Wispr Flowのために作られました"
   },
   "capacity": {

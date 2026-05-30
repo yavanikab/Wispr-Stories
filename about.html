@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Wispr Stories</title>
+<link rel="icon" type="image/png" href="assets/ws-logo-whblbg.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global/styles/main.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/fontawesome.min.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
+<style>
+body {
+  background: var(--cream);
+  color: var(--ink);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--sans);
+}
+.main {
+  flex: 1;
+  overflow-y: auto;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 24px 48px;
+}
+.main::-webkit-scrollbar { width: 0; }
+.main { scrollbar-width: none; }
+.footer {
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  margin-left: 0;
+}
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(26px, 2.5vw, 32px);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+h2 {
+  font-family: var(--serif);
+  font-size: clamp(18px, 1.8vw, 22px);
+  font-weight: 700;
+  margin-top: 40px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.main p {
+  font-size: clamp(14px, 1.2vw, 15px);
+  line-height: 1.7;
+  color: var(--ink2);
+  margin-bottom: 16px;
+}
+.tagline {
+  font-size: clamp(15px, 1.3vw, 17px);
+  color: var(--ink);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.faq-item {
+  margin-bottom: 20px;
+}
+.faq-q {
+  font-weight: 600;
+  font-size: clamp(14px, 1.2vw, 15px);
+  color: var(--ink);
+  margin-bottom: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.faq-q i {
+  font-size: 12px;
+  color: var(--ink3);
+  transition: transform 0.2s;
+}
+.faq-q.open i {
+  transform: rotate(90deg);
+}
+.faq-a {
+  font-size: clamp(13px, 1.1vw, 14px);
+  line-height: 1.6;
+  color: var(--ink2);
+  padding-left: 20px;
+  display: none;
+}
+.faq-a.open {
+  display: block;
+}
+.faq-a p { margin-bottom: 8px; }
+ul, ol {
+  padding-left: 24px;
+  margin-bottom: 12px;
+  font-size: clamp(13px, 1.1vw, 14px);
+  color: var(--ink2);
+  line-height: 1.6;
+}
+li { margin-bottom: 4px; }
+a { color: var(--ink); }
+@media (max-width: 640px) {
+  .main { padding: 24px 16px 32px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">
+    <img src="assets/ws-logo-blwbg.png" alt="Wispr Stories" class="nav-logo" />
+    <span class="nav-brand-text">Wispr Stories</span>
+  </a>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </div>
+</nav>
+
+<div class="main">
+  <h1>About Wispr Stories</h1>
+  <p class="tagline">Turn your voice into shareable cards, in your language, in seconds.</p>
+  <p>Wispr Stories is a free web app that lets you create beautifully styled cards from your voice or text. Speak naturally or dictate with Wispr Flow &mdash; choose a tone, color palette, and corner style, then share your card as a link or save it as a PNG image.</p>
+  <p>Every card you create can be written in any of 44 supported languages, with automatic script detection for the card label. Speech input works in 44 languages through Deepgram Nova-3 Multilingual and OpenAI Whisper, routed automatically to the best engine.</p>
+  <p>Cards shared via link are automatically removed from our servers after about 36 hours. Downloaded images stay on your device permanently.</p>
+
+  <h2>Frequently Asked Questions</h2>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> What is Wispr Flow?</div>
+    <div class="faq-a">
+      <p><a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener noreferrer">Wispr Flow</a> is an AI voice input layer that works across Mac, Windows, iPhone, and Android. It lets you speak naturally and turns messy speech into polished text in any app &mdash; emails, documents, messages, code comments, and more. Wispr Stories is an independent project inspired by the same idea: making voice input fast and natural.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> Why are there 44 languages in the speech selector?</div>
+    <div class="faq-a">
+      <p>We support all 44 languages for both speech input and card display. Each language is routed to the best speech-to-text engine &mdash; Deepgram Nova-3 Multilingual or OpenAI Whisper &mdash; for the most accurate transcription.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> What does the "Native" option mean?</div>
+    <div class="faq-a">
+      <p>"Native" is for languages that the speech-to-text engines don't specifically name but can still auto-detect. If your language isn't listed individually, select Native and the engine will do its best with automatic detection. The card label will display "Native" instead of a specific language name.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> How does AI tone rewriting work?</div>
+    <div class="faq-a">
+      <p>After you create your card, you can choose a tone that matches how you want it to sound. Original keeps your exact words unchanged &mdash; unlimited and free. Warm softens your message with a kind, friendly touch. Bold makes it strong and direct. Poetic gives it a flowing, rhythmic feel. Playful keeps it light and fun. Reflective adds a calm, thoughtful tone. Honest keeps it raw and unfiltered.</p><p>Each tone gets 5 free rewrites per day. Your language is preserved &mdash; the AI never translates or transliterates.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> How long do shared cards last?</div>
+    <div class="faq-a">
+      <p>Shared cards are automatically deleted from our servers after about 36 hours. Cards you download as images stay on your device permanently.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> Is Wispr Stories free?</div>
+    <div class="faq-a">
+      <p>Yes &mdash; completely free. No account or credit card needed. Free users get 15-second audio recordings (up to 5 per day) and 5 AI rewrites per tone per day.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> What do I get with Pro?</div>
+    <div class="faq-a">
+      <p>Pro unlocks unlimited tone rewrites with no daily caps, 30-second audio recordings (up to 50 per day), and priority support. Upgrade directly from the app.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> Do I need Wispr Flow to use Wispr Stories?</div>
+    <div class="faq-a">
+      <p>Not at all. Wispr Stories is an independent project. You can type or paste text, record with your browser's microphone, or use any dictation tool you prefer. Wispr Flow works great with it, but it's entirely optional.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> Is my data private?</div>
+    <div class="faq-a">
+      <p>When you create a card, your text is sent to speech-to-text engines (Deepgram or OpenRouter Whisper) for transcription, and to an AI model (OpenRouter) for tone rewriting. We do not store your card text permanently on our servers &mdash; only the metadata needed to display a shared card link (text, name, tone, palette) is stored temporarily alongside the card image. See License &amp; Terms in the footer menu for full details.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q"><i class="fa-solid fa-chevron-right"></i> How do I get support or report issues?</div>
+    <div class="faq-a">
+      <p>You can reach us at <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback">yellowgreenlabs@proton.me</a> or use the "Submit Issues" link in the footer menu. If you find Wispr Stories useful, you can also support the project via the "Support Here" link.</p>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>
+    <a href="/" class="footer-wave wave-on-hover">Wispr Stories</a>
+    — made for
+    <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="footer-wave wave-on-hover"><strong>Wispr Flow</strong></a>
+  </p>
+  <span>Independent project &middot; Not affiliated with Wispr Flow</span>
+  <span class="footer-copyright">&copy; 2026 <span class="footer-sep" aria-hidden="true">|</span><script src="global/footer-menu.js"></script></span>
+</footer>
+
+<script>
+(function() {
+  var saved = localStorage.getItem('theme');
+  var html = document.documentElement;
+  if (saved === 'dark') html.classList.add('dark');
+  var themeToggle = document.getElementById('themeToggle');
+  function setTheme(mode) {
+    if (mode === 'dark') html.classList.add('dark');
+    else html.classList.remove('dark');
+    localStorage.setItem('theme', mode);
+    themeToggle.innerHTML = mode === 'dark'
+      ? '<i class="fa-solid fa-sun"></i>'
+      : '<i class="fa-solid fa-moon"></i>';
+    themeToggle.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false');
+  }
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function() {
+      setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+    });
+  }
+  setTheme(saved === 'dark' ? 'dark' : 'light');
+
+  document.querySelectorAll('.faq-q').forEach(function(q) {
+    q.addEventListener('click', function() {
+      this.classList.toggle('open');
+      var answer = this.nextElementSibling;
+      if (answer) answer.classList.toggle('open');
+    });
+  });
+
+  document.body.addEventListener('wheel', function(e) {
+    var main = document.querySelector('.main');
+    if (main && !main.contains(e.target)) {
+      main.scrollTop += e.deltaY;
+    }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
-export const config = { runtime: 'edge' };
-
 import { getRedis, secondsUntilMidnightUTC } from '../lib/redis.js';
 
-// Accepted audio MIME types — validated before use in Deepgram/Whisper request
-// headers to prevent header injection from client-supplied format strings.
+// Accepted audio base MIME types — validated before use in Deepgram/Whisper
+// request headers to prevent header injection from client-supplied format strings.
+// Only the base type (before ';') is checked; codec parameters (e.g. codecs=opus)
+// are preserved from the original rawFormat since they are needed by Deepgram.
 const ALLOWED_AUDIO_FORMATS = [
   'audio/webm', 'audio/ogg', 'audio/mp4', 'audio/wav', 'audio/mpeg',
 ];
@@ -12,6 +12,8 @@ const ALLOWED_AUDIO_FORMATS = [
 // limit enforced by /api/limits so legitimate users never hit this — it is
 // purely a server-side safety net against callers who bypass /api/limits.
 const STT_MAX_CALLS_PER_SESSION = 20;
+
+export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
   // Health check — used by client to decide server STT vs Web Speech fallback
@@ -37,23 +39,37 @@ export default async function handler(req) {
   const isAdmin = adminSecret && process.env.ADMIN_API_SECRET && adminSecret === process.env.ADMIN_API_SECRET;
   const apiKey = isAdmin ? process.env.DEEPGRAM_API_KEY_ADMIN : process.env.DEEPGRAM_API_KEY;
 
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'Server not configured — add DEEPGRAM_API_KEY' }), {
+  var orKey = process.env.OPENROUTER_API_KEY;
+
+  if (!apiKey && !orKey) {
+    return new Response(JSON.stringify({ error: 'Server not configured — add DEEPGRAM_API_KEY or OPENROUTER_API_KEY' }), {
       status: 500, headers: { 'Content-Type': 'application/json' },
     });
   }
 
   try {
-    const { audio, format: rawFormat, language, sessionId } = await req.json();
+    const rawContentType = req.headers.get('content-type') || 'audio/webm';
+    const language = req.headers.get('x-language') || '';
+    const sessionId = req.headers.get('x-session-id') || '';
+    const baseType = rawContentType.split(';')[0].trim();
+    const isValid = ALLOWED_AUDIO_FORMATS.includes(baseType);
+    // Validate base type for security, but send the full original type (with codecs)
+    // to Deepgram so it knows the exact audio codec.
+    const dgContentType = isValid ? rawContentType : 'audio/webm';
 
-    // Sanitize format to an explicit allowlist. rawFormat comes from the
-    // client and would otherwise be passed directly into a Deepgram request
-    // header, creating a header-injection risk.
-    const format = ALLOWED_AUDIO_FORMATS.includes(rawFormat) ? rawFormat : 'audio/webm';
+    // Read raw audio bytes directly — no base64 round-trip
+    const audioArrayBuffer = await req.arrayBuffer();
+    const bytes = new Uint8Array(audioArrayBuffer);
 
-    // Server-side session rate limit — catches callers who call /api/stt
-    // directly without going through the /api/limits pre-flight.
-    // Admin calls and anonymous sessions (no sessionId) bypass this check.
+    // Generate base64 from raw bytes for Whisper path
+    function rawBytesToBase64(buf) {
+      var bin = '';
+      for (var i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
+      return btoa(bin);
+    }
+    var audioBase64 = rawBytesToBase64(bytes);
+
+    // Server-side session rate limit
     if (!isAdmin && sessionId) {
       try {
         const redis = getRedis();
@@ -69,25 +85,18 @@ export default async function handler(req) {
         await redis.incr(sttKey);
         await redis.expire(sttKey, ttl);
       } catch (redisErr) {
-        // Redis unavailable — fail open rather than block legitimate users
         console.warn('[STT] Rate limit check failed, allowing through:', redisErr.message);
       }
     }
 
-    const binaryStr = atob(audio);
-    const bytes = new Uint8Array(binaryStr.length);
-    for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
     var dgLang = (language || '').slice(0, 2).toLowerCase();
 
     // Whisper-routed languages: CJK/Thai + Deepgram-unsupported Indian languages
-    var whisperLanguages = ['th', 'ja', 'ko', 'zh', 'ml', 'pa'];
+    var whisperLanguages = ['th', 'ja', 'ko', 'zh', 'ml', 'pa', 'ne', 'my', 'si', 'jw', 'uz'];
 
-    if (whisperLanguages.indexOf(dgLang) !== -1) {
-      var orKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey || whisperLanguages.indexOf(dgLang) !== -1) {
       if (orKey) {
-        // Sanitize format: "audio/webm;codecs=opus" → "webm"
-        var audioFormat = (format || '').split(';')[0].split('/')[1] || 'webm';
+        var audioFormat = baseType.split('/')[1] || 'webm';
         var whisperRes = await fetch('https://openrouter.ai/api/v1/audio/transcriptions', {
           method: 'POST',
           headers: {
@@ -98,7 +107,7 @@ export default async function handler(req) {
           },
           body: JSON.stringify({
             model: 'openai/whisper-large-v3-turbo',
-            input_audio: { data: audio, format: audioFormat },
+            input_audio: { data: audioBase64, format: audioFormat },
             language: dgLang,
           }),
         });
@@ -116,15 +125,15 @@ export default async function handler(req) {
       }
     }
 
-    // Deepgram Nova-3 Multilingual (Batch) — pass language code for non-English
-    var dgSupported = ['de','es','fr','gu','hi','id','it','kn','pt','ru','sv','ta','te','tr'];
+    // Deepgram Nova-3 Multilingual (Batch)
+    var dgSupported = ['de','el','es','fr','gu','hi','id','it','kn','pt','ru','sv','ta','te','tr','ca','cs','ar','bn','da','fa','fi','he','hu','mr','ms','nl','pl','tl','uk','ur','vi'];
     var langParam = dgLang && dgSupported.indexOf(dgLang) !== -1 ? '&language=' + dgLang : '';
     const url = 'https://api.deepgram.com/v1/listen?model=nova-3&smart_format=true&punctuate=true' + langParam;
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Authorization': 'Token ' + apiKey,
-        'Content-Type': format,
+        'Content-Type': dgContentType,
       },
       body: bytes,
     });
@@ -138,7 +147,20 @@ export default async function handler(req) {
 
     const data = await res.json();
     const text = data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
-    return new Response(JSON.stringify({ text }), {
+    const dgMeta = data.metadata || {};
+    const diag = {
+      byteLen: bytes.length,
+      ct: dgContentType,
+      mDuration: dgMeta.duration || 0,
+      mRequestId: dgMeta.request_id || '',
+      dgError: data.err_code || data.err_msg || null,
+      hasResults: !!data.results,
+      channels: data.results?.channels?.length || 0,
+      transcript: data.results?.channels?.[0]?.alternatives?.[0]?.transcript || '(empty)',
+      confidence: data.results?.channels?.[0]?.alternatives?.[0]?.confidence || 0,
+      words: (data.results?.channels?.[0]?.alternatives?.[0]?.words || []).length,
+    };
+    return new Response(JSON.stringify({ text, dg: diag }), {
       status: 200, headers: { 'Content-Type': 'application/json' },
     });
   } catch (e) {

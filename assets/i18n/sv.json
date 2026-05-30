@@ -18,6 +18,20 @@
     "sub": "Dina ord visas när du slutar",
     "generating": "Genererar…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "Ställ in språk",
+    "reminderEmpty": "Välj språk för taligenkänning",
+    "reminderNative": "Språk som inte stöds behandlas som modersmål",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "eller skriv eller klistra in dina ord",
   "textarea": {
     "label": "Dina ord",
@@ -109,10 +123,10 @@
     "or": "— eller —",
     "haveKey": "Har du redan en supportnyckel?",
     "keyPlaceholder": "Klistra in din nyckel...",
-    "go": "Kör",
+    "continue": "Fortsätt",
     "lostKey": "Förlorat din nyckel?",
     "emailPlaceholder": "Ange din e-post",
-    "emailSend": "Skicka återställningsmejl",
+    "emailSend": "Skicka",
     "disclaimer": "Wispr Stories — skapat för Wispr Flow"
   },
   "capacity": {

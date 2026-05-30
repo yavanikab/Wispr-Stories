@@ -18,6 +18,20 @@
     "sub": "Kata-kata Anda muncul saat Anda berhenti",
     "generating": "Membuat…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "Atur bahasa",
+    "reminderEmpty": "Pilih bahasa untuk pengenalan suara",
+    "reminderNative": "Bahasa yang tidak didukung akan dianggap sebagai bahasa asli",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "atau ketik atau tempel kata-kata Anda",
   "textarea": {
     "label": "Kata-kata Anda",
@@ -109,10 +123,10 @@
     "or": "— atau —",
     "haveKey": "Sudah punya kunci pendukung?",
     "keyPlaceholder": "Tempel kunci Anda...",
-    "go": "Lanjut",
+    "continue": "Lanjutkan",
     "lostKey": "Kehilangan kunci Anda?",
     "emailPlaceholder": "Masukkan email Anda",
-    "emailSend": "Kirim email pemulihan",
+    "emailSend": "Kirim",
     "disclaimer": "Wispr Stories — dibuat untuk Wispr Flow"
   },
   "capacity": {

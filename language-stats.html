@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Language Stats — Wispr Stories</title>
+<link rel="icon" type="image/png" href="assets/ws-logo-whblbg.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="global/styles/main.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/fontawesome.min.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/regular.min.css" />
+<link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
+<link rel="stylesheet" href="assets/flag-icons/css/flag-icons.min.css">
+<link rel="stylesheet" href="global/styles/language-stats.css">
+<script src="lib/chart.umd.min.js"></script>
+<style>
+body {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.main {
+  flex: 1;
+  overflow-y: auto;
+}
+.main::-webkit-scrollbar { width: 0; }
+.main { scrollbar-width: none; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-brand">
+    <img src="assets/ws-logo-blwbg.png" alt="Wispr Stories" class="nav-logo" />
+    <span class="nav-brand-text">Wispr Stories</span>
+  </a>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </div>
+</nav>
+
+<div class="main">
+  <h1>Language Stats</h1>
+  <p class="subtitle">Live card-creation usage across 44 supported languages</p>
+
+  <div class="disclaimer-banner">
+    <i class="fa-solid fa-info-circle"></i>
+    <span>These are global, aggregate statistics shared by all users — they show how Wispr Stories is performing across everyone, not your personal usage. See how many cards are being created, which languages are used most and least, and which input method (voice vs story) people prefer.</span>
+  </div>
+
+  <div class="stats-banner">
+    <div class="stat-card">
+      <span class="num" id="statTotal">0</span>
+      <span class="label">Total Cards</span>
+    </div>
+    <div class="stat-card">
+      <span class="num" id="statVoice">0</span>
+      <span class="label">Voice</span>
+    </div>
+    <div class="stat-card">
+      <span class="num" id="statStory">0</span>
+      <span class="label">Story</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">44</span>
+      <span class="label">Languages</span>
+    </div>
+    <div class="stat-card">
+      <span class="num" id="statLangsUsed">0</span>
+      <span class="label">Languages Used</span>
+    </div>
+  </div>
+
+  <div class="region-list" id="regionList"></div>
+
+  <h2 class="section-heading">Usage by Language</h2>
+
+  <div id="regionBadge" class="region-badge" style="display:none">
+    <span>Filtered: <strong id="regionName"></strong></span>
+    <button id="clearRegionFilter" aria-label="Clear region filter">&times;</button>
+  </div>
+
+  <div class="chart-wrap">
+    <div id="chartContainer">
+      <canvas id="langChart"></canvas>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-sort="lang">Language</th>
+          <th data-sort="voice" class="num-cell">Voice</th>
+          <th data-sort="story" class="num-cell">Story</th>
+          <th data-sort="total" class="num-cell">Total</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>
+    <a href="/" class="footer-wave wave-on-hover">Wispr Stories</a>
+    — made for
+    <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="footer-wave wave-on-hover"><strong>Wispr Flow</strong></a>
+  </p>
+  <span>Independent project &middot; Not affiliated with Wispr Flow</span>
+  <span class="footer-copyright">&copy; 2026 <span class="footer-sep" aria-hidden="true">|</span><script src="global/footer-menu.js"></script></span>
+</footer>
+
+<script src="global/language-stats.js"></script>
+<script>
+document.body.addEventListener('wheel', function(e) {
+  var main = document.querySelector('.main');
+  if (main && !main.contains(e.target)) {
+    main.scrollTop += e.deltaY;
+  }
+}, { passive: true });
+</script>
+</body>
+</html>

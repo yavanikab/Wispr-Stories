@@ -121,7 +121,7 @@ select {
 
 .nav-brand {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 15px, 19px);
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--ink);
@@ -138,7 +138,7 @@ select {
 
 .nav-brand-text {
   font-family: var(--sans);
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 15px, 19px);
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--ink);

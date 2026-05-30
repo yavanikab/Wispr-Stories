@@ -28,7 +28,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: clamp(18px, 0.5vw + 16px, 20px);
   transition:
     color 0.2s ease,
     background 0.2s ease,
@@ -50,7 +50,7 @@
 }
 .nav-brand {
   font-family: var(--serif);
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 15px, 19px);
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--ink);
@@ -65,7 +65,7 @@
 }
 .nav-brand-text {
   font-family: var(--sans);
-  font-size: 17px;
+  font-size: clamp(17px, 0.5vw + 15px, 19px);
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--ink);
@@ -76,7 +76,7 @@
   border-radius: 4px;
 }
 .pro-badge {
-  font-size: 11px;
+  font-size: clamp(11px, 0.3vw + 10px, 12px);
   font-family: var(--sans);
   color: var(--ink);
   background: #febbf1;
@@ -90,7 +90,7 @@
   font-weight: 700;
 }
 .pro-badge i {
-  font-size: 10px;
+  font-size: clamp(10px, 0.3vw + 9px, 11px);
   margin-right: 2px;
 }
 :root.dark .pro-badge {

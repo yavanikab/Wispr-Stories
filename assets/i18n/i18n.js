@@ -66,7 +66,8 @@
         var val = resolveKey(translations, key);
         if (val) el.title = val;
       });
-      /* Page is already visible; nothing to reveal. */
+      /* Notify dynamic listeners (e.g. speechLang trigger, mic state) */
+      window.dispatchEvent(new CustomEvent('i18nApplied', { detail: { code: code } }));
     });
   };
 

@@ -13,14 +13,22 @@
   "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.",
   "record": {
     "label": "Your voice",
-    "tip": "Press record and speak naturally. When you tap stop, your words appear in the text box below — ready for the card.",
     "status": "Tap to speak",
-    "sub": "Words appear when you stop",
+    "sub": "",
     "generating": "Generating…"
   },
   "speechLang": {
     "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy"
+    "sub": "Choose your speaking language — 44 options",
+    "triggerLabel": "Set language",
+    "reminderEmpty": "Select a language for speech detection",
+    "reminderNative": "Unsupported languages are treated as the native language",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
   },
   "orText": "or type or paste your words",
   "textarea": {
@@ -114,10 +122,10 @@
     "or": "— or —",
     "haveKey": "Already have a supporter key?",
     "keyPlaceholder": "Paste your key...",
-    "go": "Go",
+    "continue": "Continue",
     "lostKey": "Lost your key?",
     "emailPlaceholder": "Enter your email",
-    "emailSend": "Send",
+    "emailSend": "Submit",
     "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
@@ -183,5 +191,15 @@
     "proUnlocked": "Pro unlocked! Enjoy unlimited everything.",
     "thankYouEmail": "Thank you! I'll get back to you shortly.",
     "validEmail": "Please enter a valid email address."
+  },
+  "voice": {
+    "attach": "Attach voice",
+    "attached": "Voice will be attached",
+    "detached": "Voice removed from card",
+    "textChanged": "Text changed — voice detached. Re-record to attach.",
+    "webmDone": "WebM with voice also downloaded",
+    "webmFailed": "WebM export failed — PNG downloaded",
+    "listen": "Listen to voice",
+    "playing": "Playing..."
   }
 }

@@ -15,6 +15,27 @@
 import { put } from '@vercel/blob';
 import sharp from 'sharp';
 
+const VALID_TONES = new Set([
+  'original', 'warm', 'bold', 'poetic', 'playful', 'reflective', 'honest',
+]);
+const PAL_COUNT = 10;
+const VALID_CORNERS = new Set(['rounded', 'sharp']);
+
+function safeTone(value) {
+  return VALID_TONES.has(value) ? value : 'original';
+}
+
+function safePalette(value) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isInteger(parsed) && parsed >= 0 && parsed < PAL_COUNT
+    ? String(parsed)
+    : '0';
+}
+
+function safeCorners(value) {
+  return VALID_CORNERS.has(value) ? value : 'rounded';
+}
+
 // Generate random 8-char alphanumeric ID
 function randomId() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -79,6 +100,22 @@ export default async function handler(req, res) {
       cacheControlMaxAge: 60 * 60 * 24 * 5, // 5 days
       contentType: 'image/jpeg',
     });
+
+    // Store card metadata sidecar if provided via custom headers
+    const cardText = req.headers['x-card-text'] ? decodeURIComponent(req.headers['x-card-text']) : '';
+    const cardName = req.headers['x-card-name'] ? decodeURIComponent(req.headers['x-card-name']) : '';
+    const cardTone = safeTone(req.headers['x-card-tone']) || 'original';
+    const cardP = safePalette(req.headers['x-card-p']) || '0';
+    const cardR = safeCorners(req.headers['x-card-r']) || 'rounded';
+    if (cardText || cardName) {
+      const meta = { text: cardText, name: cardName, tone: cardTone, p: cardP, r: cardR };
+      await put(`meta/${shortId}.json`, JSON.stringify(meta), {
+        access: 'public',
+        addRandomSuffix: false,
+        cacheControlMaxAge: 60 * 60 * 24 * 5,
+        contentType: 'application/json',
+      });
+    }
 
     res.setHeader('Content-Type', 'application/json');
     // Restrict CORS to own origin — upload should only be callable from the app itself.

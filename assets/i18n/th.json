@@ -18,6 +18,20 @@
     "sub": "คำของคุณปรากฏเมื่อคุณหยุด",
     "generating": "กำลังสร้าง…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "ตั้งค่าภาษา",
+    "reminderEmpty": "เลือกภาษาสำหรับการรู้จำเสียง",
+    "reminderNative": "ภาษาที่ไม่รองรับจะถูกถือว่าเป็นภาษาแม่",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "หรือพิมพ์หรือวางคำของคุณ",
   "textarea": {
     "label": "คำของคุณ",
@@ -109,10 +123,10 @@
     "or": "— หรือ —",
     "haveKey": "มีคีย์ผู้สนับสนุนอยู่แล้ว?",
     "keyPlaceholder": "วางคีย์ของคุณ...",
-    "go": "ไป",
+    "continue": "ดำเนินการต่อ",
     "lostKey": "ทำคีย์หาย?",
     "emailPlaceholder": "ป้อนอีเมลของคุณ",
-    "emailSend": "ส่งอีเมลกู้คืน",
+    "emailSend": "ส่ง",
     "disclaimer": "Wispr Stories — สร้างเพื่อ Wispr Flow"
   },
   "capacity": {

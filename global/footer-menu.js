@@ -23,12 +23,12 @@
   const style = document.createElement("style");
   style.textContent = `
     .fmenu-root {
-      --fmenu-bg-shade-2: oklch(27% 0.009 317);
-      --fmenu-bg-shade-3: oklch(32% 0.009 322);
-      --fmenu-purple: #6b6b6b;
-      --fmenu-yellow: #ffd866;
-      --fmenu-primary: var(--fmenu-purple);
-      --fmenu-secondary: var(--fmenu-yellow);
+      --fmenu-bg: #2a2a2a;
+      --fmenu-border: rgba(255, 255, 235, 0.12);
+      --fmenu-text: #c0c0b0;
+      --fmenu-text-dim: #a0a090;
+      --fmenu-accent: #f59e0b;
+      --fmenu-toggle-color: #a0a090;
       --fmenu-font-main: "Space Grotesk", sans-serif;
       --fmenu-font-mono: "Space Mono", monospace;
       --fmenu-text-tag: clamp(0.65rem, 0.8vw, 0.75rem);
@@ -37,29 +37,31 @@
       position: relative;
     }
 
-    [data-theme="light"] .fmenu-root {
-      --fmenu-bg-shade-2: #eceae6;
-      --fmenu-bg-shade-3: #d4d0c8;
-      --fmenu-purple: #777;
-      --fmenu-yellow: #1a1a1a;
+    :root:not(.dark) .fmenu-root {
+      --fmenu-bg: #f5f1e6;
+      --fmenu-border: rgba(26, 26, 26, 0.12);
+      --fmenu-text: #555548;
+      --fmenu-text-dim: #77776a;
+      --fmenu-toggle-color: #555548;
     }
 
     .fmenu-toggle {
       font-family: var(--fmenu-font-mono);
       font-size: var(--fmenu-text-tag);
-      color: var(--fmenu-secondary);
+      color: var(--fmenu-toggle-color);
       font-weight: 700;
       text-transform: uppercase;
       text-decoration: none;
       cursor: pointer;
+      transition: color 0.2s;
     }
 
     .fmenu-toggle:hover {
-      color: oklch(from var(--fmenu-primary) calc(l + 0.1) c h);
+      color: var(--fmenu-accent);
     }
 
     .fmenu-toggle:focus-visible {
-      outline: 2px solid var(--fmenu-primary);
+      outline: 2px solid var(--fmenu-accent);
       outline-offset: 2px;
       border-radius: 2px;
     }
@@ -68,8 +70,9 @@
       position: absolute;
       bottom: calc(100% + 8px);
       right: 0;
-      background: var(--fmenu-bg-shade-2);
-      border: 1px solid var(--fmenu-bg-shade-3);
+      left: auto;
+      background: var(--fmenu-bg);
+      border: 1px solid var(--fmenu-border);
       border-radius: 4px;
       padding: 8px 0;
       z-index: var(--fmenu-z-menu);
@@ -82,29 +85,27 @@
     }
 
     .fmenu-link {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 8px 16px;
-      color: oklch(from var(--fmenu-primary) calc(l + 0.1) calc(c - 0.16) h);
+      color: var(--fmenu-text);
       text-decoration: none;
       font-family: var(--fmenu-font-main);
       font-size: 0.875rem;
-      // border-bottom: 1px solid var(--fmenu-bg-shade-3);
       cursor: pointer;
+      transition: color 0.15s;
     }
 
-    .fmenu-link:last-child {
-      border-bottom: none;
-    }
-
+    .footer .fmenu-link:hover,
     .fmenu-link:hover {
-      // background: var(--fmenu-bg-shade-3);
-      color: var(--fmenu-secondary);
+      color: var(--fmenu-accent);
     }
 
     .fmenu-link i {
-      margin-right: 8px;
       width: 16px;
-      display: inline-block;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     @media (max-width: 768px) {
@@ -115,9 +116,8 @@
 
     .fmenu-version {
       display: none;
-      text-align: center;
       padding: 10px 16px 8px;
-      border-top: 1px solid var(--fmenu-bg-shade-3);
+      border-top: 1px solid var(--fmenu-border);
       line-height: 1.4;
     }
     .fmenu-version.loaded {
@@ -127,13 +127,13 @@
       display: block;
       font-family: var(--sans);
       font-size: 0.6rem;
-      color: oklch(from var(--fmenu-primary) calc(l + 0.05) c h);
+      color: var(--fmenu-text-dim);
     }
     .fmenu-version-name {
       display: block;
       font-family: var(--sans);
       font-size: 0.6rem;
-      color: var(--fmenu-secondary);
+      color: var(--fmenu-text);
     }
   `;
   document.head.appendChild(style);
@@ -162,6 +162,15 @@
       <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link">
         <i class="fa-solid fa-pen-clip"></i> Submit Issues
       </a>
+      <a href="#" class="fmenu-link" id="fmenu-help">
+        <i class="fa-solid fa-circle-question"></i> How to Use
+      </a>
+      <a href="about.html" class="fmenu-link">
+        <i class="fa-solid fa-book-open"></i> About
+      </a>
+      <a href="language-stats.html" class="fmenu-link">
+        <i class="fa-solid fa-chart-simple"></i> Lang Stats
+      </a>
       <a href="#" class="fmenu-link">
         <i class="fa-solid fa-file-shield"></i> License & Terms
       </a>
@@ -172,7 +181,10 @@
     </div>
   `;
 
- // <a href="#" class="fmenu-link">
+  // <a href="language-stats.html" class="fmenu-link">
+      //   <i class="fa-solid fa-chart-simple"></i> Lang Stats
+      // </a>
+      // <a href="#" class="fmenu-link">
       //   <i class="fa-solid fa-book-open"></i> About
       // </a>
       // <a href="#" class="fmenu-link">
@@ -204,6 +216,13 @@
       panel.classList.add("hidden");
       toggle.setAttribute("aria-expanded", "false");
     }
+  });
+
+  wrapper.querySelector("#fmenu-help")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    panel.classList.add("hidden");
+    toggle.setAttribute("aria-expanded", "false");
+    if (typeof window.showOnboarding === "function") window.showOnboarding();
   });
 
   window.addEventListener("scroll", () => {

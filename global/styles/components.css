@@ -11,7 +11,7 @@
   border: 1px solid var(--rule);
   border-radius: 10px;
   margin-top: 12px;
-  font-size: 13px;
+  font-size: clamp(13px, 0.3vw + 12px, 14px);
   color: var(--ink2);
 }
 .rewrite-preview-bar.show {
@@ -30,7 +30,7 @@
   padding: 6px 14px;
   border: none;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: clamp(13px, 0.3vw + 12px, 14px);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;

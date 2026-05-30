@@ -1,5 +1,90 @@
 # Version History
 
+## v0.10.1 — Bugfix: Download WebM, dark overlay, syntax error (2026-05-27)
+
+### Fixed
+- **WebM caching** — `generateWebm()` now caches the generated blob with a 24-hour expiry (keyed by audio size + text + palette + tone). Re-downloading returns instantly. Cache invalidates on re-record, text change, palette change, or tone change.
+- **WebM frame rate** — Increased from 1 FPS to 30 FPS for proper video player compatibility. Frame capture uses `requestAnimationFrame` before `recorder.start()` to guarantee first frame presence.
+- **WebM download no longer includes PNG** — `_downloadWebmWithAudio()` now only generates and downloads the `.webm` file. The old code downloaded a PNG first, then the WebM, triggering a browser multi-download warning.
+- **WebM dark overlay** — `generateWebm()` rewritten to use compositing: card background rendered via `createExportBackground()` at 2x resolution, foreground via html2canvas, combined onto a single canvas. Eliminates transparency→black artifact from video codec YUV conversion.
+- **Download choice modal hover contrast** — More visible hover states for both buttons in light and dark modes (border color changes, background shifts).
+- **Syntax error** — `dlChoicePng` and `dlChoiceWebm` event listeners were missing closing `});`, causing `Unexpected end of input` on page load.
+
+## v0.10.0 — Full 44-language STT + About page + Nav cleanup (2026-05-26)
+
+### Features
+- **15 new speech languages**: Arabic, Bengali, Danish, Persian, Finnish, Hebrew, Hungarian, Marathi, Malay, Dutch, Polish, Tagalog, Ukrainian, Urdu, Vietnamese added — all 44 languages now have STT support. No gap between the stats page and speech modal.
+- **About page** (`about.html`): standalone page with app overview and 7-item collapsible FAQ covering languages, Native option, AI rewriting, card retention, privacy, Wispr Flow, and support.
+- **About + How to Use links**: added to the footer support dropdown menu. Help button removed from nav bar and moved to footer menu.
+
+### Changed
+- Speech modal grid sorted by country flag (English first, Native second, then by flag code + label). Indian languages grouped together.
+- Nav bar "Language" shortened to "Lang". Help icon removed from nav.
+- `languages.json` expanded: 29 → 44 entries.
+- STT routing: all 44 languages routed to Deepgram Nova-3 Multilingual (15 new in `dgSupported`).
+- Main page logo swapped to `ws-logo-blwbg.png` (visible in dark mode).
+
+### Technical
+- `about.html`: standalone page with matching app theme, collapsible FAQ, inline theme toggle with dark-mode persistence.
+- `footer-menu.js`: "How to Use" (triggers `showOnboarding()`) and "About" links added.
+- `api/stt.js`: `dgSupported` expanded with `ar, bn, da, fa, fi, he, hu, mr, ms, nl, pl, tl, uk, ur, vi`.
+- Discovery: Vercel Dev on Windows requires Edge runtime (`@vercel/edge`) for all API functions; Node.js serverless runtime hangs indefinitely.
+- `wisprstories.js`: `_wsLocales` expanded; `populateSlGrid()` now sorts by flag code.
+- `languages-loader.js`: `LATIN_LANGS` expanded with `nl, da, fi, pl, hu, vi, ms, tl`.
+
+## v0.9.9 — Language Stats page + Speech expansion + Global usage tracking (2026-05-26)
+
+### Features
+- Language Stats page (`language-stats.html`): dynamic Chart.js bar chart + data table tracking 44 languages + Native card creation, split by Voice vs Story input method. Header with stats banner, region-grouped listing, zero-data state, dark/light toggle.
+- Global usage tracking: card creation events tracked via separate Upstash Redis instance (`UPSTASH_REDIS_LANG_STATS_URL`), aggregated via `GET /api/lang-stats`.
+- 8 new speech languages added: Greek, Catalan, Czech, Nepali, Burmese, Sinhala, Javanese, Uzbek — 44 total + Native supported.
+- "Lang Stats" link added to the footer support dropdown menu.
+
+### Technical
+- `lib/lang-stats-redis.js`: separate Redis client for isolated stats storage (reads distinct env vars).
+- `api/track-usage.js`: POST endpoint incrementing `HINCRBY wispr:langstats`.
+- `api/lang-stats.js`: GET endpoint returning parsed `{ voice: {}, story: {} }`.
+- `wisprstories.js`: `trackCardUsage()` fires on card creation, sending detected language + `inputSource`.
+- `api/stt.js`: `whisperLanguages` extended with `ne, my, si, jw, uz`; `dgSupported` with `el, ca, cs`.
+- `assets/languages/languages.json`: 8 new entries (29 total).
+- `docs/existing-redis.md` and `docs/language-stats-page.md` created.
+- `language-stats-mockup.html` deleted (replaced by `language-stats.html`).
+- **Language Stats page refactored**: Inline CSS/JS extracted to `global/styles/language-stats.css` and `global/language-stats.js`. Thin HTML shell. Region-colored chart bars (5 regions), cross-filter by region click, three-state table sorting (A→Z/Z→A/default for Language, desc/asc/default for numbers). 6 missing flag SVGs downloaded (np, mm, lk, gr, cz, uz). Favicon added. Uzbek merged into Middle East & Central Asia region.
+- **Theme toggle fixed**: Main app's theme toggle button was present but had no click handler. Now toggles `.dark` class + `localStorage.theme` + moon/sun icon. Stats page theme toggle shares `localStorage.theme` key.
+
+## v0.9.8 — Landing page CTA + Share URL metadata + Nudge fix + i18n cleanup (2026-05-26)
+
+### Features
+- Landing page personalization: sender name appears in image alt, caption, and OG meta tags on shared card pages.
+- Share URL metadata: card text, author, tone, palette, and corners are now stored as `meta/<id>.json` alongside card images in Vercel Blob.
+- CTA pre-population: "Create your own" link on shared card pages now passes card content as hash params, pre-filling the editor.
+
+### Bug fixes
+- Example sentence click no longer triggers redundant speech language nudge animation.
+- Upgrade modal "Send" button now shows "Send" consistently in all 21 locales (was "Send recovery email" in non-English).
+
+### Technical
+- `api/upload.js`: added `safeTone()`, `safePalette()`, `safeCorners()` validation; accepts `X-Card-*` headers for metadata; stores `meta/<id>.json` sidecar.
+- `wisprstories.js`: both share handlers send `X-Card-Text`, `X-Card-Name`, `X-Card-Tone`, `X-Card-P`, `X-Card-R` headers on upload.
+- `api/c/[id].js`: handler changed to async; fetches metadata from Blob and personalizes landing page; falls back gracefully for old cards without sidecar.
+
+## v0.9.7 — Native language support + Card label auto-detect + Mic guard (2026-05-25)
+
+### Features
+- "Native" speech language option: white neutral flag for all unsupported languages (Persian, Malaysian, Sri Lankan, Argentine Spanish, etc.).
+- Card language label auto-detection: detects script from text → labels correctly (Hindi, Thai, Korean, etc.) instead of relying on user's speechLang setting.
+- Auto-set Native: when a detectable but unsupported script is entered with no speech language set, Native is auto-selected.
+- Mic recording guard: blocks recording when no language or "Native" is selected — prevents wasted API calls.
+
+### Bug fixes
+- Card label no longer shows wrong language when speechLang doesn't match text content (auto-detect wins).
+- Speech language trigger no longer shows "undefined" on page load (i18n cache timing fix from v0.9.6).
+
+### Technical
+- `autoDetectLangFromText()` now returns detected language code (callers can use return value).
+- `__native__` sentinel for speechLang — filtered from Deepgram/Web Speech API calls.
+- "Native" grid item uses `fi-xx` (white neutral flag) from flag-icons CSS library.
+
 ## v0.9.6 — Hero subtitle + Occasions cleanup + Audit fixes (2026-05-24)
 
 ### Features

@@ -18,6 +18,20 @@
     "sub": "మీరు ఆపినప్పుడు పదాలు కనిపిస్తాయి",
     "generating": "సృష్టిస్తోంది…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "భాషను సెట్ చేయండి",
+    "reminderEmpty": "వాయిస్ గుర్తింపుకు భాషను ఎంచుకోండి",
+    "reminderNative": "మద్దతు లేని భాషలను మాతృభాషగా పరిగణిస్తారు",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "లేదా మీ పదాలు టైప్ చేయండి లేదా పేస్ట్ చేయండి",
   "textarea": {
     "label": "మీ పదాలు",
@@ -109,10 +123,10 @@
     "or": "— లేదా —",
     "haveKey": "ఇప్పటికే సపోర్టర్ కీ ఉందా?",
     "keyPlaceholder": "మీ కీని పేస్ట్ చేయండి...",
-    "go": "వెళ్ళు",
+    "continue": "కొనసాగించు",
     "lostKey": "మీ కీని కోల్పోయారా?",
     "emailPlaceholder": "మీ ఇమెయిల్ నమోదు చేయండి",
-    "emailSend": "రీకవరీ ఇమెయిల్ పంపండి",
+    "emailSend": "సమర్పించు",
     "disclaimer": "Wispr Stories — Wispr Flow కోసం తయారు చేయబడింది"
   },
   "capacity": {

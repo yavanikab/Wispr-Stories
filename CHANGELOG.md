@@ -1,5 +1,100 @@
 # Changelog
 
+## [v0.10.1] — 2026-05-27
+
+### Fixed
+- **WebM generation: caching + 30 FPS + frame readiness** — `generateWebm()` now caches the generated WebM blob with a 24-hour expiry using a memory cache keyed by audio size, text, palette, and tone. Subsequent downloads return instantly. Frame rate increased from 1 FPS to 30 FPS for proper video player compatibility. Frame capture uses `requestAnimationFrame` before starting the recorder to guarantee the first frame is present. Cache automatically invalidates on re-record, text change, palette change, or tone change.
+- **Download WebM no longer triggers PNG download** — `_downloadWebmWithAudio()` now generates and downloads only the `.webm` file, eliminating the browser's multi-download warning. Clicking "Download WebM with Voice" no longer also saves a PNG.
+- **WebM dark overlay eliminated** — `generateWebm()` now uses a two-layer compositing approach: the card background is drawn via `createExportBackground()` at 2x resolution, then foreground content (text, labels) is composited on top via html2canvas. This fixes the transparency→black issue in video codec YUV conversion.
+- **Download choice modal hover contrast** — PNG and WebM buttons now have distinct, visible hover states in both light and dark modes (border color changes, background shifts instead of subtle opacity changes).
+- **Syntax error crash** — Two `addEventListener` calls for `dlChoicePng` and `dlChoiceWebm` were missing their closing `});`, causing `Unexpected end of input` at page load. Fixed.
+
+## [v0.10.0] — 2026-05-26
+
+### Added
+- **15 new speech languages** — Arabic (`ar`), Bengali (`bn`), Danish (`da`), Persian (`fa`), Finnish (`fi`), Hebrew (`he`), Hungarian (`hu`), Marathi (`mr`), Malay (`ms`), Dutch (`nl`), Polish (`pl`), Tagalog (`tl`), Ukrainian (`uk`), Urdu (`ur`), Vietnamese (`vi`) added to speech modal grid, STT routing (all via Deepgram Nova-3 Multilingual), Web Speech locale mappings, and Latin-script wave animation flag where applicable. Speech modal now covers all 44 languages from the stats page — no gap.
+- **About page** — New `about.html` at root with descriptive About section and collapsible FAQ (7 questions covering language count, Native option, AI rewriting, card retention, privacy, Wispr Flow, support).
+- **"How to Use" in footer menu** — Help button removed from nav bar and added to the footer support dropdown as "How to Use" with `fa-circle-question` icon, triggers the onboarding flow.
+- **"About" link in footer menu** — New link with `fa-book-open` icon pointing to `about.html`.
+
+### Changed
+- **Speech modal sorting** — Languages now sorted: English first, Native second, then alphabetically by country flag code, then by label within each country. All Indian languages (`flag: in`) naturally group together.
+- **Nav bar** — "Language" label shortened to "Lang". Help button removed from nav.
+- **`assets/languages/languages.json`** — Expanded from 29 to 44 entries (added 15 languages).
+- **`api/stt.js`** — `dgSupported` extended with 15 new languages (all routed to Deepgram Nova-3).
+- **`wisprstories.js`** — `_wsLocales` extended with 15 locale mappings for Web Speech fallback.
+- **`assets/languages/languages-loader.js`** — `LATIN_LANGS` extended with 8 Latin-script languages.
+- **`global/footer-menu.js`** — Added "How to Use" and "About" menu items.
+- **`sw.js`** — Service worker cache updated to use `ws-logo-blwbg.png`.
+
+### Fixed
+- **Main page nav logo** — Changed from `ws-logo-bl.png` (black on transparent, invisible in dark mode) to `ws-logo-blwbg.png` (black logo with white background, visible in both modes).
+
+### Technical
+- `about.html` — standalone page matching app design (cream/ink theme, same nav + footer). Collapsible FAQ with `fa-chevron-right` toggle. Theme toggle handler and dark-mode persistence included inline.
+- All 44 languages now have STT routing — no gap between the language-stats page (44) and the speech language modal (was 29, now 44). The "Native" option makes 45 total entries in the modal.
+- **Vercel Dev on Windows: Edge runtime required** — `api/stt.js` must remain on Edge runtime. The Node.js serverless runtime (`@vercel/node`) hangs indefinitely (>30s) on Windows. This affects other API routes too — all must use `runtime: 'edge'` for local development.
+
+### Added
+- **Language Stats page** — New `language-stats.html` standalone page with dynamic Chart.js bar chart and data table tracking card creation across 44 languages + Native, split by Voice vs Story input method. Header with stats banner and region-grouped listing. Zero-data state handled gracefully. Navbar with logo + dark/light toggle. Footer with support menu.
+- **Global usage tracking** — Card creation now POSTs to `/api/track-usage` with detected language and input method (`inputSource`). Data stored in a separate Upstash Redis instance (new `UPSTASH_REDIS_LANG_STATS_URL` / `_TOKEN` env vars). New `GET /api/lang-stats` endpoint feeds the stats page.
+- **8 new speech languages** — Greek (`el`), Catalan (`ca`), Czech (`cs`), Nepali (`ne`), Burmese (`my`), Sinhala (`si`), Javanese (`jw`), Uzbek (`uz`) added to speech modal grid, STT routing, Web Speech locale mappings, and Latin-script wave animation flag.
+- **Documentation** — `docs/existing-redis.md` (existing Upstash Redis architecture) and `docs/language-stats-page.md` (stats page architecture + tracking data flow) created.
+
+### Changed
+- **`api/stt.js`** — Extended `whisperLanguages` with `ne, my, si, jw, uz`; extended `dgSupported` with `el, ca, cs`.
+- **`assets/languages/languages.json`** — Added 8 new language entries (29 total).
+- **`global/footer-menu.js`** — Added "Lang Stats" link in the support dropdown panel.
+- **`assets/languages/languages-loader.js`** — Updated `LATIN_LANGS` with `el, ca, cs`.
+
+### Technical
+- New `lib/lang-stats-redis.js` — separate Redis client reading `UPSTASH_REDIS_LANG_STATS_URL` / `UPSTASH_REDIS_LANG_STATS_TOKEN`.
+- `api/track-usage.js` — POST endpoint, increments `HINCRBY wispr:langstats "{source}:{lang}"`.
+- `api/lang-stats.js` — GET endpoint, returns parsed `{ voice: {}, story: {} }` objects; gracefully returns empty data when Redis is not configured.
+- `wisprstories.js` — `trackCardUsage()` fires on card creation (btnC click), sending `{ lang, source }` to `/api/track-usage`. Fails silently.
+- `language-stats-mockup.html` deleted (replaced by `language-stats.html`).
+- **Language Stats page refactored** — Inline `<style>` extracted to `global/styles/language-stats.css`; inline `<script>` extracted to `global/language-stats.js`. Page now a thin HTML shell. CSP-safe (no CDN JS at runtime). Favicon added.
+- **Region-colored chart bars** — Chart bars color-coded by 5 regions (South Asia=amber, Europe=blue, SEA=green, MidEast+Central Asia=purple, East Asia=red). Uzbek (`uz`) merged into Middle East & Central Asia.
+- **Cross-filter by region** — Click chart bar → table filters to that region; click same bar clears filter. Non-matching bars dimmed. Region badge with ✕ button shown above chart when filter active. Native row hidden during filter.
+- **Three-state table sorting** — Language column: A→Z / Z→A / default. Numeric columns (Voice/Story/Total): desc / asc / default. Sort indicator arrows (▲/▼) on sorted column header.
+- **6 missing flag SVGs downloaded** — `np.svg`, `mm.svg`, `lk.svg`, `gr.svg`, `cz.svg`, `uz.svg` to `assets/flag-icons/flags/4x3/`.
+- **Theme toggle handler added** — `wisprstories.html` had a theme toggle button with no click handler. Added toggle logic: switches `.dark` class, persists `localStorage.theme`, swaps moon/sun icon. Initial icon state set via DOMContentLoaded listener. Stats page theme toggle shares the same `localStorage.theme` key.
+
+## [v0.9.8] — 2026-05-26
+
+### Added
+- **Landing page sender name** — Shared card landing page (`/c/:id`) now displays the sender's name in the image alt text ("You have received a Wispr Story from {name}"), as a caption below the card ("{name} shared a Wispr Story with you."), and in OG meta tags. CTA link pre-populates the editor with the card's text, name, tone, palette, and corners via hash params.
+- **Card metadata sidecar** — `api/upload.js` now stores `meta/<id>.json` alongside card images in Vercel Blob, containing `{ text, name, tone, p, r }`. Client sends metadata as custom HTTP headers during share upload.
+- **Share URL metadata** — Both "Copy link" and native share now send the card's text, author name, tone, palette, and corners as headers to the upload API.
+
+### Changed
+- **emailSend i18n** — Unified to `"Send"` in all 21 locale files (was `"Send recovery email"` in 20 non-English locales).
+- **api/c/[id].js** — Handler changed from sync to `async` for metadata fetch. Landing page now personalizes OG title, description, image alt, and CTA link based on card metadata.
+- **api/upload.js** — Added `safeTone()`, `safePalette()`, `safeCorners()` validation helpers. Now accepts `X-Card-*` headers for metadata sidecar storage.
+
+### Fixed
+- **Example sentence nudge** — Removed `updateSlNudge()` from example click handler (`wisprstories.js`). The nudge animation was redundant when examples populated the card; it now only fires on user input (typing, recording, draft restore).
+
+## [v0.9.7] — 2026-05-25
+
+### Added
+- **"Native" speech language option** — White neutral flag (`fi-xx`) at the bottom of the speech language grid. For languages not in our supported list (Persian, Malaysian, Sri Lankan, Argentine Spanish, etc.). Card shows "Native" label instead of a wrong language name.
+- **Auto-detect card label** — Card language label now uses auto-detected language from text content first, then falls back to speechLang, then curLang. Auto-detect handles 15+ non-Latin scripts (Hindi, Thai, Korean, Japanese, Chinese, Tamil, Telugu, etc.).
+- **Auto-set Native** — When text is typed in a detectable script (Arabic, Bengali, etc.) and no speech language is selected, speechLang is automatically set to "Native".
+- **Mic recording guard** — Mic button is blocked when no speech language is selected (toast: "Select a language first") or when "Native" is selected (toast: "This language isn't supported for speech yet. Type your words below."). Prevents wasted API calls.
+- **Record tooltip** — Updated to mention selecting a speaking language first.
+
+### Changed
+- **`autoDetectLangFromText()`** — Now returns the detected language code (or null) instead of being void. Callers can use the return value directly.
+- **`updateSlTrigger()`** — Added `__native__` sentinel branch showing the white neutral flag.
+- **`populateSlGrid()`** — Appends "Native" item after the 21 supported languages.
+- **Deepgram API call** — Filters out `__native__` sentinel (passes empty string, letting Deepgram auto-detect).
+- **Web Speech restart** — Uses fallback chain (`_wsLocales[speechLang] || _wsLocales[curLang]`) instead of raw speechLang.
+
+### Technical
+- `__native__` sentinel value stored in `localStorage('wsSpeechLang')` for the "Native" meta-option.
+- `SCRIPT_TO_LANG` entries for `beng` and `arab` remain `null` (these scripts auto-set speechLang to `__native__` instead of mapping to a non-existent language).
+
 ## [v0.9.6] — 2026-05-24
 
 ### Added

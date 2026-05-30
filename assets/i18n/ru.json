@@ -18,6 +18,20 @@
     "sub": "Ваши слова появляются, когда вы остановитесь",
     "generating": "Создаётся…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "Выбрать язык",
+    "reminderEmpty": "Выберите язык для распознавания речи",
+    "reminderNative": "Неподдерживаемые языки будут считаться родным языком",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "или введите или вставьте свои слова",
   "textarea": {
     "label": "Ваши слова",
@@ -109,10 +123,10 @@
     "or": "— или —",
     "haveKey": "Уже есть ключ поддержки?",
     "keyPlaceholder": "Вставьте свой ключ...",
-    "go": "Вперёд",
+    "continue": "Продолжить",
     "lostKey": "Потеряли ключ?",
     "emailPlaceholder": "Введите свой email",
-    "emailSend": "Отправить письмо для восстановления",
+    "emailSend": "Отправить",
     "disclaimer": "Wispr Stories — создано для Wispr Flow"
   },
   "capacity": {

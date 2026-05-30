@@ -18,6 +18,20 @@
     "sub": "Le tue parole appaiono quando ti fermi",
     "generating": "Generazione…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "Imposta lingua",
+    "reminderEmpty": "Seleziona la lingua per il riconoscimento vocale",
+    "reminderNative": "Le lingue non supportate saranno considerate lingua nativa",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "o digita o incolla le tue parole",
   "textarea": {
     "label": "Le tue parole",
@@ -109,10 +123,10 @@
     "or": "— o —",
     "haveKey": "Hai già una chiave sostenitore?",
     "keyPlaceholder": "Incolla la tua chiave...",
-    "go": "Vai",
+    "continue": "Continua",
     "lostKey": "Hai perso la tua chiave?",
     "emailPlaceholder": "Inserisci la tua email",
-    "emailSend": "Invia email di recupero",
+    "emailSend": "Invia",
     "disclaimer": "Wispr Stories — creato per Wispr Flow"
   },
   "capacity": {

@@ -18,6 +18,20 @@
     "sub": "रुकने पर शब्द दिखाई देते हैं",
     "generating": "बना रहा है…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "भाषा सेट करें",
+    "reminderEmpty": "भाषण पहचान के लिए भाषा चुनें",
+    "reminderNative": "असमर्थित भाषाओं को मातृभाषा माना जाएगा",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "या अपने शब्द टाइप या पेस्ट करें",
   "textarea": {
     "label": "आपके शब्द",
@@ -109,10 +123,10 @@
     "or": "— या —",
     "haveKey": "पहले से सपोर्टर्स की है?",
     "keyPlaceholder": "अपनी की पेस्ट करें...",
-    "go": "जाएं",
+    "continue": "जारी रखें",
     "lostKey": "अपनी की खो दी?",
     "emailPlaceholder": "अपना ईमेल दर्ज करें",
-    "emailSend": "रिकवरी ईमेल भेजें",
+    "emailSend": "सबमिट करें",
     "disclaimer": "Wispr Stories — Wispr Flow के लिए बनाया गया"
   },
   "capacity": {

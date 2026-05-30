@@ -33,25 +33,33 @@ const SCRIPT_FONTS = {
     zht: "Noto Sans TC",
     jpn: "Noto Sans JP",
     kor: "Noto Sans KR",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Inter",
   },
   // WARM TONE
   warm: {
-    dev: "Inter", // Latin (English, Spanish, Portuguese, French, Vietnamese, etc.)
-    cyr: "Inter", // Cyrillic (Russian, Ukrainian, etc.)
-    deva: "Noto Sans Devanagari", // Devanagari (Hindi)
-    beng: "Noto Sans Bengali", // Bengali
-    guru: "Noto Sans Gurmukhi", // Punjabi/Gurmukhi
-    gujr: "Noto Sans Gujarati", // Gujarati
-    taml: "Noto Sans Tamil", // Tamil
-    telu: "Noto Sans Telugu", // Telugu
-    kann: "Noto Sans Kannada", // Kannada
-    mlym: "Noto Sans Malayalam", // Malayalam
-    thai: "Noto Sans Thai Looped", // Thai
-    arab: "Noto Sans Arabic", // Arabic
-    zhs: "Noto Sans SC", // Chinese Simplified
-    zht: "Noto Sans TC", // Chinese Traditional
-    jpn: "Noto Sans JP", // Japanese
-    kor: "Noto Sans KR", // Korean
+    dev: "Inter",
+    cyr: "Inter",
+    deva: "Noto Sans Devanagari",
+    beng: "Noto Sans Bengali",
+    guru: "Noto Sans Gurmukhi",
+    gujr: "Noto Sans Gujarati",
+    taml: "Noto Sans Tamil",
+    telu: "Noto Sans Telugu",
+    kann: "Noto Sans Kannada",
+    mlym: "Noto Sans Malayalam",
+    thai: "Noto Sans Thai Looped",
+    arab: "Noto Sans Arabic",
+    zhs: "Noto Sans SC",
+    zht: "Noto Sans TC",
+    jpn: "Noto Sans JP",
+    kor: "Noto Sans KR",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Inter",
   },
   // BOLD TONE
   bold: {
@@ -71,6 +79,10 @@ const SCRIPT_FONTS = {
     zht: "LXGW WenKai TC",
     jpn: "WDXL Lubrifont JP N",
     kor: "Gowun Dodum",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Stack Sans Headline",
   },
   // POETIC TONE
   poetic: {
@@ -90,6 +102,10 @@ const SCRIPT_FONTS = {
     zht: "Noto Serif TC",
     jpn: "M PLUS Rounded 1c",
     kor: "Noto Serif KR",
+    mymr: "Noto Serif Myanmar",
+    sinh: "Noto Serif Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "EB Garamond",
   },
   // PLAYFUL TONE
   playful: {
@@ -109,6 +125,10 @@ const SCRIPT_FONTS = {
     zht: "Chiron GoRound TC",
     jpn: "Kosugi Maru",
     kor: "Jua",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Fredoka",
   },
   // REFLECTIVE TONE
   reflective: {
@@ -128,6 +148,10 @@ const SCRIPT_FONTS = {
     zht: "Noto Serif TC",
     jpn: "Hachi Maru Pop",
     kor: "Yeon Sung",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Merriweather",
   },
   // HONEST TONE
   honest: {
@@ -147,6 +171,10 @@ const SCRIPT_FONTS = {
     zht: "Noto Sans TC",
     jpn: "Kosugi",
     kor: "Hahmlet",
+    mymr: "Noto Sans Myanmar",
+    sinh: "Noto Sans Sinhala",
+    java: "Noto Sans Javanese",
+    grc: "Atkinson Hyperlegible",
   },
 };
 
@@ -184,9 +212,13 @@ function charScript(ch, context) {
   if (c >= 0x0c00 && c <= 0x0c7f) return "telu";
   if (c >= 0x0c80 && c <= 0x0cff) return "kann";
   if (c >= 0x0d00 && c <= 0x0d7f) return "mlym";
+  if (c >= 0x0d80 && c <= 0x0dff) return "sinh";
   if (c >= 0x0600 && c <= 0x06ff) return "arab";
   if (c >= 0xac00 && c <= 0xd7af) return "kor";
   if (c >= 0x0400 && c <= 0x04ff) return "cyr";
+  if (c >= 0x1000 && c <= 0x109f) return "mymr";
+  if (c >= 0xa980 && c <= 0xa9df) return "java";
+  if (c >= 0x0370 && c <= 0x03ff) return "grc";
   return "dev";
 }
 

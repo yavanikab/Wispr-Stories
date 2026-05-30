@@ -18,6 +18,20 @@
     "sub": "Durduğunuzda kelimeleriniz görünür",
     "generating": "Oluşturuluyor…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "Dil ayarla",
+    "reminderEmpty": "Konuşma tanıma dili seçin",
+    "reminderNative": "Desteklenmeyen diller ana dil olarak kabul edilir",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "veya kelimelerinizi yazın veya yapıştırın",
   "textarea": {
     "label": "Kelimeleriniz",
@@ -109,10 +123,10 @@
     "or": "— veya —",
     "haveKey": "Zaten destekçi anahtarınız var mı?",
     "keyPlaceholder": "Anahtarınızı yapıştırın...",
-    "go": "Git",
+    "continue": "Devam Et",
     "lostKey": "Anahtarınızı mı kaybettiniz?",
     "emailPlaceholder": "E-postanızı girin",
-    "emailSend": "Kurtarma e-postası gönder",
+    "emailSend": "Gönder",
     "disclaimer": "Wispr Stories — Wispr Flow için yapıldı"
   },
   "capacity": {

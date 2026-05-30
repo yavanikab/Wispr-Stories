@@ -65,7 +65,7 @@
 
   .ex-hint {
     display: block;
-    font-size: 11px;
+    font-size: clamp(11px, 0.3vw + 10px, 12px);
     color: var(--ink3);
     text-align: center;
     margin-top: 16px;
@@ -161,10 +161,10 @@
     max-width: 120px;
   }
   .mobile-bar-btn i {
-    font-size: 18px;
+    font-size: clamp(18px, 0.5vw + 16px, 20px);
   }
   .mobile-bar-btn-label {
-    font-size: 10px;
+    font-size: clamp(10px, 0.3vw + 9px, 11px);
     font-weight: 600;
     line-height: 1;
     letter-spacing: 0.02em;
@@ -198,7 +198,7 @@
     transform: scale(0.95);
   }
   .mobile-bar-rewrite-text {
-    font-size: 14px;
+    font-size: clamp(14px, 0.3vw + 13px, 15px);
     font-weight: 800;
     color: #dc2626;
     line-height: 1.1;
@@ -210,13 +210,13 @@
     min-width: 60px;
   }
   .mobile-bar-rewrite-text .rewrite-count {
-    font-size: 18px;
+    font-size: clamp(18px, 0.5vw + 16px, 20px);
     font-weight: 900;
     color: #dc2626;
     line-height: 1;
   }
   .mobile-bar-rewrite-text .rewrite-label {
-    font-size: 9px;
+    font-size: clamp(9px, 0.2vw + 8px, 10px);
     font-weight: 600;
     color: var(--ink3);
     text-transform: uppercase;
@@ -251,7 +251,7 @@
   }
 
   .nav-brand-text {
-    font-size: 14px;
+    font-size: clamp(14px, 0.3vw + 13px, 15px);
   }
 
   .nav-logo {
@@ -265,10 +265,10 @@
   .ii {
     width: 12px;
     height: 12px;
-    font-size: 8px;
+    font-size: clamp(8px, 0.2vw + 7px, 9px);
   }
   .tip {
-    font-size: 11px;
+    font-size: clamp(11px, 0.3vw + 10px, 12px);
     padding: 8px 10px;
     max-width: 220px;
     line-height: 1.5;
@@ -352,7 +352,7 @@
     border-left-width: 2px;
   }
   .tc {
-    font-size: 11px;
+    font-size: clamp(11px, 0.3vw + 10px, 12px);
     padding: 8px 12px;
   }
 
@@ -373,7 +373,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: clamp(13px, 0.3vw + 12px, 14px);
     font-weight: 500;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.18);
   }
@@ -390,7 +390,7 @@
     border-radius: 8px;
     padding: 8px 16px;
     font-weight: 700;
-    font-size: 12px;
+    font-size: clamp(12px, 0.3vw + 11px, 13px);
     cursor: pointer;
     flex-shrink: 0;
   }
@@ -425,7 +425,7 @@
   }
 
   .right {
-    padding: 20px 14px 24px;
+    padding: 20px 14px 90px;
   }
 
   .bg-ghost-decoration,
@@ -461,10 +461,10 @@
     /* Tightened for very narrow phones but keeps the stacked icon-over-
        label layout from the 720px media block above. */
     padding: 6px 8px;
-    font-size: 9px;
+    font-size: clamp(9px, 0.2vw + 8px, 10px);
     min-width: 50px;
   }
   .reset-btn i {
-    font-size: 13px;
+    font-size: clamp(13px, 0.3vw + 12px, 14px);
   }
 }

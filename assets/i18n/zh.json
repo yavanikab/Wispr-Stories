@@ -18,6 +18,20 @@
     "sub": "停止后文字会出现",
     "generating": "生成中…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "设置语言",
+    "reminderEmpty": "选择语音识别语言",
+    "reminderNative": "不支持的语言将视为母语语言",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "或输入或粘贴你的文字",
   "textarea": {
     "label": "你的文字",
@@ -109,10 +123,10 @@
     "or": "— 或 —",
     "haveKey": "已有支持者密钥？",
     "keyPlaceholder": "粘贴你的密钥...",
-    "go": "开始",
+    "continue": "继续",
     "lostKey": "丢失了密钥？",
     "emailPlaceholder": "输入你的邮箱",
-    "emailSend": "发送恢复邮件",
+    "emailSend": "提交",
     "disclaimer": "Wispr Stories — 为 Wispr Flow 制作"
   },
   "capacity": {

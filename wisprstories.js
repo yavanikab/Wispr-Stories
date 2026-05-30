@@ -26,14 +26,6 @@ function getCardBgImage() {
 // Cache for already-preloaded URLs so we don't re-fire Image() requests.
 const _cardBgPreloaded = new Set();
 
-// Page init — one-time activation via URL hash
-(function() {
-  var _m = window.location.hash.match(/^#ws-admin=(.+)$/);
-  if (_m && _m[1]) {
-    try { localStorage.setItem('wsAdminSecret', _m[1]); } catch (_e) {}
-    history.replaceState(null, '', window.location.pathname + window.location.search);
-  }
-})();
 function getAdminHeaders() {
   var _s;
   try { _s = localStorage.getItem('wsAdminSecret'); } catch (_e) {}
@@ -137,9 +129,19 @@ let usingDeepgram = false,
   deepgramStartTime = null;
 
 let audioBlob = null;
+let _skipDurationReport = false;
 let voiceAttached = false;
+var _webmCache = null;
+var _pngCache = null;
 let webmCodecString = null;
 let audioDurationSec = 0;
+var _cardWaveform = null; // [35] static bar heights (0-1) from actual audio, null = use sin/cos
+var _generatingWebm = false; // guard to prevent concurrent WebM exports
+// Manual card-text font-size bump (in px) added on top of the responsive base
+// size. Enabled only for short card text (see FONT_SIZE_MAX_CHARS). 0 = base.
+var cardFontBump = 0;
+var FONT_BUMP_MAX = 3;          // largest increase allowed: base + 3px
+var FONT_SIZE_MAX_CHARS = 85;   // control enabled only when shown text < this
 
 function detectWebmCodec() {
   var codecs = [
@@ -153,6 +155,89 @@ function detectWebmCodec() {
   return null;
 }
 webmCodecString = detectWebmCodec();
+
+// Convert decoded AudioBuffer to 16kHz 16-bit mono WAV for universal STT compatibility.
+// Resampling to 16kHz keeps the output ~470KB for 15s (vs ~1.4MB at 48kHz).
+function _audioBufferToWav(audioBuffer) {
+  var srcRate = audioBuffer.sampleRate;
+  var dstRate = 16000;
+  var srcData = audioBuffer.getChannelData(0);
+  var srcLen = srcData.length;
+  var ratio = srcRate / dstRate;
+  var dstLen = Math.round(srcLen / ratio);
+  // Linear resample
+  var dstData = new Float32Array(dstLen);
+  for (var i = 0; i < dstLen; i++) {
+    var srcIdx = i * ratio;
+    var lo = Math.floor(srcIdx);
+    var hi = Math.min(lo + 1, srcLen - 1);
+    var frac = srcIdx - lo;
+    dstData[i] = srcData[lo] * (1 - frac) + srcData[hi] * frac;
+  }
+  // Encode as 16-bit PCM WAV
+  var numChannels = 1, bitsPerSample = 16;
+  var dataLength = dstLen * (bitsPerSample / 8);
+  var buffer = new ArrayBuffer(44 + dataLength);
+  var view = new DataView(buffer);
+  function writeString(offset, str) {
+    for (var i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  }
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataLength, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, dstRate, true);
+  view.setUint32(28, dstRate * numChannels * (bitsPerSample / 8), true);
+  view.setUint16(32, numChannels * (bitsPerSample / 8), true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(36, 'data');
+  view.setUint32(40, dataLength, true);
+  var offset = 44;
+  for (var i = 0; i < dstLen; i++) {
+    var s = Math.max(-1, Math.min(1, dstData[i]));
+    s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+    view.setInt16(offset, s, true);
+    offset += 2;
+  }
+  return buffer;
+}
+
+// Decode audio blob and compute 35 static bar heights for the card waveform.
+// Returns null (with console warning) on decode failure so callers fall back to sin/cos.
+async function _computeWaveform(blob) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var buf = await ctx.decodeAudioData(await blob.arrayBuffer());
+    var data = buf.getChannelData(0);
+    var len = data.length;
+    var heights = [];
+    for (var i = 0; i < 35; i++) {
+      var start = Math.floor((i / 35) * len);
+      var end = Math.floor(((i + 1) / 35) * len);
+      var sumSq = 0, count = 0;
+      for (var j = start; j < end; j++) { sumSq += data[j] * data[j]; count++; }
+      heights.push(Math.sqrt(sumSq / (count || 1)));
+    }
+    ctx.close();
+    // Normalize so the loudest bar reaches full height. Raw RMS of speech is
+    // small (often 0.02–0.1), which without scaling renders as tiny 2% "dashes".
+    // Scaling to the peak bar makes the waveform read as an actual waveform at
+    // any recording volume. If the audio is essentially silent (max ~0), leave
+    // the values as-is so a flat line still signals "no sound captured".
+    var maxH = 0;
+    for (var k = 0; k < heights.length; k++) { if (heights[k] > maxH) maxH = heights[k]; }
+    if (maxH > 0.001) {
+      for (var m = 0; m < heights.length; m++) { heights[m] = heights[m] / maxH; }
+    }
+    return heights;
+  } catch (e) {
+    console.warn("[Waveform] Audio decode failed:", e);
+    return null;
+  }
+}
 
 // Unified notice system — one slot, one message at a time, dismissable.
 // Priority: Firefox warning beats shared-link CTA (the functional/blocking
@@ -211,6 +296,7 @@ function saveDraft() {
       rounded: useRounded,
       cardReady: cardReady,
       voiceAttached: voiceAttached,
+      fontBump: cardFontBump,
     };
     sessionStorage.setItem("wisprDraft", JSON.stringify(draft));
   } catch (e) { /* storage unavailable */ }
@@ -250,6 +336,10 @@ function loadDraft() {
     }
     // Restore voice toggle intent if previously ON (disabled since no audio blob)
     voiceAttached = draft.voiceAttached && inputSource === "voice" ? true : false;
+    // Restore font bump (clamped). updateCard() below re-validates it against the
+    // length limit, so a saved bump on now-too-long text is reset to base.
+    var savedBump = typeof draft.fontBump === "number" ? draft.fontBump : 0;
+    cardFontBump = Math.max(0, Math.min(FONT_BUMP_MAX, Math.round(savedBump)));
     updateCard();
     updateSlNudge();
     updateMicState();
@@ -263,9 +353,28 @@ function wave(text) {
   el.innerHTML = "";
   if (!(text || "").trim()) return;
   const len = Math.min((text || "").length, 150);
-  const seed = (text || "").split("").reduce((s, c) => s + c.charCodeAt(0), 7);
   const active = Math.floor((len / 150) * 35);
   const col = PALS[curP];
+  if (_cardWaveform) {
+    for (let i = 0; i < 35; i++) {
+      var h = _cardWaveform[i] * 100;
+      if (h < 2) h = 2;
+      const b = document.createElement("div");
+      b.className = "wb";
+      b.style.height = Math.min(h, 100) + "%";
+      if (i < active) {
+        b.style.background = col;
+        b.style.opacity = ".5";
+      } else if (i < active + 4) {
+        b.style.background = col;
+        b.style.opacity = ".2";
+      }
+      el.appendChild(b);
+    }
+    return;
+  }
+  const seed = (text || "").split("").reduce((s, c) => s + c.charCodeAt(0), 7);
+  if (!seed) return;
   for (let i = 0; i < 35; i++) {
     const h =
       10 +
@@ -318,6 +427,8 @@ function updateStyleChipSummary() {
 function applyPal(idx) {
   if (isNaN(idx) || idx < 0 || idx >= PALS.length) return;
   curP = idx;
+  _webmCache = null;
+  _pngCache = null;
   const bg = document.getElementById("cardBg");
   const col = PALS[idx];
   // Solid color fallback first — prevents page-bg flash while the WebP loads.
@@ -421,13 +532,17 @@ function updateSupporterBadge() {
 function openUpgradeModal() {
   document.getElementById("upgradeModal").classList.add("open");
   document.body.classList.add("modal-open");
+  _activateModal(document.getElementById("upgradeModal"));
 }
 function closeUpgradeModal() {
+  _deactivateModal();
   document.getElementById("upgradeModal").classList.remove("open");
   document.body.classList.remove("modal-open");
   document.getElementById("upgradeKeyMsg").textContent = "";
   document.getElementById("upgradeEmailMsg").textContent = "";
 }
+document.getElementById("upgradeClose")?.addEventListener("click", closeUpgradeModal);
+document.getElementById("upgradeBackdrop")?.addEventListener("click", closeUpgradeModal);
 async function handleUpgradeKey() {
   const input = document.getElementById("upgradeKeyInput");
   const msg = document.getElementById("upgradeKeyMsg");
@@ -498,6 +613,8 @@ function canCreateCard() {
 
 function applyTone(tone) {
   curTone = tone;
+  _webmCache = null;
+  _pngCache = null;
   const t = TONES[tone] || TONES.original;
   document.getElementById("cardGhost").innerHTML =
     '<i class="' + t.g + '"></i>';
@@ -581,7 +698,7 @@ function applyTone(tone) {
       } else {
         showPill();
         if (left === 0) {
-          pill.textContent = (getI18nSync("rewrite.exhausted") || "0 {tone} rewrites left today — try another tone").replace("{tone}", toneLabel.toLowerCase());
+          pill.textContent = (getI18nSync("rewrite.exhausted") || "0 {tone} rewrites left today. Try another tone").replace("{tone}", toneLabel.toLowerCase());
           pill.className = "tone-pill exhausted";
         } else {
           var leftKey = left === 1 ? "rewrite.left" : "rewrite.plural";
@@ -610,7 +727,6 @@ function updateSourceLabel() {
     vl.textContent = storyIcon + (isStyled ? " Story Styled" : " Story Original");
   }
 }
-
 function formatDuration(sec) {
   var m = Math.floor(sec / 60);
   var s = sec % 60;
@@ -737,7 +853,79 @@ function updateCard(preserveText) {
   wave(raw);
   checkOccasions();
   updateVoiceBar();
+
+  // Font-size control: only for short, non-empty card text. The length checked
+  // is what the card actually shows (capped at 150 + ellipsis). If the text is
+  // empty or has grown past the limit, snap the size back to base and disable.
+  var shownLen = raw.trim() ? (raw.length > 150 ? 153 : raw.length) : 0;
+  var fontEligible = shownLen > 0 && shownLen < FONT_SIZE_MAX_CHARS;
+  if (!fontEligible && cardFontBump !== 0) cardFontBump = 0;
+  applyCardFontSize();
+  updateFontSizeUI(fontEligible);
 }
+
+// Apply the current font bump to the card text. Uses calc() on top of the same
+// responsive base from card.css so the text still flexes with screen size; the
+// computed pixel value is what html2canvas bakes into PNG/WebM exports.
+function applyCardFontSize() {
+  var tx = document.getElementById("cardText");
+  if (!tx) return;
+  if (cardFontBump > 0) {
+    tx.style.fontSize = "calc(clamp(14px, 0.25vw + 13.2px, 15px) + " + cardFontBump + "px)";
+  } else {
+    tx.style.fontSize = "";
+  }
+}
+
+// Reflect font-control state in the UI: greyed-out + info label when disabled,
+// per-button bounds (− off at base, + off at max), and the live size number.
+function updateFontSizeUI(eligible) {
+  var row = document.getElementById("fontSizeRow");
+  if (!row) return;
+  var minus = document.getElementById("fontMinus");
+  var plus = document.getElementById("fontPlus");
+  var valEl = document.getElementById("fontSizeVal");
+  var info = document.getElementById("fontSizeInfo");
+  row.classList.toggle("disabled", !eligible);
+  // Always show the explanation so users understand the rule in BOTH states:
+  // why it's available now, and why it's greyed out otherwise.
+  if (info) {
+    var key = eligible ? "fontSize.infoOn" : "fontSize.info";
+    var fallback = eligible
+      ? "Your card text is short: tap + or − to adjust the size."
+      : "Available only when your card text is under 85 characters.";
+    info.textContent = (typeof getI18nSync === "function" && getI18nSync(key)) || fallback;
+    info.classList.toggle("on", !!eligible);
+  }
+  if (minus) minus.disabled = !eligible || cardFontBump <= 0;
+  if (plus) plus.disabled = !eligible || cardFontBump >= FONT_BUMP_MAX;
+  if (valEl) {
+    var tx = document.getElementById("cardText");
+    var px = tx ? Math.round(parseFloat(getComputedStyle(tx).fontSize)) : 0;
+    valEl.textContent = px ? px + "px" : "";
+  }
+}
+
+// − / + button wiring. Buttons carry a disabled attribute when out of range or
+// when the control is disabled, so these handlers only act on valid clicks.
+// We deliberately do NOT call updateCard() here — that resets cardReady and
+// would un-create an already-built card. We update only the font + its UI.
+document.getElementById("fontMinus")?.addEventListener("click", function () {
+  if (cardFontBump <= 0) return;
+  cardFontBump--;
+  applyCardFontSize();
+  updateFontSizeUI(true);
+  saveDraft();
+});
+document.getElementById("fontPlus")?.addEventListener("click", function () {
+  if (cardFontBump >= FONT_BUMP_MAX) return;
+  cardFontBump++;
+  applyCardFontSize();
+  updateFontSizeUI(true);
+  saveDraft();
+});
+// Safe default before the first updateCard runs (empty card = disabled).
+updateFontSizeUI(false);
 
 // Card is fixed at 2:2 (square) so the share preview reliably renders as the
 // Spotify-style large image-first preview on WhatsApp/iMessage/etc. Kept as
@@ -754,9 +942,93 @@ function applySize() {
 }
 
 
+// Populate the microphone picker from available input devices. Device labels are
+// only exposed after mic permission is granted, so this runs after the first
+// successful getUserMedia and whenever the device list changes (devicechange).
+async function refreshMicList() {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+    var sel = document.getElementById("micSelect");
+    var row = document.getElementById("micSelectRow");
+    if (!sel || !row) return;
+    var devices = await navigator.mediaDevices.enumerateDevices();
+    var mics = devices.filter(function (d) { return d.kind === "audioinput"; });
+    console.log("[Mic] Available inputs: " + mics.map(function (m) { return m.label || "(unlabeled)"; }).join(" | "));
+    // Labels are empty until permission is granted — without them the picker is useless.
+    var labeled = mics.filter(function (m) { return m.label; });
+    if (labeled.length === 0) { row.style.display = "none"; return; }
+    var savedId = localStorage.getItem("wsMicDevice") || "";
+    sel.innerHTML = "";
+    var defaultOpt = document.createElement("option");
+    defaultOpt.value = "";
+    defaultOpt.textContent = "Default microphone";
+    sel.appendChild(defaultOpt);
+    labeled.forEach(function (m) {
+      var opt = document.createElement("option");
+      opt.value = m.deviceId;
+      opt.textContent = m.label;
+      if (m.deviceId === savedId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    // Only show the picker when there's an actual choice to make.
+    row.style.display = labeled.length > 1 ? "flex" : "none";
+  } catch (e) {
+    console.warn("[Mic] enumerateDevices failed:", e && e.message);
+  }
+}
+
+// Wire up the mic picker: persist the choice and refresh on device hot-plug.
+(function initMicPicker() {
+  var sel = document.getElementById("micSelect");
+  if (sel) {
+    sel.addEventListener("change", function () {
+      if (sel.value) {
+        localStorage.setItem("wsMicDevice", sel.value);
+      } else {
+        localStorage.removeItem("wsMicDevice");
+      }
+      showToast("Microphone set. Tap record to use it");
+    });
+  }
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+    navigator.mediaDevices.addEventListener("devicechange", function () { refreshMicList(); });
+  }
+  // Populate on load. If mic permission was granted in a previous session it
+  // persists, so device labels are already available and the picker shows up
+  // BEFORE the user records — instead of popping in mid-recording and eating
+  // into the recording time (which matters on the 5-recordings/day free tier).
+  refreshMicList();
+})();
+
 async function startDeepgramRecording() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Use the user-selected mic if one was chosen; otherwise the system default.
+    // If the saved device is gone (OverconstrainedError), clear it and retry default.
+    var savedMicId = localStorage.getItem("wsMicDevice") || "";
+    var stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: savedMicId ? { deviceId: { exact: savedMicId } } : true,
+      });
+    } catch (constraintErr) {
+      if (savedMicId) {
+        console.warn("[Mic] Saved device unavailable, falling back to default:", constraintErr && constraintErr.name);
+        localStorage.removeItem("wsMicDevice");
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } else {
+        throw constraintErr;
+      }
+    }
+    const audioTrack = stream.getAudioTracks()[0];
+    if (audioTrack) {
+      var settings = {};
+      try { settings = audioTrack.getSettings(); } catch(e) {}
+      console.log("[Mic] Device label=" + audioTrack.label + " enabled=" + audioTrack.enabled + " settings=" + JSON.stringify(settings));
+    } else {
+      console.error("[Mic] No audio tracks in stream!");
+    }
+    // Populate the mic picker now that permission is granted (labels need it).
+    refreshMicList();
     const mt = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
       ? "audio/webm;codecs=opus"
       : "audio/webm";
@@ -773,7 +1045,7 @@ async function startDeepgramRecording() {
       isRec = false;
       if (recDurationTimer) { clearInterval(recDurationTimer); recDurationTimer = null; }
       stream.getTracks().forEach((t) => t.stop());
-      showToast("Recording stopped — check your mic connection");
+      showToast("Recording stopped. Check your mic connection");
       finishRec();
     };
 
@@ -793,7 +1065,15 @@ async function startDeepgramRecording() {
             fullTx = result.text ? result.text.trim().slice(0, 150) : "";
             var preview = (result.text || "").slice(0, 30) + ((result.text || "").length > 30 ? "..." : "");
             console.log("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
-            if (!fullTx) showToast("We didn’t catch that — check your mic and try again");
+            if (!fullTx) showToast("We didn\u2019t catch that \u2014 check your mic and try again");
+            if (audioBlob) {
+              _computeWaveform(audioBlob).then(function(h) {
+                _cardWaveform = h;
+                if (document.getElementById("sta").value.trim()) {
+                  wave(document.getElementById("sta").value);
+                }
+              }).catch(function() { _cardWaveform = null; });
+            }
             var actualDuration = finishRec();
             reportRecordingDuration(actualDuration || result.duration);
           });
@@ -824,7 +1104,7 @@ function stopDeepgramRecording() {
       resolve({ text: "", duration });
       return;
     }
-      mediaRec.onstop = () => {
+      mediaRec.onstop = async () => {
         mediaRec.stream.getTracks().forEach((t) => t.stop());
         if (recDurationTimer) {
           clearInterval(recDurationTimer);
@@ -838,53 +1118,78 @@ function stopDeepgramRecording() {
         audioBlob = blob;
         audioDurationSec = duration;
 
-      const reader = new FileReader();
-      reader.onloadend = async () => {
+        // Diagnostic: measure the actual loudness of the captured audio. Decodes
+        // the already-finished blob offline (NOT the live stream, so it won't
+        // re-trigger the Bluetooth HFP/silent-capture issue). A peak near 0 means
+        // the mic captured silence (capture problem); a healthy peak means the
+        // audio has sound and the empty transcript is a transcription-side issue.
         try {
-          const base64 = reader.result.split(",")[1];
-          var controller = new AbortController();
-          var sttTimeout = setTimeout(function() { controller.abort(); }, 10000);
-            try {
-            console.log("[STT] Sending request, base64Len=" + base64.length + ", lang=" + (speechLang === "__native__" ? "" : speechLang));
-            const res = await fetch("/api/stt", {
-              method: "POST",
-              headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
-              body: JSON.stringify({ audio: base64, format: mediaRec.mimeType, language: speechLang === "__native__" ? "" : speechLang, sessionId: localStorage.getItem("wsSessionId") || null }),
-              signal: controller.signal,
-            });
-            clearTimeout(sttTimeout);
-            console.log("[STT] Response status=" + res.status);
-            if (!res.ok) {
-              const err = await res.text();
-              console.error("[STT] API error:", err);
-              showToast("Transcription failed \u2014 tap record to try again");
-              resolve({ text: "", duration });
-              return;
-            }
-            const data = await res.json();
-            resolve({ text: data.text || "", duration });
-          } catch (e) {
-            clearTimeout(sttTimeout);
-            if (e.name === 'AbortError') {
-              console.warn("[STT] Request timed out");
-              showToast("Transcription timed out \u2014 tap record to try again");
-            } else {
-              console.error("[STT] Error:", e);
-              showToast("Transcription failed \u2014 tap record to try again");
-            }
-            resolve({ text: "", duration });
+          var _lvlCtx = new (window.AudioContext || window.webkitAudioContext)();
+          var _lvlBuf = await _lvlCtx.decodeAudioData(await blob.arrayBuffer());
+          var _lvlCh = _lvlBuf.getChannelData(0);
+          var _lvlPeak = 0, _lvlSum = 0;
+          for (var _lvlI = 0; _lvlI < _lvlCh.length; _lvlI++) {
+            var _lvlAbs = Math.abs(_lvlCh[_lvlI]);
+            if (_lvlAbs > _lvlPeak) _lvlPeak = _lvlAbs;
+            _lvlSum += _lvlAbs;
           }
+          _lvlCtx.close();
+          console.log("[Mic] Captured audio level: peak=" + _lvlPeak.toFixed(4) + " avg=" + (_lvlSum / (_lvlCh.length || 1)).toFixed(6) + " samples=" + _lvlCh.length);
+        } catch (_lvlErr) {
+          console.warn("[Mic] Level check failed:", _lvlErr && _lvlErr.message);
+        }
+
+        // Convert WebM Opus → 16kHz WAV for universal Deepgram compatibility.
+        // Resampling to 16kHz keeps the output ~470KB for 15s (vs ~1.4MB at 48kHz).
+        var _wavArrBuf = await (async function() {
+          var _c = new (window.AudioContext || window.webkitAudioContext)();
+          var _b = await _c.decodeAudioData(await blob.arrayBuffer());
+          var _w = _audioBufferToWav(_b);
+          _c.close();
+          return _w;
+        })();
+        var fetchBlob = new Blob([_wavArrBuf], { type: "audio/wav" });
+        console.log("[STT] Sending WAV: size=" + fetchBlob.size);
+        var controller = new AbortController();
+        var sttTimeout = setTimeout(function() { controller.abort(); }, 15000);
+        try {
+          const res = await fetch("/api/stt", {
+            method: "POST",
+            headers: Object.assign({
+              "Content-Type": "audio/wav",
+              "X-Language": speechLang === "__native__" ? "" : speechLang,
+              "X-Session-Id": localStorage.getItem("wsSessionId") || "",
+            }, getAdminHeaders()),
+            body: fetchBlob,
+            signal: controller.signal,
+          });
+          clearTimeout(sttTimeout);
+          console.log("[STT] Response status=" + res.status);
+          if (!res.ok) {
+            const err = await res.text();
+            console.error("[STT] API error:", err);
+            showToast("Transcription failed \u2014 tap record to try again");
+            resolve({ text: "", duration });
+            return;
+          }
+          const data = await res.json();
+          if (!data.text) console.warn("[STT] Empty response, full data:", JSON.stringify(data));
+          resolve({ text: data.text || "", duration });
         } catch (e) {
-          console.error("[STT] Error:", e);
-          showToast("Transcription failed \u2014 tap record to try again");
+          clearTimeout(sttTimeout);
+          if (e.name === 'AbortError') {
+            console.warn("[STT] Request timed out");
+            showToast("Transcription timed out \u2014 tap record to try again");
+          } else {
+            console.error("[STT] Error:", e);
+            showToast("Transcription failed \u2014 tap record to try again");
+          }
           resolve({ text: "", duration });
         }
       };
-      reader.readAsDataURL(blob);
-    };
-    mediaRec.stop();
-  });
-}
+      mediaRec.stop();
+    });
+  }
 
 function startRec() {
   if (location.protocol === "file:") {
@@ -1012,7 +1317,8 @@ function startWebSpeechAPI() {
       clearTimeout(recogTimeout);
       recogTimeout = null;
     }
-    if (isRec) {
+_vibrate();
+  if (isRec) {
       recogRestartCount++;
       if (recogRestartCount > RECOG_MAX_RESTARTS) {
         console.warn("[Speech] Max restarts reached");
@@ -1079,8 +1385,8 @@ function startWebSpeechAPI() {
 function finishRec() {
   console.warn("[Rec] finishRec() called, fullTx='" + (fullTx || "").slice(0, 40) + "', recStartTime=" + recStartTime + ", usingDeepgram=" + usingDeepgram);
   if (recDurationTimer) {
-    clearTimeout(recGraceTimer);
-    recGraceTimer = null;
+    clearInterval(recDurationTimer);
+    recDurationTimer = null;
   }
   const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
   recStartTime = null;
@@ -1110,7 +1416,13 @@ function finishRec() {
   return actualDuration;
 }
 
+// Haptic feedback helper
+function _vibrate(duration) {
+  if (typeof navigator.vibrate === 'function') navigator.vibrate(duration || 12);
+}
+
 document.getElementById("recBtn").addEventListener("click", async () => {
+  _vibrate();
   if (isRec) {
     isRec = false;
     if (recDurationTimer) {
@@ -1124,7 +1436,15 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     if (usingDeepgram) {
       const result = await stopDeepgramRecording();
       fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-      if (!fullTx) showToast("We didn't catch that — check your mic and try again");
+      if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
+      if (audioBlob) {
+        _computeWaveform(audioBlob).then(function(h) {
+          _cardWaveform = h;
+          if (document.getElementById("sta").value.trim()) {
+            wave(document.getElementById("sta").value);
+          }
+        }).catch(function() { _cardWaveform = null; });
+      }
       const actualDuration = finishRec();
       await reportRecordingDuration(actualDuration || result.duration);
       return;
@@ -1149,6 +1469,13 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     return;
   }
 
+  // Show immediate feedback before any async setup
+  document.getElementById("recBtn").classList.add("on");
+  document.getElementById("recSt").textContent = "Starting\u2026";
+  document.getElementById("recSub").textContent = "Setting up mic\u2026";
+  document.getElementById("recSub").classList.add("live");
+  document.getElementById("liveBox").textContent = "Starting\u2026";
+
   // Server-side limit check before starting recording (check only, don't increment)
   const sessionId = localStorage.getItem("wsSessionId");
   if (!sessionId) {
@@ -1167,6 +1494,13 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     const data = await res.json();
 
     if (!data.allowed) {
+      // Revert button state on failure
+      document.getElementById("recBtn").classList.remove("on");
+      document.getElementById("recSt").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+      document.getElementById("recSub").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+      document.getElementById("recSub").classList.remove("live");
       if (data.reason === "too_many") {
         showToast(isPro
           ? `Pro limit reached (${data.max}/day). Come back tomorrow!`
@@ -1188,6 +1522,7 @@ document.getElementById("recBtn").addEventListener("click", async () => {
 });
 
 async function reportRecordingDuration(actualDuration) {
+  if (_skipDurationReport) { _skipDurationReport = false; return; }
   if (!actualDuration || actualDuration <= 0) return;
   const sessionId = localStorage.getItem("wsSessionId");
   const isPro = isSupporter();
@@ -1304,13 +1639,19 @@ function openSlModal() {
   if (!m) return;
   m.classList.add('open');
   document.body.classList.add('modal-open');
+  _activateModal(m);
   populateSlGrid();
 }
 function closeSlModal() {
   var m = document.getElementById('slModal');
   if (!m) return;
+  _deactivateModal();
   m.classList.remove('open');
   document.body.classList.remove('modal-open');
+  // Clear filter and show all items
+  var filter = document.getElementById('slFilter');
+  if (filter) { filter.value = ''; }
+  document.querySelectorAll('#slGrid .sl-modal-item').forEach(function(i) { i.style.display = ''; });
 }
 function populateSlGrid() {
   var g = document.getElementById('slGrid');
@@ -1401,6 +1742,22 @@ function populateSlGrid() {
 document.getElementById('speechLangTrigger').addEventListener('click', function(){ openSlModal(); });
 document.getElementById('slClose').addEventListener('click', function(){ closeSlModal(); });
 document.getElementById('slBackdrop').addEventListener('click', function(){ closeSlModal(); });
+// Speech-language modal live filter
+var _slFilterTimer = null;
+document.getElementById('slFilter').addEventListener('input', function() {
+  clearTimeout(_slFilterTimer);
+  var q = this.value.toLowerCase().trim();
+  _slFilterTimer = setTimeout(function() {
+    document.querySelectorAll('#slGrid .sl-modal-item').forEach(function(item) {
+      var label = item.querySelector('.sl-en');
+      var native = item.querySelector('.sl-native');
+      var code = item.dataset.code || '';
+      var matches = !q || (label && label.textContent.toLowerCase().indexOf(q) !== -1) ||
+        (native && native.textContent.toLowerCase().indexOf(q) !== -1) || code.indexOf(q) !== -1;
+      item.style.display = matches ? '' : 'none';
+    });
+  }, 150);
+});
 // init trigger
 if (typeof allLanguages !== 'undefined' && allLanguages.length) { updateSlTrigger(); updateMicState(); }
 document.addEventListener('languagesReady', function(){ updateSlTrigger(); updateMicState(); });
@@ -1443,7 +1800,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   const isPro = isSupporter();
   if (!isPro && getRewritesLeftForTone(tone) <= 0) {
     const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
-    showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
+    showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
     applyTone("original");
     updateCard();
     saveDraft();
@@ -1497,10 +1854,10 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
           setToneUsed(errTone, err.used);
         }
         const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + errTone) : errTone;
-        showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
+        showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
         applyTone("original");
       } else {
-        showToast("Rewrite failed — showing original");
+        showToast("Rewrite failed. Showing original");
         applyTone(tone);
       }
       cardText.textContent = prevText;
@@ -1532,9 +1889,9 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   } catch (err) {
     console.error("[Rewrite] Error:", err);
     if (err.name === "AbortError") {
-      showToast("Rewrite timed out — showing original");
+      showToast("Rewrite timed out. Showing original");
     } else {
-      showToast("Rewrite failed — showing original");
+      showToast("Rewrite failed. Showing original");
     }
     cardText.textContent = prevText;
     cardText.classList.remove("mt");
@@ -1579,15 +1936,37 @@ document.getElementById("roundnessRow").addEventListener("click", (e) => {
   saveDraft();
   applyPal(curP);
 });
+// Start placeholder cycling after examples load
+(function _initPhCycle() {
+  var check = function() {
+    if (window._examplePrompts && window._examplePrompts.length) { _startPlaceholderCycle(); return; }
+    setTimeout(check, 1000);
+  };
+  setTimeout(check, 2000);
+})();
+// Cycling placeholder in textarea
+var _phTimer = null;
+function _startPlaceholderCycle() {
+  _stopPlaceholderCycle();
+  var sta = document.getElementById("sta");
+  if (!sta || sta.value.length > 0 || !window._examplePrompts || !window._examplePrompts.length) return;
+  var prompts = window._examplePrompts;
+  var idx = Math.floor(Math.random() * prompts.length);
+  sta.placeholder = prompts[idx];
+  _phTimer = setInterval(function() {
+    idx = (idx + 1) % prompts.length;
+    sta.placeholder = prompts[idx];
+  }, 5000);
+}
+function _stopPlaceholderCycle() {
+  if (_phTimer) { clearInterval(_phTimer); _phTimer = null; }
+}
 let _dc;
 document.getElementById("sta").addEventListener("input", (e) => {
   rewriteCache = {};
-  if (!userOverride) {
-    var _len = (e.data || "").length;
-    if (_len >= 4) {
-      inputSource = "voice";
-    }
-  }
+  // No auto-switch to "voice" for text input (paste, type, dictate).
+  // Only the mic recording path in finishRec() sets inputSource = "voice".
+  // User can manually toggle via the source label.
   if (voiceAttached && (e.data || "").length > 0) {
     voiceAttached = false;
     var vt = document.getElementById("voiceToggle");
@@ -1595,11 +1974,16 @@ document.getElementById("sta").addEventListener("input", (e) => {
     showToast(typeof getI18nSync === "function" ? getI18nSync("voice.textChanged") : "Text changed \u2014 voice detached. Re-record to attach.");
     updateVoiceBar();
   }
+  _webmCache = null;
+  _pngCache = null;
   clearTimeout(_dc);
   _dc = setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
+  _stopPlaceholderCycle();
 });
 document.getElementById("sta").addEventListener("paste", () => {
   rewriteCache = {};
+  _webmCache = null;
+  _pngCache = null;
   inputSource = "story";
   setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
 });
@@ -1608,6 +1992,8 @@ document.getElementById("nin").addEventListener("input", function() {
   updateCard();
   saveDraft();
 });
+document.getElementById("sta").addEventListener("focus", _stopPlaceholderCycle);
+document.getElementById("sta").addEventListener("blur", function() { if (!this.value.length) setTimeout(_startPlaceholderCycle, 2000); });
 document.getElementById("resetBtn").addEventListener("click", () => {
   rewriteCache = {};
   if (isRec) {
@@ -1615,7 +2001,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-        if (!fullTx) showToast("We didn't catch that — check your mic and try again");
+        if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
@@ -1643,6 +2029,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   userOverride = false;
   // Do NOT reset language — keep user's selection
   audioBlob = null;
+  _cardWaveform = null;
   voiceAttached = false;
   audioDurationSec = 0;
   cardReady = false;
@@ -1705,22 +2092,20 @@ document.getElementById("voicePlayBtn").addEventListener("click", function() {
     this.textContent = "\u25B6";
   }.bind(this));
 });
+// Re-record — re-triggers the mic without consuming a daily slot
+document.getElementById("voiceReRecordBtn")?.addEventListener("click", () => {
+  if (isRec) return;
+  if (!audioBlob) return;
+  _webmCache = null;
+  _pngCache = null;
+  _skipDurationReport = true;
+  document.getElementById("recBtn").click();
+});
 // Restore card from draft or shared URL
 var restored = false;
 // Tap source label to toggle between Voice and Story
-document.getElementById("voiceLabel").addEventListener("click", function() {
-  inputSource = (inputSource === "voice") ? "story" : "voice";
-  userOverride = true;
-  if (inputSource === "story" && voiceAttached) {
-    voiceAttached = false;
-    var vt = document.getElementById("voiceToggle");
-    if (vt) vt.checked = false;
-  }
-  updateSourceLabel();
-  updateVoiceBar();
-  updateCard();
-  saveDraft();
-});
+// voiceLabel is display-only — inputSource is set automatically:
+// recording → "voice", typing/paste/examples → "story".
 if (location.hash && location.hash.length > 1) {
   var params = new URLSearchParams(location.hash.slice(1));
   var hText = params.get("text");
@@ -1812,92 +2197,31 @@ function updateMobileBar() {
 }
 window.addEventListener("resize", updateMobileBar);
 
-// Auto-detect language from browser on first load (no UI dropdown)
+// Auto-detect language from browser on first load (no UI dropdown).
+// Only switches to a language we actually translate (I18N_DISPLAY_LANGS);
+// any other browser language falls back to English so the page never loads
+// in a half-translated state.
 function tryAutoDetectLang() {
   const saved = sessionStorage.getItem("wisprDraft");
   if (saved) return; // respect saved draft language
   if (typeof allLanguages === "undefined" || !allLanguages.length) return; // not loaded yet
-  const navLang = navigator.language || "en-US";
-  const tryCodes = [navLang, navLang.split("-")[0], "en-US"];
+  const i18nList = window.I18N_DISPLAY_LANGS || ["en"];
+  const navLang = navigator.language || "en";
+  const tryCodes = [navLang, navLang.split("-")[0]];
   for (const code of tryCodes) {
-    if (allLanguages.find((l) => l.code === code)) {
+    if (i18nList.indexOf(code) !== -1 && allLanguages.find((l) => l.code === code)) {
       curLang = code;
       isRTL = false;
       window.setLanguageByCode(code);
       return;
     }
   }
-  curLang = "en-US";
+  curLang = "en";
   isRTL = false;
-  window.setLanguageByCode("en-US");
+  window.setLanguageByCode("en");
 }
 tryAutoDetectLang();
 document.addEventListener("languagesReady", tryAutoDetectLang);
-
-// Check daily user cap on app load
-async function checkDailyCap() {
-  const sessionId = localStorage.getItem("wsSessionId");
-  if (!sessionId) {
-    const newId = "sess_" + Math.random().toString(36).slice(2, 10);
-    localStorage.setItem("wsSessionId", newId);
-  }
-  const sid = localStorage.getItem("wsSessionId");
-
-  // Server-side Pro validation
-  let isPro = false;
-  const storedKey = sessionStorage.getItem("wsProKey");
-  if (storedKey) {
-    try {
-      const proRes = await fetch("/api/pro-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: storedKey }),
-      });
-      const proData = await proRes.json();
-      isPro = proData.isPro || false;
-    } catch (e) {
-      console.warn("[Cap] Pro check failed:", e.message);
-    }
-  }
-
-  try {
-    const res = await fetch("/api/usage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: sid, isPro }),
-    });
-    const data = await res.json();
-
-    if (!data.allowed) {
-      // Show capacity page
-      document.getElementById("capacityPage").classList.add("show");
-      document.body.style.overflow = "hidden";
-
-      // Update reset text with countdown
-      if (data.resetsAt) {
-        const resetTime = new Date(data.resetsAt);
-        const now = new Date();
-        const diffMs = resetTime - now;
-        if (diffMs > 0 && diffMs < 60 * 60 * 1000) {
-          const mins = Math.ceil(diffMs / 60000);
-          document.getElementById("capacityResetText").textContent =
-            `We'll be back in about ${mins} minute${mins !== 1 ? "s" : ""}.`;
-        }
-      }
-      return false;
-    }
-  } catch (e) {
-    console.warn("[Cap] Check failed, allowing access:", e.message);
-  }
-  return true;
-}
-
-// Run cap check on load
-checkDailyCap().then((allowed) => {
-  if (allowed) {
-    console.log("[Cap] Access granted");
-  }
-});
 
 // Re-validate Pro key on load
 async function revalidateProKey() {
@@ -1944,8 +2268,7 @@ if (!localStorage.getItem("wsOnboardingSeen")) {
   setTimeout(showOnboarding, 800);
 }
 
-// Help icon in nav — re-show onboarding
-document.getElementById("helpBtn")?.addEventListener("click", showOnboarding);
+
 
 // Dismiss buttons
 document.getElementById("onboardingClose")?.addEventListener("click", hideOnboarding);
@@ -2089,7 +2412,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
     if (tone !== "original" && !isSupporter() && getRewritesLeftForTone(tone) === 0) {
       applyTone("original");
       const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
-      showToast("Daily " + toneLabel.toLowerCase() + " rewrites used — try another tone");
+      showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
     } else {
       applyTone(tone);
     }
@@ -2118,6 +2441,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
 
 // Create card
 document.getElementById("btnC").addEventListener("click", () => {
+  _vibrate();
   const btn = document.getElementById("btnC");
   if (btn.disabled) return;
   btn.disabled = true;
@@ -2164,43 +2488,97 @@ document.getElementById("btnC").addEventListener("click", () => {
   showToast("Card ready \u2014 tap Share to download");
 });
 
+// Download helpers -- PNG only
+async function _downloadPngOnly() {
+  await window.ensureHtml2canvas();
+  await document.fonts.ready;
+  const pngBlob = await generateBlobWithProgress();
+  var a = document.createElement("a");
+  a.download = "wispr-story.png";
+  a.href = URL.createObjectURL(pngBlob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast("Downloaded!");
+}
+// Download helpers -- WebM only (no PNG)
+async function _downloadWebmWithAudio() {
+  await window.ensureHtml2canvas();
+  await document.fonts.ready;
+  showExportProgress();
+  try {
+    _setExportStage("Rendering card…");
+    var webmBlob = await generateWebm();
+    var v = document.createElement("a");
+    v.download = "wispr-story.webm";
+    v.href = URL.createObjectURL(webmBlob);
+    v.click();
+    URL.revokeObjectURL(v.href);
+    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
+  } catch (webmErr) {
+    console.error("[WebM]", webmErr);
+    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed");
+  } finally {
+    hideExportProgress();
+  }
+}
+// Download choice modal
+document.getElementById("dlChoicePng")?.addEventListener("click", async () => {
+  hideDownloadChoice();
+  const btn = document.getElementById("dlBtn");
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting\u2026';
+  try { await _downloadPngOnly(); _flashDlBtn(btn); } catch(e) { btn.innerHTML = '<i class="fas fa-download"></i> Download card'; }
+});
+document.getElementById("dlChoiceWebm")?.addEventListener("click", async () => {
+  hideDownloadChoice();
+  const btn = document.getElementById("dlBtn");
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting\u2026';
+  try { await _downloadWebmWithAudio(); _flashDlBtn(btn); } catch(e) { btn.innerHTML = '<i class="fas fa-download"></i> Download card'; }
+});
+document.getElementById("dlChoiceClose")?.addEventListener("click", hideDownloadChoice);
+document.getElementById("dlChoiceBackdrop")?.addEventListener("click", hideDownloadChoice);
+function _formatSize(bytes) {
+  if (!bytes || bytes < 1) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1048576) return (bytes / 1024).toFixed(0) + " KB";
+  return (bytes / 1048576).toFixed(1) + " MB";
+}
+function _estPngSize() {
+  if (_pngCache && _pngCache.blob) return _pngCache.blob.size;
+  var txt = (document.getElementById("sta").value || "").length;
+  return Math.round(150 + txt * 1.5); // rough estimate
+}
+function showDownloadChoice() {
+  // Update size estimates
+  var pngSize = _estPngSize();
+  var pngEl = document.getElementById("dlChoicePng");
+  var webmSize = audioBlob ? audioBlob.size + 80000 : 0; // 80KB video overhead
+  pngEl.innerHTML = '&#128247; Download PNG <small class="dl-est">' + _formatSize(pngSize) + ' &middot; ~2s</small>';
+  var webmEl = document.getElementById("dlChoiceWebm");
+  webmEl.innerHTML = '&#127916; Download WebM <small class="dl-est">' + _formatSize(webmSize) + ' &middot; ~3-6s</small>';
+  document.getElementById("dlChoice").classList.add("open");
+  document.body.classList.add("modal-open");
+  _activateModal(document.getElementById("dlChoice"));
+}
+function hideDownloadChoice() { _deactivateModal(); document.getElementById("dlChoice").classList.remove("open"); document.body.classList.remove("modal-open"); }
+function _flashDlBtn(btn) {
+  btn.classList.add("success");
+  btn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
+  setTimeout(function() {
+    btn.classList.remove("success");
+    btn.innerHTML = '<i class="fas fa-download"></i> Download card';
+  }, 1500);
+}
+
 // Download
 document.getElementById("dlBtn").addEventListener("click", async () => {
   if (!cardReady) { document.getElementById("btnC").click(); return; }
+  if (voiceAttached && audioBlob && webmCodecString) {
+    showDownloadChoice();
+    return;
+  }
   const btn = document.getElementById("dlBtn");
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting\u2026';
-  try {
-    await window.ensureHtml2canvas();
-    await document.fonts.ready;
-    const pngBlob = await generateBlobWithProgress();
-    var a = document.createElement("a");
-    a.download = "wispr-story.png";
-    a.href = URL.createObjectURL(pngBlob);
-    a.click();
-    URL.revokeObjectURL(a.href);
-    showToast("Downloaded!");
-    if (voiceAttached && audioBlob && webmCodecString) {
-      showExportProgress();
-      try {
-        var webmBlob = await generateWebm();
-        var v = document.createElement("a");
-        v.download = "wispr-story.webm";
-        v.href = URL.createObjectURL(webmBlob);
-        v.click();
-        URL.revokeObjectURL(v.href);
-        showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice also downloaded");
-      } catch (webmErr) {
-        console.error("[WebM]", webmErr);
-        showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed \u2014 PNG downloaded");
-      } finally {
-        hideExportProgress();
-      }
-    }
-    btn.innerHTML = '<i class="fas fa-download"></i> Download card';
-  } catch (e) {
-    btn.innerHTML = '<i class="fas fa-download"></i> Download card';
-    showToast("Export failed \u2014 try again");
-  }
+  try { await _downloadPngOnly(); _flashDlBtn(btn); } catch(e) { btn.innerHTML = '<i class="fas fa-download"></i> Download card'; }
 });
 
 // Unified mobile bar buttons mirror inline buttons
@@ -2214,9 +2592,10 @@ document.getElementById("mobileBtnS")?.addEventListener("click", () => {
 // Share modal
 let _shareBlob = null;
 document.getElementById("btnS").addEventListener("click", async () => {
+  _vibrate();
   if (!cardReady) { document.getElementById("btnC").click(); return; }
   const btn = document.getElementById("btnS");
-  const generatingLabel = typeof getI18nSync === "function" ? getI18nSync("shareModal.generating") : "Generating\u2026";
+  const generatingLabel = typeof getI18nSync === "function" ? getI18nSync("record.generating") : "Generating\u2026";
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + generatingLabel;
   btn.disabled = true;
   try {
@@ -2234,14 +2613,15 @@ document.getElementById("btnS").addEventListener("click", async () => {
         ? "" : "none";
     document.getElementById("shareModal").classList.add("open");
     document.body.classList.add("modal-open");
+    _activateModal(document.getElementById("shareModal"));
   } catch (e) {
     btn.innerHTML = '<i class="fas fa-share-nodes"></i> Share card';
     btn.disabled = false;
     showToast("Export failed \u2014 try again");
   }
 });
-document.getElementById("shareClose").addEventListener("click", function () { document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
-document.getElementById("shareBackdrop").addEventListener("click", function () { document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
+document.getElementById("shareClose").addEventListener("click", function () { _deactivateModal(); document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
+document.getElementById("shareBackdrop").addEventListener("click", function () { _deactivateModal(); document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
 document.getElementById("shareNative").addEventListener("click", async function () {
   if (!_shareBlob) return;
   var btn = document.getElementById("shareNative");
@@ -2260,7 +2640,7 @@ document.getElementById("shareNative").addEventListener("click", async function 
     var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
     navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
   } catch (e) {
-    showToast("Upload failed — try again");
+    showToast("Upload failed. Try again");
   }
   btn.innerHTML = origHTML;
   btn.disabled = false;
@@ -2280,7 +2660,7 @@ document.getElementById("shareDownload").addEventListener("click", async functio
       v.href = URL.createObjectURL(webmBlob);
       v.click();
       URL.revokeObjectURL(v.href);
-      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice also downloaded");
+      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
     } catch (e) {
       console.error("[WebM] Share download failed:", e);
     }
@@ -2302,7 +2682,7 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
     var url = "https://wisprstories.vercel.app/c/" + data.shortId;
     navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
   } catch (e) {
-    showToast("Upload failed — try again");
+    showToast("Upload failed. Try again");
   }
   btn.innerHTML = origHTML;
   btn.disabled = false;
@@ -2325,9 +2705,9 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
       a.download = "wispr-story.png";
       a.href = URL.createObjectURL(_shareBlob);
       a.click();
-      showToast("Image saved — open Photos to paste");
+      showToast("Image saved. Open Photos to paste");
     } catch (e) {
-      showToast("Download failed — try Share instead");
+      showToast("Download failed. Try Share instead");
     }
     btn.innerHTML = origHTML;
     btn.disabled = false;
@@ -2349,10 +2729,10 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
         a.click();
         showToast("Image saved to downloads");
       } catch (e2) {
-        showToast("Download failed — try Share instead");
+        showToast("Download failed. Try Share instead");
       }
     } else {
-      showToast("Copy not supported — try Download instead");
+      showToast("Copy not supported. Try Download instead");
     }
   }
   btn.innerHTML = origHTML;
@@ -2415,21 +2795,44 @@ function adjustTooltipPosition(tip) {
   if (r.bottom > window.innerHeight) tip.style.top = "auto";
 }
 
+var _toastQueue = [], _toastShowing = false;
 function showToast(msg) {
+  if (_toastShowing) {
+    if (_toastQueue.length < 3) _toastQueue.push(msg);
+    return;
+  }
+  _toastShowing = true;
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.classList.add("show");
   clearTimeout(t._t);
-  t._t = setTimeout(() => t.classList.remove("show"), 3200);
+  t._t = setTimeout(function() {
+    t.classList.remove("show");
+    _toastShowing = false;
+    if (_toastQueue.length) setTimeout(function() { showToast(_toastQueue.shift()); }, 250);
+  }, 3200);
 }
 
 // Export
 const EXPORT_PROGRESS = document.getElementById("exportProgress");
 function showExportProgress() {
   EXPORT_PROGRESS.classList.add("show");
+  var bar = document.querySelector(".export-progress-bar");
+  if (bar) { bar.style.width = "0%"; bar.classList.add("indeterminate"); }
 }
 function hideExportProgress() {
   EXPORT_PROGRESS.classList.remove("show");
+}
+function _setExportStage(msg) {
+  var el = document.querySelector(".export-progress-text");
+  if (el) el.textContent = msg;
+  document.querySelector(".export-progress-bar")?.classList.add("indeterminate");
+}
+function _setExportProgress(pct) {
+  var bar = document.querySelector(".export-progress-bar");
+  if (!bar) return;
+  bar.classList.remove("indeterminate");
+  bar.style.width = Math.min(100, Math.max(0, pct * 100)) + "%";
 }
 async function generateBlobWithProgress() {
   showExportProgress();
@@ -2440,54 +2843,16 @@ async function generateBlobWithProgress() {
   }
 }
 
-function drawRoundedRect(ctx, x, y, w, h, r) {
-  const radius = Math.min(r || 0, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + w - radius, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-  ctx.lineTo(x + w, y + h - radius);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-  ctx.lineTo(x + radius, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-}
-
-function loadImage(src) {
-  return new Promise((resolve) => {
-    if (!src) { resolve(null); return; }
-    const img = new Image();
-    img.onload = function () { resolve(img); };
-    img.onerror = function () { resolve(null); };
-    img.src = src;
-  });
-}
-
-async function createExportBackground(card, cw, ch, scale) {
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(cw * scale);
-  canvas.height = Math.round(ch * scale);
-  const ctx = canvas.getContext("2d");
-  const radius = useRounded ? parseFloat(getComputedStyle(card).borderTopLeftRadius) || 0 : 0;
-
-  ctx.save();
-  ctx.scale(scale, scale);
-  drawRoundedRect(ctx, 0, 0, cw, ch, radius);
-  ctx.clip();
-  const img = await loadImage(getCardBgImage());
-  if (img) ctx.drawImage(img, 0, 0, cw, ch);
-  ctx.restore();
-  return canvas;
-}
-
 async function generateBlob() {
   if (!window.html2canvas) throw new Error("not loaded");
+  var cacheKey = document.getElementById("sta").value + "|" + curP + "|" + curTone;
+  if (_pngCache && _pngCache.key === cacheKey && Date.now() - _pngCache.ts < 86400000) {
+    return _pngCache.blob;
+  }
   const card = document.getElementById("card");
   const cw = card.offsetWidth;
   const ch = card.offsetHeight;
-  const scale = 3;
+  const scale = 2;
   const bgUrl = getCardBgImage();
   const opt = {
     backgroundColor: null,
@@ -2511,74 +2876,274 @@ async function generateBlob() {
   const canvas = await html2canvas(card, opt);
   return new Promise(function (resolve, reject) {
     canvas.toBlob(function (blob) {
-      if (blob) resolve(blob);
-      else reject(new Error("blob"));
+      if (blob) {
+        _pngCache = { blob: blob, key: cacheKey, ts: Date.now() };
+        resolve(blob);
+      } else {
+        _pngCache = null;
+        reject(new Error("blob"));
+      }
     });
   });
 }
 
+// Animated WebM path: canvas.captureStream + MediaRecorder with frequency-driven waveform bars.
+// Only used when _cardWaveform exists (built-in mic recording with audio data).
+// Falls back to static ffmpeg path on any error.
+async function _generateAnimatedWebm(blob, cacheKey) {
+  _generatingWebm = true;
+  _setExportStage("Preparing animation\u2026");
+  try {
+    await window.ensureHtml2canvas();
+    if (!window.html2canvas) throw new Error("html2canvas not loaded");
+    var card = document.getElementById("card");
+    var cw = card.offsetWidth;
+    var ch = card.offsetHeight;
+    var scale = 2;
+    var bgUrl = getCardBgImage();
+
+    // Capture card-wv position relative to card for canvas overlay.
+    // Use the content box (subtract left/right padding) so the drawn bars match
+    // the live DOM bars. When an occasion image is present, .card-wv gets a
+    // right padding (occasions.css) that keeps the live bars clear of the image;
+    // reading that same padding here stops the exported bars overlapping it.
+    var cardWvEl = document.getElementById("cardWv");
+    var cardRect = card.getBoundingClientRect();
+    var wvRect = cardWvEl.getBoundingClientRect();
+    var wvCs = getComputedStyle(cardWvEl);
+    var wvPadL = parseFloat(wvCs.paddingLeft) || 0;
+    var wvPadR = parseFloat(wvCs.paddingRight) || 0;
+    var wvX = Math.round((wvRect.left - cardRect.left + wvPadL) * scale);
+    var wvY = Math.round((wvRect.top - cardRect.top) * scale);
+    var wvW = Math.round((wvRect.width - wvPadL - wvPadR) * scale);
+    var wvH = Math.round(wvRect.height * scale);
+    if (wvW < 10 || wvH < 4) throw new Error("Waveform container too small");
+
+    // Capture card base WITHOUT waveform bars (opacity:0 in clone — keeps layout)
+    var baseCanvas = await html2canvas(card, {
+      backgroundColor: null, scale: scale, logging: false, useCORS: true,
+      x: 0, y: 0, width: cw, height: ch,
+      onclone: function(doc) {
+        var c = doc.getElementById("card");
+        var bg = doc.getElementById("cardBg");
+        var wv = doc.getElementById("cardWv");
+        if (c) { c.style.backgroundImage = "url(" + bgUrl + ")"; c.style.backgroundSize = "100% 100%"; }
+        if (bg) bg.style.display = "none";
+        if (wv) wv.style.opacity = "0";
+      }
+    });
+
+    // Setup audio processing pipeline
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') { try { await audioCtx.resume(); } catch(ce) {} }
+    var audioBuffer = await audioCtx.decodeAudioData(await blob.arrayBuffer());
+    var source = audioCtx.createBufferSource();
+    source.buffer = audioBuffer;
+    var analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    var dest = audioCtx.createMediaStreamDestination();
+    source.connect(dest);
+
+    // Animation canvas
+    var animCanvas = document.createElement("canvas");
+    animCanvas.width = baseCanvas.width;
+    animCanvas.height = baseCanvas.height;
+    var ctx = animCanvas.getContext("2d");
+    ctx.drawImage(baseCanvas, 0, 0);
+
+    // Combine video + audio streams
+    var videoStream = animCanvas.captureStream(30);
+    var audioTrack = dest.stream.getAudioTracks()[0];
+    if (!audioTrack) throw new Error("No audio track from destination");
+    videoStream.addTrack(audioTrack);
+
+    var duration = audioBuffer.duration;
+    if (!duration || duration < 0.1) throw new Error("Audio too short");
+    var barCount = 35;
+    var col = PALS[curP];
+    var freqData = new Uint8Array(analyser.frequencyBinCount);
+    var gap = Math.round(1.5 * scale);
+    var barTotalWidth = Math.max(1, (wvW - (barCount - 1) * gap) / barCount);
+    var binSize = freqData.length / barCount;
+
+    _setExportStage("Recording animation\u2026");
+    source.start(0);
+
+    return new Promise(function(resolve, reject) {
+      var chunks = [];
+      var rec = new MediaRecorder(videoStream, { mimeType: webmCodecString });
+      rec.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      rec.onstop = function() {
+        clearInterval(_animTimer);
+        var webmBlob = new Blob(chunks, { type: 'video/webm' });
+        try { audioCtx.close(); } catch(ce) {}
+        _generatingWebm = false;
+        // If the recorder produced no data, don't cache or return an empty blob —
+        // reject so generateWebm() falls back to the static ffmpeg path instead of
+        // handing back a 0-byte file that downloads but won't open.
+        if (!webmBlob.size) { reject(new Error("Animated WebM produced 0 bytes")); return; }
+        _webmCache = { blob: webmBlob, key: cacheKey, ts: Date.now() };
+        resolve(webmBlob);
+      };
+      rec.onerror = function(e) {
+        clearInterval(_animTimer);
+        try { audioCtx.close(); } catch(ce) {}
+        _generatingWebm = false;
+        reject(e);
+      };
+      rec.start(200);
+
+      var animStartTime = performance.now();
+      var _animTimer = setInterval(function() {
+        analyser.getByteFrequencyData(freqData);
+
+        // Full redraw: clear + base + animated bars
+        ctx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+        ctx.drawImage(baseCanvas, 0, 0);
+
+        for (var i = 0; i < barCount; i++) {
+          var sum = 0;
+          var s = Math.floor(i * binSize);
+          var e = Math.floor((i + 1) * binSize);
+          for (var j = s; j < e; j++) sum += freqData[j];
+          var avg = sum / (e - s);
+          var norm = avg / 255;
+          var barHeight = Math.max(4, Math.round(norm * wvH));
+          var bx = wvX + Math.round(i * (barTotalWidth + gap));
+          var by = wvY + wvH - barHeight;
+          ctx.globalAlpha = 0.3 + norm * 0.5;
+          ctx.fillStyle = col;
+          ctx.fillRect(bx, by, Math.max(1, Math.round(barTotalWidth)), barHeight);
+        }
+        ctx.globalAlpha = 1;
+
+        // Update progress
+        var elapsed = (performance.now() - animStartTime) / 1000;
+        _setExportProgress(Math.min(elapsed / duration, 0.95));
+
+        // Stop when audio duration is reached
+        if (elapsed >= duration) {
+          clearInterval(_animTimer);
+          setTimeout(function() { if (rec.state !== 'inactive') try { rec.stop(); } catch(ce) {} }, 200);
+        }
+      }, 33); // ~30fps
+
+      // Safety timeout
+      setTimeout(function() {
+        if (rec.state !== 'inactive') {
+          clearInterval(_animTimer);
+          try { rec.stop(); } catch(ce) {}
+        }
+      }, (duration + 3) * 1000);
+    });
+  } catch(e) {
+    _generatingWebm = false;
+    throw e;
+  }
+}
+
 async function generateWebm() {
   if (!audioBlob || !webmCodecString) throw new Error("No audio or unsupported browser");
+  if (_generatingWebm) throw new Error("Already generating WebM");
+  var cacheKey = audioBlob.size + "|" + document.getElementById("sta").value + "|" + curP + "|" + curTone;
+  if (_webmCache && _webmCache.key === cacheKey && Date.now() - _webmCache.ts < 86400000) {
+    return _webmCache.blob;
+  }
+  _webmCache = null;
+
+  // Animated path: when real audio waveform data is available (built-in mic recording)
+  if (_cardWaveform) {
+    try {
+      return await _generateAnimatedWebm(audioBlob, cacheKey);
+    } catch(e) {
+      console.warn("[WebM] Animated path failed, falling back to static:", e);
+      // Fall through to static ffmpeg path
+    }
+  }
+
+  // Static path: existing ffmpeg loop approach
   await window.ensureHtml2canvas();
   if (!window.html2canvas) throw new Error("html2canvas not loaded");
-  await document.fonts.ready;
   var card = document.getElementById("card");
   var cw = card.offsetWidth;
   var ch = card.offsetHeight;
+  var scale = 2;
   var bgUrl = getCardBgImage();
   var canvas = await html2canvas(card, {
     backgroundColor: null,
-    scale: 1,
+    scale: scale,
     logging: false,
     useCORS: true,
     x: 0, y: 0, width: cw, height: ch,
     onclone: function(doc) {
       var c = doc.getElementById("card");
-      if (c) {
-        c.style.backgroundImage = "url(" + bgUrl + ")";
-        c.style.backgroundSize = "100% 100%";
-      }
       var bg = doc.getElementById("cardBg");
+      if (c) { c.style.backgroundImage = "url(" + bgUrl + ")"; c.style.backgroundSize = "100% 100%"; }
       if (bg) bg.style.display = "none";
     }
   });
-  var videoStream = canvas.captureStream(1);
-  var videoTrack = videoStream.getVideoTracks()[0];
-  var audioCtx = new AudioContext();
-  var arrayBuffer = await audioBlob.arrayBuffer();
-  var audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-  var dest = audioCtx.createMediaStreamDestination();
-  var source = audioCtx.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(dest);
-  var combinedStream = new MediaStream([
-    videoTrack,
-    dest.stream.getAudioTracks()[0]
-  ]);
-  return new Promise(function(resolve, reject) {
-    var chunks = [];
-    var recorder = new MediaRecorder(combinedStream, { mimeType: webmCodecString });
-    recorder.ondataavailable = function(e) {
-      if (e.data.size > 0) chunks.push(e.data);
-    };
-    recorder.onstop = function() {
-      audioCtx.close();
-      videoTrack.stop();
-      resolve(new Blob(chunks, { type: "video/webm" }));
-    };
-    recorder.onerror = function(e) {
-      audioCtx.close();
-      videoTrack.stop();
-      reject(e);
-    };
-    recorder.start();
-    source.start(0);
-    source.onended = function() {
-      if (recorder.state !== "inactive") recorder.stop();
-    };
+  var pngBlob = await new Promise(function(resolve, reject) {
+    canvas.toBlob(function(b) {
+      if (b) resolve(b);
+      else reject(new Error("PNG frame failed"));
+    });
   });
+  _setExportStage("Loading encoder\u2026");
+  var ffmpeg = await _loadFfmpeg();
+  _setExportStage("Encoding video\u2026");
+  var ext = audioBlob.type && (audioBlob.type.includes('mp4') || audioBlob.type.includes('aac') || audioBlob.type.includes('m4a')) ? '.mp4' : '.webm';
+  await ffmpeg.writeFile('frame.png', new Uint8Array(await pngBlob.arrayBuffer()));
+  await ffmpeg.writeFile('audio' + ext, new Uint8Array(await audioBlob.arrayBuffer()));
+  await ffmpeg.exec(['-loop','1','-i','frame.png','-i','audio' + ext,'-c:v','libvpx','-c:a','libopus','-shortest','-r','30','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2','out.webm'], undefined, function(p) { if (p && typeof p.progress === 'number') _setExportProgress(p.progress); });
+  _setExportStage("Finalizing\u2026");
+  var data = await ffmpeg.readFile('out.webm');
+  var webmBlob = new Blob([data], { type: 'video/webm' });
+  // Never return/cache an empty export — a 0-byte file downloads but won't open.
+  if (!webmBlob.size) throw new Error("WebM export produced 0 bytes");
+  _webmCache = {
+    blob: webmBlob,
+    key: audioBlob.size + "|" + document.getElementById("sta").value + "|" + curP + "|" + curTone,
+    ts: Date.now()
+  };
+  return webmBlob;
 }
 
+var _activeModalEl = null;
+function _trapFocus(e) {
+  if (e.key !== 'Tab') return;
+  if (!_activeModalEl) return;
+  var f = _activeModalEl.querySelectorAll('button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+function _activateModal(el) {
+  if (_activeModalEl && _activeModalEl !== el) {
+    var prev = _activeModalEl;
+    prev.classList.remove("open");
+    document.body.classList.remove("modal-open");
+  }
+  _activeModalEl = el;
+  document.addEventListener("keydown", _trapFocus);
+  var f = el.querySelectorAll('button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (f.length) setTimeout(function() { f[0].focus(); }, 100);
+}
+function _deactivateModal() {
+  document.removeEventListener("keydown", _trapFocus);
+  _activeModalEl = null;
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key !== "Escape") return;
+  var openModals = document.querySelectorAll(".share-modal.open, .upgrade-modal.open, .sl-modal.open, .dl-choice.open");
+  if (openModals.length) {
+    openModals.forEach(function(m) { m.classList.remove("open"); });
+    document.body.classList.remove("modal-open");
+    _deactivateModal();
+  }
+});
 // Spacebar record toggle
 document.addEventListener("keydown", (e) => {
   if (e.key !== " " && e.key !== "Spacebar") return;
@@ -2591,7 +3156,7 @@ document.addEventListener("keydown", (e) => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-        if (!fullTx) showToast("We didn't catch that — check your mic and try again");
+        if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
@@ -2657,6 +3222,29 @@ window.ensureHtml2canvas = (function () {
   };
 })();
 
+// ffmpeg.wasm lazy loader — single-threaded WASM build from CDN.
+// Loaded on hover (preloader) so it's ready by the time the user clicks.
+let _ffmpegInstance = null;
+let _ffmpegPromise = null;
+async function _loadFfmpeg() {
+  if (_ffmpegInstance) return _ffmpegInstance;
+  if (_ffmpegPromise) return _ffmpegPromise;
+  _ffmpegPromise = (async () => {
+    const { FFmpeg } = await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+    const { toBlobURL } = await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+    const ffmpeg = new FFmpeg();
+    const base = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    await ffmpeg.load({
+      coreURL: await toBlobURL(base + '/ffmpeg-core.js', 'text/javascript'),
+      wasmURL: await toBlobURL(base + '/ffmpeg-core.wasm', 'application/wasm'),
+      classWorkerURL: await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/worker.js', 'text/javascript'),
+    });
+    _ffmpegInstance = ffmpeg;
+    return ffmpeg;
+  })();
+  try { return await _ffmpegPromise; }
+  catch (e) { _ffmpegPromise = null; throw e; }
+}
 (function wireLazyLoad() {
   const triggers = ["dlBtn", "btnS", "btnC"];
   const events = ["pointerenter", "focusin", "touchstart"];

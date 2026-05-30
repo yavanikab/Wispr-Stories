@@ -1,6 +1,6 @@
 /* TYPOGRAPHY */
 .hl-eye {
-  font-size: 9px;
+  font-size: clamp(9px, 0.2vw + 8px, 10px);
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -55,7 +55,7 @@
   line-height: 1.5;
 }
 .intro {
-  font-size: 12px;
+  font-size: clamp(12px, 0.3vw + 11px, 13px);
   color: var(--ink2);
   line-height: 1.65;
   padding-left: 14px;
@@ -71,7 +71,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  font-size: 13px;
+  font-size: clamp(13px, 0.3vw + 12px, 14px);
   color: var(--ink2);
   background: var(--cream2);
   border: 1px solid var(--rule);
@@ -102,7 +102,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: clamp(18px, 0.5vw + 16px, 20px);
   line-height: 1;
   color: var(--ink3);
   background: transparent;
@@ -125,7 +125,7 @@
    than legal fine-print. Reversible: revert this block to restore the
    uppercase tracking. */
 .lbl {
-  font-size: 14px;
+  font-size: clamp(14px, 0.3vw + 13px, 15px);
   font-weight: 600;
   letter-spacing: -0.005em;
   color: var(--ink);

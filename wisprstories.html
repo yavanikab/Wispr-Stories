@@ -101,8 +101,17 @@
         localStorage.getItem("theme") === "dark" ||
         (!localStorage.getItem("theme") &&
           matchMedia("(prefers-color-scheme:dark)").matches)
-      )
+      ) {
         document.documentElement.classList.add("dark");
+        document.documentElement.classList.add("theme-init-dark");
+      }
+      document.addEventListener("DOMContentLoaded", function() {
+        var tt = document.getElementById("themeToggle");
+        if (tt && document.documentElement.classList.contains("dark")) {
+          tt.setAttribute("aria-pressed", "true");
+          tt.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        }
+      });
       /* First-paint policy: render English defaults immediately rather than
          hiding the document until i18n loads. Non-English users may see a
          very brief flash of English on slow connections before the strings
@@ -130,7 +139,7 @@
     />
     <!-- Indian scripts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Serif+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Serif+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Serif+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Serif+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Serif+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Serif+Malayalam:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&family=Noto+Serif+Gurmukhi:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Serif+Gujarati:wght@400;700&family=Noto+Sans+Oriya:wght@400;700&family=Noto+Serif+Oriya:wght@400;700&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Serif+Sinhala:wght@400;700&family=Anek+Devanagari:wght@400&family=Alkatra:wght@400&family=Baloo+Chettan+2:wght@400&family=Rajdhani:wght@400&family=Anek+Tamil:wght@400&family=Karla+Tamil+Inclined:wght@400&family=Catamaran:wght@400&family=Meera+Inimai&family=Anek+Telugu:wght@400&family=Akaya+Telivigala&family=Sirivennela&family=Anek+Kannada:wght@400&family=Tiro+Kannada&family=Hubballi&family=Anek+Malayalam:wght@400&family=Chilanka&family=Manjari:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Serif+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&family=Noto+Serif+Bengali:wght@400;700&family=Noto+Sans+Tamil:wght@400;700&family=Noto+Serif+Tamil:wght@400;700&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Serif+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Serif+Kannada:wght@400;700&family=Noto+Sans+Malayalam:wght@400;700&family=Noto+Serif+Malayalam:wght@400;700&family=Noto+Sans+Gurmukhi:wght@400;700&family=Noto+Serif+Gurmukhi:wght@400;700&family=Noto+Sans+Gujarati:wght@400;700&family=Noto+Serif+Gujarati:wght@400;700&family=Noto+Sans+Oriya:wght@400;700&family=Noto+Serif+Oriya:wght@400;700&family=Noto+Sans+Sinhala:wght@400;700&family=Noto+Serif+Sinhala:wght@400;700&family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Serif+Myanmar:wght@400;700&family=Noto+Sans+Javanese:wght@400&family=Anek+Devanagari:wght@400&family=Alkatra:wght@400&family=Baloo+Chettan+2:wght@400&family=Rajdhani:wght@400&family=Anek+Tamil:wght@400&family=Karla+Tamil+Inclined:wght@400&family=Catamaran:wght@400&family=Meera+Inimai&family=Anek+Telugu:wght@400&family=Akaya+Telivigala&family=Sirivennela&family=Anek+Kannada:wght@400&family=Tiro+Kannada&family=Hubballi&family=Anek+Malayalam:wght@400&family=Chilanka&family=Manjari:wght@400&display=swap"
       rel="stylesheet"
     />
     <!-- Middle East -->
@@ -192,7 +201,7 @@
     <nav class="nav">
       <a href="#top" class="nav-brand">
         <img
-          src="assets/ws-logo-bl.png"
+          src="assets/ws-logo-blwbg.png"
           alt="Wispr Stories"
           class="nav-logo"
         /><span class="nav-brand-text">Wispr Stories</span>
@@ -209,14 +218,6 @@
           <div class="lang-dropdown" id="langDropdown"></div>
           <input type="hidden" id="langSel" value="en" />
         </div>
-        <button
-          class="nav-help-btn"
-          id="helpBtn"
-          aria-label="How to use Wispr Stories"
-          title="How to use"
-        >
-          <i class="fa-solid fa-circle-question"></i>
-        </button>
         <button
           class="theme-toggle"
           id="themeToggle"
@@ -251,18 +252,9 @@
           <div>
             <div class="lbl">
               <span data-i18n="record.label">Your voice</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
-                <span class="tip" data-i18n="record.tip"
-                  >Press record and speak naturally. When you tap stop, your
-                  words appear in the text box below &mdash; ready for the
-                  card.</span
-                ></span
-              >
             </div>
             <div class="speech-lang-trigger" id="speechLangTrigger"><i class="fi fi-us"></i> <span>English</span> <span class="sl-arr"></span></div>
+            <p class="lang-reminder" id="langReminder">Select a language for an accurate card label</p>
             <div class="rec-row">
               <button class="rec-btn" id="recBtn" aria-label="Record">
                 <svg viewBox="0 0 20 20" fill="none">
@@ -303,9 +295,7 @@
               </button>
               <div>
                 <div class="rec-st" id="recSt" data-i18n="record.status" aria-live="polite" aria-atomic="true">Tap to speak</div>
-                <div class="rec-sub" id="recSub" data-i18n="record.sub">
-                  Words appear when you stop
-                </div>
+                <div class="rec-sub" id="recSub" data-i18n="record.sub"></div>
                 <div class="rec-counter" id="recCounter"></div>
               </div>
               <button class="reset-btn" id="resetBtn" aria-label="Start over — clear the form">
@@ -626,6 +616,21 @@
           <button class="dl-btn" id="dlBtn" style="display: none">
             <i class="fas fa-download"></i> <span data-i18n="download">Download card</span>
           </button>
+          <div class="voice-bar" id="voiceBar" style="display:none">
+            <label class="voice-toggle-label">
+              <span class="voice-toggle-icon">&#127908;</span>
+              <span class="voice-toggle-text" id="voiceToggleText" data-i18n="voice.attach">Attach voice</span>
+              <span class="voice-toggle-switch">
+                <input type="checkbox" id="voiceToggle" />
+                <span class="voice-toggle-slider"></span>
+              </span>
+            </label>
+            <span class="voice-toggle-info" id="voiceToggleInfo" style="display:none">
+              <span class="voice-toggle-duration" id="voiceDurationLabel"></span>
+              <button class="voice-play-btn" id="voicePlayBtn" title="Preview voice">&#9654;</button>
+              <button class="voice-rerecord-btn" id="voiceReRecordBtn" title="Re-record voice">&#8635;</button>
+            </span>
+          </div>
           <div class="card card-empty" id="card">
             <div class="card-bg" id="cardBg"></div>
             <div class="card-ghost" id="cardGhost">“</div>
@@ -646,6 +651,7 @@
                 <div class="card-voice-label" id="voiceLabel">
                   &#128395;&#65039; Story Original
                 </div>
+                <span class="source-nudge" id="sourceNudge">Tap to switch Voice/Story</span>
               </div>
               <div class="card-foot">
                 <div class="card-logo">
@@ -766,7 +772,7 @@
             data-i18n-placeholder="upgradeModal.keyPlaceholder"
             placeholder="Paste your key..."
           />
-          <button class="upgrade-modal-btn" id="upgradeKeyGo" data-i18n="upgradeModal.go">Go</button>
+          <button class="upgrade-modal-btn" id="upgradeKeyGo" data-i18n="upgradeModal.continue">Continue</button>
         </div>
         <div id="upgradeKeyMsg" class="upgrade-modal-msg"></div>
         <p class="upgrade-modal-label lost-key" data-i18n="upgradeModal.lostKey">Lost your key?</p>
@@ -782,10 +788,10 @@
           <button
             class="upgrade-modal-btn"
             id="upgradeEmailGo"
-            aria-label="Send recovery email"
+            aria-label="Submit"
             data-i18n="upgradeModal.emailSend"
           >
-            Send
+            Submit
           </button>
         </div>
         <div id="upgradeEmailMsg" class="upgrade-modal-msg"></div>
@@ -799,7 +805,7 @@
       <div class="sl-modal-content">
         <button class="sl-modal-close" id="slClose">&times;</button>
         <div class="sl-modal-title" data-i18n="speechLang.title">Select speech language</div>
-        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language for better transcription accuracy</p>
+        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language — 44 options</p>
         <div class="sl-modal-grid" id="slGrid"></div>
       </div>
     </div>
@@ -888,6 +894,19 @@
           <i class="fas fa-mug-hot"></i>
           <span class="mobile-bar-btn-label" data-i18n="mobileBar.upgrade">Upgrade</span>
         </button>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD CHOICE MODAL -->
+    <div class="dl-choice" id="dlChoice">
+      <div class="dl-choice-backdrop" id="dlChoiceBackdrop"></div>
+      <div class="dl-choice-content">
+        <button class="dl-choice-close" id="dlChoiceClose">&times;</button>
+        <div class="dl-choice-title">Download your card</div>
+        <div class="dl-choice-actions">
+          <button class="dl-choice-btn" id="dlChoicePng">&#128247; Download PNG</button>
+          <button class="dl-choice-btn dl-choice-btn-secondary" id="dlChoiceWebm">&#127916; Download WebM</button>
+        </div>
       </div>
     </div>
 

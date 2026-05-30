@@ -1,7 +1,7 @@
 let allLanguages = [];
 
 // Languages that use Latin script (wave animation is safe)
-const LATIN_LANGS = ['en', 'es', 'fr', 'pt', 'id', 'de', 'tr', 'it', 'sv'];
+const LATIN_LANGS = ['en', 'es', 'fr', 'pt', 'id', 'de', 'tr', 'it', 'sv', 'el', 'ca', 'cs', 'nl', 'da', 'fi', 'pl', 'hu', 'vi', 'ms', 'tl'];
 
 window.isLatinScript = function(code) {
   return LATIN_LANGS.indexOf(code) !== -1;
@@ -25,6 +25,7 @@ async function loadLanguages() {
       var item = document.createElement('button');
       item.className = 'lang-dropdown-item';
       item.type = 'button';
+      item.dataset.code = lang.code;
       item.onclick = function() { setLanguage(lang, btn, input); };
       if (lang.code === 'en') {
         item.textContent = lang.label;
@@ -56,7 +57,13 @@ function setLanguage(lang, btn, input) {
   if (input) input.value = lang.code;
   if (btn) {
     var btnText = document.getElementById('langBtnText');
-    if (btnText) btnText.innerHTML = '<i class="fa-solid fa-globe"></i> Language';
+    if (btnText) {
+      if (lang.code === 'en') {
+        btnText.innerHTML = '<i class="fa-solid fa-globe"></i> Lang';
+      } else {
+        btnText.innerHTML = '<i class="fa-solid fa-globe"></i> <i class="fi fi-' + lang.flagCode + '"></i>';
+      }
+    }
   }
   if (input) input.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -68,8 +75,15 @@ function setLanguage(lang, btn, input) {
     window.applyI18n(lang.i18nCode);
   }
 
+  // Update checkmark in dropdown
   var dropdown = document.getElementById('langDropdown');
-  if (dropdown) dropdown.classList.remove('open');
+  if (dropdown) {
+    var items = dropdown.querySelectorAll('.lang-dropdown-item');
+    items.forEach(function(item) { item.classList.remove('selected'); });
+    var selected = dropdown.querySelector('.lang-dropdown-item[data-code="' + lang.code + '"]');
+    if (selected) selected.classList.add('selected');
+    dropdown.classList.remove('open');
+  }
 }
 
 window.setLanguageByCode = function(code) {

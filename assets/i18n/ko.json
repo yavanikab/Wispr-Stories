@@ -18,6 +18,20 @@
     "sub": "멈추면 단어가 표시됩니다",
     "generating": "생성 중…"
   },
+
+  "speechLang": {
+    "title": "Select speech language",
+    "sub": "Choose your speaking language for better transcription accuracy",
+    "triggerLabel": "언어 설정",
+    "reminderEmpty": "음성 인식 언어 선택",
+    "reminderNative": "지원되지 않는 언어는 모국어로 처리됩니다",
+    "micDisabledNoLang": "Mic disabled",
+    "micDisabledNative": "Mic disabled",
+    "subNoLang": "Select a language to enable the mic",
+    "subNative": "Choose a different language to speak",
+    "tooltipNoLang": "Select a language to enable the mic",
+    "tooltipNative": "Mic is currently disabled for native language"
+  },
   "orText": "또는 단어를 입력하거나 붙여넣기",
   "textarea": {
     "label": "당신의 단어",
@@ -109,10 +123,10 @@
     "or": "— 또는 —",
     "haveKey": "이미 서포터 키를 가지고 계신가요?",
     "keyPlaceholder": "키를 붙여넣으세요...",
-    "go": "GO",
+    "continue": "계속",
     "lostKey": "키를 잃어버리셨나요?",
     "emailPlaceholder": "이메일 입력",
-    "emailSend": "복구 이메일 보내기",
+    "emailSend": "제출",
     "disclaimer": "Wispr Stories — Wispr Flow를 위해 만들어짐"
   },
   "capacity": {

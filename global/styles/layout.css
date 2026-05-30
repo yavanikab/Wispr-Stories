@@ -91,7 +91,7 @@
 }
 .footer p,
 .footer span {
-  font-size: 12px;
+  font-size: clamp(12px, 0.3vw + 11px, 13px);
   color: var(--ink3);
 }
 .footer a {
@@ -121,7 +121,7 @@
   opacity: 0.4;
 }
 .footer .fmenu-root {
-  font-size: 11px;
+  font-size: clamp(11px, 0.3vw + 10px, 12px);
   opacity: 0.5;
   transition: opacity 0.2s ease;
   vertical-align: middle;
@@ -130,41 +130,18 @@
 .footer .fmenu-root:focus-within {
   opacity: 1;
 }
-/* Restore script-intended colors over the .footer a / .footer a:hover rules. */
+/* Footer menu sizing and alignment overrides */
 .footer .fmenu-toggle {
-  font-size: 11px;
+  font-size: clamp(11px, 0.3vw + 10px, 12px);
   letter-spacing: 0.02em;
-  /* color: var(--fmenu-secondary); */
-}
-.footer .fmenu-toggle:hover {
-  color: oklch(from var(--fmenu-primary) calc(l + 0.1) c h);
 }
 .footer .fmenu-panel {
   min-width: 180px;
-  font-size: 12px;
+  font-size: clamp(12px, 0.3vw + 11px, 13px);
 }
 .footer .fmenu-link {
   padding: 7px 14px;
   font-size: 0.8rem;
-  color: oklch(from var(--fmenu-primary) calc(l + 0.1) calc(c - 0.16) h);
-}
-.footer .fmenu-link:hover {
-  color: var(--fmenu-secondary);
-}
-
-/* Light-mode palette — soften the purple/yellow to suit the cream surface. */
-:root:not(.dark) .footer .fmenu-root {
-  --fmenu-bg-shade-2: #f5f1e6;
-  --fmenu-bg-shade-3: rgba(26, 26, 26, 0.12);
-  --fmenu-purple: #777;
-  --fmenu-yellow: #1a1a1a;
-}
-/* Dark-mode palette — keep the menu's native dark colors but match Wispr's
-   surface tone so it blends with the footer instead of looking like an
-   embedded widget. */
-:root.dark .footer .fmenu-root {
-  --fmenu-bg-shade-2: #2a2a2a;
-  --fmenu-bg-shade-3: rgba(255, 255, 235, 0.12);
 }
 
 /* Show on mobile (the script hides itself at <=768px). On mobile the menu
