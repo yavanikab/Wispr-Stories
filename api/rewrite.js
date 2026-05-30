@@ -205,8 +205,8 @@ export default async function handler(req) {
     // STRICT RULE: inclusionai/ling-2.6-flash is ONLY for verified pro users.
     // It must never appear in the free-user model list under any circumstance.
     const models = isPro
-      ? ['inclusionai/ling-2.6-flash']          // paid model — pro users only
-      : ['qwen/qwen3-14b:free', 'qwen/qwen3-8b:free'];  // free models with fallback
+      ? ['inclusionai/ling-2.6-flash', 'sao10k/l3-lunaris-8b']  // pro: primary + fallback
+      : ['google/gemma-4-31b-it:free', 'moonshotai/kimi-k2.6:free', 'google/gemma-4-26b-a4b-it:free'];  // free: 3-model chain
     let lastError = null;
     let data = null;
 
