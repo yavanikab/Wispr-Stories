@@ -10,32 +10,32 @@
     "quote": "\"기억을 붙잡으세요; 기억이 당신을 붙잡아 줄 것입니다.\""
   },
   "sharedCta": "✨ <strong>Wispr Story를 받았습니다!</strong> <em>내 카드 만들기</em>를 탭하여 자신만의 카드를 만드세요.",
-  "ffNotice": "🌐 Firefox에서는 음성 녹음이 지원되지 않습니다. Chrome이나 Safari를 사용하세요 — 또는 아래에 텍스트를 붙여넣으세요.",
+  "ffNotice": "🌐 Firefox에서는 음성 녹음이 지원되지 않습니다. Chrome이나 Safari를 사용하세요, 또는 아래에 텍스트를 붙여넣으세요.",
   "record": {
     "label": "당신의 목소리",
-    "tip": "녹음을 누르고 자연스럽게 말하세요. 단어가 실시간으로 표시됩니다. 다시 탭하여 중지 — 단어가 카드 준비를 위해 텍스트 상자로 이동합니다.",
+    "tip": "녹음을 누르고 자연스럽게 말하세요. 단어가 실시간으로 표시됩니다. 다시 탭하여 중지. 단어가 카드 준비를 위해 텍스트 상자로 이동합니다.",
     "status": "탭하여 말하기",
     "sub": "멈추면 단어가 표시됩니다",
     "generating": "생성 중…"
   },
-
   "speechLang": {
-    "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy",
+    "title": "음성 언어 선택",
+    "sub": "말하기 언어 선택: 44개 옵션",
     "triggerLabel": "언어 설정",
     "reminderEmpty": "음성 인식 언어 선택",
     "reminderNative": "지원되지 않는 언어는 모국어로 처리됩니다",
-    "micDisabledNoLang": "Mic disabled",
-    "micDisabledNative": "Mic disabled",
-    "subNoLang": "Select a language to enable the mic",
-    "subNative": "Choose a different language to speak",
-    "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "micDisabledNoLang": "마이크 비활성화",
+    "micDisabledNative": "마이크 비활성화",
+    "subNoLang": "마이크를 사용하려면 언어를 선택하세요",
+    "subNative": "다른 언어를 선택하여 말하세요",
+    "tooltipNoLang": "마이크를 사용하려면 언어를 선택하세요",
+    "tooltipNative": "모국어에 대해 마이크가 비활성화되었습니다",
+    "filter": "언어 검색…"
   },
   "orText": "또는 단어를 입력하거나 붙여넣기",
   "textarea": {
     "label": "당신의 단어",
-    "tip": "위의 녹음을 먼저 사용하세요 — 단어가 자동으로 여기에 표시됩니다. 또는 직접 입력하세요. 또는 Wispr Flow에서 붙여넣으세요. 어떤 언어든 여기에서 작동합니다.",
+    "tip": "위의 녹음을 먼저 사용하세요. 단어가 자동으로 여기에 표시됩니다. 또는 직접 입력하세요. 또는 Wispr Flow에서 붙여넣으세요. 어떤 언어든 여기에서 작동합니다.",
     "placeholder": "목소리를 녹음하거나 아무거나 입력하세요: 생일 축하, 추억, 레시피, 연애 편지, 감사, 조언..."
   },
   "resetBtn": "모두 초기화",
@@ -52,7 +52,7 @@
   },
   "tone": {
     "label": "톤",
-    "tip": "원본은 당신의 말을 그대로 유지합니다 — 무제한, 일일 제한 없음. 다른 톤은 AI로 다시 씁니다: 따뜻함은 부드럽고, 대담함은 직설적이며, 시적임은 리듬으로 흐르고, 장난스러움은 가볍고, 사색적임은 느리며, 정직함은 날것입니다. 글자 간격과 기울기만 변경 — 크기나 굵기는 변경하지 않습니다.",
+    "tip": "원본은 당신의 말을 그대로 유지합니다, 무제한, 일일 제한 없음. 다른 톤은 AI로 다시 씁니다: 따뜻함은 부드럽고, 대담함은 직설적이며, 시적임은 리듬으로 흐르고, 장난스러움은 가볍고, 사색적임은 느리며, 정직함은 날것입니다. 글자 간격과 기울기만 변경, 크기나 굵기는 변경하지 않습니다.",
     "original": "원본",
     "warm": "따뜻함",
     "bold": "대담함",
@@ -82,29 +82,36 @@
     "sharp": "날카로운 모서리",
     "rounded": "둥근 모서리"
   },
+  "fontSize": {
+    "label": "글자 크기",
+    "tip": "짧은 카드 텍스트를 크게 만들어 카드를 보기 좋게 채웁니다. 카드 텍스트가 짧을 때만 사용할 수 있습니다.",
+    "info": "카드 텍스트가 85자 미만일 때만 사용할 수 있습니다",
+    "infoOn": "카드 텍스트가 짧습니다: + 또는 −를 눌러 크기를 조정하세요"
+  },
   "actions": {
     "create": "카드 만들기",
     "share": "카드 공유",
     "createTone": "{tone} 톤으로 카드 만들기"
   },
-    "rewrite": {
-    "left": "{n} {tone} rewrite left today",
-    "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
-  },"closing": "당신의 목소리, 아름답게 공유되었습니다",
+  "rewrite": {
+    "left": "오늘 {tone} 재작성 {n}회 남음",
+    "plural": "오늘 {tone} 재작성 {n}회 남음",
+    "exhausted": "오늘 {tone} 재작성 0회 남음. 다른 톤을 시도하세요"
+  },
+  "closing": "당신의 목소리, 아름답게 공유되었습니다",
   "preview": {
     "label": "실시간 미리보기"
   },
   "upgrade": "업그레이드",
   "download": "카드 다운로드",
-  "cardEmpty": "세부정보를 입력하세요 —<br />카드가 여기에 표시됩니다",
+  "cardEmpty": "세부정보를 입력하세요,<br />카드가 여기에 표시됩니다",
   "cardPlaceholder": "말하거나 입력하는 동안 여기에 이야기가 표시됩니다.",
   "wcta": {
-    "text": "입력하는 곳 어디에서나 음성을 사용하세요 — WhatsApp, Gmail, Slack, 어떤 앱이든.",
+    "text": "입력하는 곳 어디에서나 음성을 사용하세요: WhatsApp, Gmail, Slack, 어떤 앱이든.",
     "link": "Wispr Flow를 무료로 사용해 보세요 →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — 를 위해 만든 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "독립 프로젝트 · Wispr Flow와 제휴하지 않음",
     "copyright": "© 2026"
   },
@@ -120,14 +127,14 @@
     "title": "Pro로 업그레이드",
     "sub": "무제한 톤 다시 쓰기. 더 이상 일일 제한 없음.",
     "buyCoffee": "☕ 커피 한 잔 사주세요",
-    "or": "— 또는 —",
+    "or": "또는",
     "haveKey": "이미 서포터 키를 가지고 계신가요?",
     "keyPlaceholder": "키를 붙여넣으세요...",
     "continue": "계속",
     "lostKey": "키를 잃어버리셨나요?",
     "emailPlaceholder": "이메일 입력",
     "emailSend": "제출",
-    "disclaimer": "Wispr Stories — Wispr Flow를 위해 만들어짐"
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
     "title": "사랑이 넘쳐납니다!",
@@ -138,9 +145,9 @@
   "onboarding": {
     "title": "Wispr Stories에 오신 것을 환영합니다",
     "step1": "메시지를 <strong>말하거나 입력</strong>하세요. 마이크를 탭하거나 텍스트를 붙여넣으세요.",
-    "step2": "카드를 <strong>맞춤 설정</strong>하세요 — 톤, 색상, 모서리 스타일을 선택하세요.",
-    "step3": "<strong>만들고 공유</strong>하세요 — PNG로 다운로드하거나 소셜 플랫폼에서 직접 공유하세요.",
-    "gotIt": "알겠습니다 — 시작해요!",
+    "step2": "카드를 <strong>맞춤 설정</strong>하세요: 톤, 색상, 모서리 스타일을 선택하세요.",
+    "step3": "<strong>만들고 공유</strong>하세요: PNG로 다운로드하거나 소셜 플랫폼에서 직접 공유하세요.",
+    "gotIt": "알겠습니다, 시작해요!",
     "hint": "나중에 도움이 필요하신가요? 상단 바의 ❓ 아이콘을 탭하세요."
   },
   "mobileBar": {
@@ -150,36 +157,36 @@
   },
   "toasts": {
     "downloaded": "다운로드 완료!",
-    "exportFailed": "내보내기 실패 — 다시 시도하세요",
-    "uploadFailed": "업로드 실패 — 다시 시도하세요",
+    "exportFailed": "내보내기 실패. 다시 시도하세요",
+    "uploadFailed": "업로드 실패. 다시 시도하세요",
     "linkCopied": "링크 복사 완료!",
     "copyFailed": "링크를 복사할 수 없습니다",
-    "imageSaved": "이미지 저장 완료 — 붙여넣으려면 사진을 열으세요",
-    "downloadFailed": "다운로드 실패 — 공유를 시도하세요",
+    "imageSaved": "이미지 저장 완료. 붙여넣으려면 사진을 열으세요",
+    "downloadFailed": "다운로드 실패. 공유를 시도하세요",
     "imageCopied": "이미지 복사 완료!",
     "imageSavedDownloads": "이미지가 다운로드에 저장되었습니다",
-    "copyNotSupported": "복사가 지원되지 않습니다 — 다운로드를 시도하세요",
-    "cardReady": "카드 준비 완료 — 다운로드하려면 공유를 탭하세요",
+    "copyNotSupported": "복사가 지원되지 않습니다. 다운로드를 시도하세요",
+    "cardReady": "카드 준비 완료. 다운로드하려면 공유를 탭하세요",
     "speakFirst": "먼저 이야기를 말하거나 쓰세요",
-    "dailyRewritesUsed": "일일 다시 쓰기 사용 완료 — 원본으로 표시",
+    "dailyRewritesUsed": "일일 다시 쓰기 사용 완료. 원본으로 표시",
     "rewriteLimit": "일일 다시 쓰기 제한에 도달했습니다",
-    "rewriteFailed": "다시 쓰기 실패 — 원본 표시",
+    "rewriteFailed": "다시 쓰기 실패. 원본 표시",
     "rewriteApplied": "다시 쓰기 적용 완료!",
-    "silence": "잡히지 않았습니다 — 더 크게 말해 보세요",
+    "silence": "잡히지 않았습니다. 더 크게 말해 보세요",
     "recordingWorks": "녹음이 작동합니다! 실제 전사를 위해 Deepgram 키를 추가하세요",
-    "transcriptionFailed": "전사 실패 — 'vercel dev' 실행 또는 배포 필요",
+    "transcriptionFailed": "전사 실패. 'vercel dev' 실행 또는 배포 필요",
     "voiceNotSupported": "Firefox에서 음성이 지원되지 않습니다",
-    "requiresHttps": "음성 녹음에는 HTTPS가 필요합니다 — localhost로 열거나 배포하여 사용하세요",
+    "requiresHttps": "음성 녹음에는 HTTPS가 필요합니다. Localhost로 열거나 배포하여 사용하세요",
     "safariEnglish": "Safari는 음성 인식에 영어(미국)만 지원할 수 있습니다",
-    "speechNotResponding": "음성 서비스가 응답하지 않습니다 — 다시 시도하거나 입력하세요",
-    "micDenied": "마이크 접근 거부됨 — 브라우저 설정을 확인하세요",
-    "speechUnavailable": "음성 서비스를 사용할 수 없습니다 — 대안을 시도 중...",
-    "couldNotStart": "녹음을 시작할 수 없습니다 — 입력을 시도하세요",
-    "noSpeech": "음성이 감지되지 않았습니다 — 더 크게 말해 보세요",
-    "speechError": "음성 오류 — 다시 시도하세요",
-    "noMatch": "음성을 일치시킬 수 없습니다 — 더 명확하게 말해 보세요",
+    "speechNotResponding": "음성 서비스가 응답하지 않습니다. 다시 시도하거나 입력하세요",
+    "micDenied": "마이크 접근 거부됨. 브라우저 설정을 확인하세요",
+    "speechUnavailable": "음성 서비스를 사용할 수 없습니다. 대안을 시도 중...",
+    "couldNotStart": "녹음을 시작할 수 없습니다. 입력을 시도하세요",
+    "noSpeech": "음성이 감지되지 않았습니다. 더 크게 말해 보세요",
+    "speechError": "음성 오류. 다시 시도하세요",
+    "noMatch": "음성을 일치시킬 수 없습니다. 더 명확하게 말해 보세요",
     "couldNotStartMic": "마이크를 시작할 수 없습니다",
-    "doneReview": "완료 — 단어를 검토한 후 만들기를 탭하세요",
+    "doneReview": "완료. 단어를 검토한 후 만들기를 탭하세요",
     "freeLimit": "무료 제한에 도달했습니다 ({max}/일). 더 많이 사용하려면 업그레이드하세요.",
     "proLimit": "Pro 제한에 도달했습니다 ({max}/일). 내일 다시 오세요!",
     "cumulativeLimit": "일일 오디오 시간 제한에 도달했습니다. 내일 다시 오세요!",
@@ -192,5 +199,23 @@
     "proUnlocked": "Pro가 잠금 해제되었습니다! 무제한 모든 것을 즐기세요.",
     "thankYouEmail": "감사합니다! 곧 답변드리겠습니다.",
     "validEmail": "유효한 이메일 주소를 입력하세요."
+  },
+  "voice": {
+    "attach": "음성 첨부",
+    "attached": "음성이 첨부됩니다",
+    "detached": "카드에서 음성이 제거되었습니다",
+    "textChanged": "텍스트가 변경되었습니다. 음성이 분리되었습니다. 다시 녹음하세요.",
+    "webmDone": "음성이 포함된 WebM 다운로드 완료",
+    "webmFailed": "WebM 내보내기 실패",
+    "listen": "음성 듣기",
+    "playing": "재생 중..."
+  },
+  "exportProgress": {
+    "generating": "카드 생성 중…"
+  },
+  "dlChoice": {
+    "title": "카드 다운로드",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> PNG 다운로드",
+    "webm": "<i class=\"fa-solid fa-video\"></i> WebM 다운로드"
   }
 }

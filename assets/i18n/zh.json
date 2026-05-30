@@ -10,32 +10,32 @@
     "quote": "\"抓住记忆，它们也会抓住你。\""
   },
   "sharedCta": "✨ <strong>你收到了一张 Wispr Story！</strong> 点击<em>创建我的卡片</em>来制作你自己的。",
-  "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari — 或在下方粘贴你的文字。",
+  "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari, 或在下方粘贴你的文字。",
   "record": {
     "label": "你的声音",
-    "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止 — 你的文字将移入文本框准备制作卡片。",
+    "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止. 你的文字将移入文本框准备制作卡片。",
     "status": "点击说话",
     "sub": "停止后文字会出现",
     "generating": "生成中…"
   },
-
   "speechLang": {
-    "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy",
+    "title": "选择语音语言",
+    "sub": "选择您的语音语言：44种选项",
     "triggerLabel": "设置语言",
     "reminderEmpty": "选择语音识别语言",
     "reminderNative": "不支持的语言将视为母语语言",
-    "micDisabledNoLang": "Mic disabled",
-    "micDisabledNative": "Mic disabled",
-    "subNoLang": "Select a language to enable the mic",
-    "subNative": "Choose a different language to speak",
-    "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "micDisabledNoLang": "麦克风已禁用",
+    "micDisabledNative": "麦克风已禁用",
+    "subNoLang": "选择一种语言以启用麦克风",
+    "subNative": "选择另一种语言进行语音输入",
+    "tooltipNoLang": "选择一种语言以启用麦克风",
+    "tooltipNative": "母语语言的麦克风已禁用",
+    "filter": "搜索语言…"
   },
   "orText": "或输入或粘贴你的文字",
   "textarea": {
     "label": "你的文字",
-    "tip": "先使用上方的录音功能 — 文字会自动出现在这里。或直接输入。或从 Wispr Flow 粘贴。任何语言都可以。",
+    "tip": "先使用上方的录音功能. 文字会自动出现在这里。或直接输入。或从 Wispr Flow 粘贴。任何语言都可以。",
     "placeholder": "录制你的声音或输入任何内容：生日祝福、回忆、食谱、情书、感恩、建议..."
   },
   "resetBtn": "全部重置",
@@ -52,7 +52,7 @@
   },
   "tone": {
     "label": "语气",
-    "tip": "原文保留您的原话 — 无限制，无每日上限。其他语气通过 AI 重写：温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是直白的。只改变字间距和倾斜度 — 不改变大小或粗细。",
+    "tip": "原文保留您的原话, 无限制，无每日上限。其他语气通过 AI 重写：温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是直白的。只改变字间距和倾斜度, 不改变大小或粗细。",
     "original": "原始",
     "warm": "温暖",
     "bold": "大胆",
@@ -82,29 +82,36 @@
     "sharp": "锐利边缘",
     "rounded": "圆角"
   },
+  "fontSize": {
+    "label": "字体大小",
+    "tip": "放大较短的卡片文字，使其更好地填满卡片。仅在卡片文字较短时可用。",
+    "info": "仅当卡片文字少于 85 个字符时可用",
+    "infoOn": "卡片文字较短：点按 + 或 − 调整大小"
+  },
   "actions": {
     "create": "创建卡片",
     "share": "分享卡片",
     "createTone": "创建{tone}卡片"
   },
-    "rewrite": {
-    "left": "{n} {tone} rewrite left today",
-    "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
-  },"closing": "你的声音，美好地分享",
+  "rewrite": {
+    "left": "今日剩余 {n} 次{tone}改写",
+    "plural": "今日剩余 {n} 次{tone}改写",
+    "exhausted": "今日 {tone} 改写次数已用完。试试其他语气"
+  },
+  "closing": "你的声音，美好地分享",
   "preview": {
     "label": "实时预览"
   },
   "upgrade": "升级",
   "download": "下载卡片",
-  "cardEmpty": "填写详情 —<br />你的卡片将出现在这里",
+  "cardEmpty": "填写详情,<br />你的卡片将出现在这里",
   "cardPlaceholder": "你的故事会在你说话或输入时出现在这里。",
   "wcta": {
-    "text": "在任何你打字的地方使用你的声音 — WhatsApp、Gmail、Slack、任何应用。",
+    "text": "在任何你打字的地方使用你的声音: WhatsApp、Gmail、Slack、任何应用。",
     "link": "免费试用 Wispr Flow →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — 为...而制作 <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "独立项目 · 与 Wispr Flow 无关联",
     "copyright": "© 2026"
   },
@@ -120,14 +127,14 @@
     "title": "升级到 Pro",
     "sub": "无限语气重写。不再有每日限制。",
     "buyCoffee": "☕ 请我喝杯咖啡",
-    "or": "— 或 —",
+    "or": "或",
     "haveKey": "已有支持者密钥？",
     "keyPlaceholder": "粘贴你的密钥...",
     "continue": "继续",
     "lostKey": "丢失了密钥？",
     "emailPlaceholder": "输入你的邮箱",
     "emailSend": "提交",
-    "disclaimer": "Wispr Stories — 为 Wispr Flow 制作"
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
     "title": "我们被爱淹没了！",
@@ -138,10 +145,10 @@
   "onboarding": {
     "title": "欢迎来到 Wispr Stories",
     "step1": "<strong>说话或输入</strong>你的信息。点击麦克风或粘贴文字。",
-    "step2": "<strong>自定义</strong>你的卡片 — 选择语气、颜色和边角样式。",
-    "step3": "<strong>创建和分享</strong> — 下载为 PNG 或直接分享到社交平台。",
-    "gotIt": "明白了 — 开始吧！",
-    "hint": "稍后需要帮助？点击顶部栏的 ❓ 图标。"
+    "step2": "<strong>自定义</strong>你的卡片: 选择语气、颜色和边角样式。",
+    "step3": "<strong>创建和分享</strong>: 下载为 PNG 或直接分享到社交平台。",
+    "gotIt": "明白了, 开始吧！",
+    "hint": "稍后需要帮助？点击页脚的 ❓ 图标。"
   },
   "mobileBar": {
     "create": "创建",
@@ -150,36 +157,36 @@
   },
   "toasts": {
     "downloaded": "已下载！",
-    "exportFailed": "导出失败 — 请重试",
-    "uploadFailed": "上传失败 — 请重试",
+    "exportFailed": "导出失败. 请重试",
+    "uploadFailed": "上传失败. 请重试",
     "linkCopied": "链接已复制！",
     "copyFailed": "无法复制链接",
-    "imageSaved": "图片已保存 — 打开照片应用粘贴",
-    "downloadFailed": "下载失败 — 请尝试分享",
+    "imageSaved": "图片已保存. 打开照片应用粘贴",
+    "downloadFailed": "下载失败. 请尝试分享",
     "imageCopied": "图片已复制！",
     "imageSavedDownloads": "图片已保存到下载",
-    "copyNotSupported": "不支持复制 — 请尝试下载",
-    "cardReady": "卡片已准备好 — 点击分享下载",
+    "copyNotSupported": "不支持复制. 请尝试下载",
+    "cardReady": "卡片已准备好. 点击分享下载",
     "speakFirst": "请先说话或写下你的故事",
-    "dailyRewritesUsed": "每日重写已用完 — 显示为原始",
+    "dailyRewritesUsed": "每日重写已用完. 显示为原始",
     "rewriteLimit": "已达到每日重写限制",
-    "rewriteFailed": "重写失败 — 显示原始内容",
+    "rewriteFailed": "重写失败. 显示原始内容",
     "rewriteApplied": "重写已应用！",
-    "silence": "我们没有捕捉到 — 请大声一点说话",
+    "silence": "我们没有捕捉到. 请大声一点说话",
     "recordingWorks": "录音正常！添加 Deepgram 密钥以进行真正的转录",
-    "transcriptionFailed": "转录失败 — 需要运行 'vercel dev' 或部署",
+    "transcriptionFailed": "转录失败. 需要运行 'vercel dev' 或部署",
     "voiceNotSupported": "Firefox 不支持语音",
-    "requiresHttps": "语音录制需要 HTTPS — 通过 localhost 打开或部署后使用",
+    "requiresHttps": "语音录制需要 HTTPS. 通过 localhost 打开或部署后使用",
     "safariEnglish": "Safari 可能只支持英语（美国）进行语音识别",
-    "speechNotResponding": "语音服务未响应 — 请重试或改为输入",
-    "micDenied": "麦克风访问被拒绝 — 请检查浏览器设置",
-    "speechUnavailable": "语音服务不可用 — 正在尝试替代方案...",
-    "couldNotStart": "无法开始录音 — 请尝试输入",
-    "noSpeech": "未检测到语音 — 请大声一点说话",
-    "speechError": "语音错误 — 请重试",
-    "noMatch": "无法匹配语音 — 请说得更清楚一些",
+    "speechNotResponding": "语音服务未响应. 请重试或改为输入",
+    "micDenied": "麦克风访问被拒绝. 请检查浏览器设置",
+    "speechUnavailable": "语音服务不可用. 正在尝试替代方案...",
+    "couldNotStart": "无法开始录音. 请尝试输入",
+    "noSpeech": "未检测到语音. 请大声一点说话",
+    "speechError": "语音错误. 请重试",
+    "noMatch": "无法匹配语音. 请说得更清楚一些",
     "couldNotStartMic": "无法启动麦克风",
-    "doneReview": "完成 — 检查你的文字然后点击创建",
+    "doneReview": "完成. 检查你的文字然后点击创建",
     "freeLimit": "已达到免费限制（{max}/天）。升级以获得更多。",
     "proLimit": "已达到 Pro 限制（{max}/天）。明天再来！",
     "cumulativeLimit": "已达到每日音频时间限制。明天再来！",
@@ -192,5 +199,23 @@
     "proUnlocked": "Pro 已解锁！享受无限功能。",
     "thankYouEmail": "谢谢！我会尽快回复你。",
     "validEmail": "请输入有效的邮箱地址。"
+  },
+  "voice": {
+    "attach": "附加语音",
+    "attached": "语音将附加到卡片",
+    "detached": "语音已从卡片移除",
+    "textChanged": "文本已更改。语音已分离。请重新录制以附加。",
+    "webmDone": "含语音的 WebM 已下载",
+    "webmFailed": "WebM 导出失败",
+    "listen": "收听语音",
+    "playing": "正在播放..."
+  },
+  "exportProgress": {
+    "generating": "正在生成卡片…"
+  },
+  "dlChoice": {
+    "title": "下载你的卡片",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> 下载 PNG",
+    "webm": "<i class=\"fa-solid fa-video\"></i> 下载 WebM"
   }
 }

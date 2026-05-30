@@ -65,11 +65,6 @@
   }
 }
 
-.footer-wave:focus-visible {
-  outline: 1px solid var(--ink3);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
 /* Firefox + shared-link notices replaced by the unified `.notice` slot;
    see typography.css. The old .ff-notice / .shared-cta classes are gone
    from the HTML — no styles needed here. */

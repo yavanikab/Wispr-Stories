@@ -10,32 +10,32 @@
     "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
   },
   "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
-  "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari — o incolla il tuo testo qui sotto.",
+  "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari, o incolla il tuo testo qui sotto.",
   "record": {
     "label": "La tua voce",
-    "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare — le tue parole si spostano nella casella di testo pronte per la card.",
+    "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare. Le tue parole si spostano nella casella di testo pronte per la card.",
     "status": "Tocca per parlare",
     "sub": "Le tue parole appaiono quando ti fermi",
     "generating": "Generazione…"
   },
-
   "speechLang": {
-    "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy",
+    "title": "Seleziona lingua vocale",
+    "sub": "Scegli la tua lingua vocale: 44 opzioni",
     "triggerLabel": "Imposta lingua",
     "reminderEmpty": "Seleziona la lingua per il riconoscimento vocale",
     "reminderNative": "Le lingue non supportate saranno considerate lingua nativa",
-    "micDisabledNoLang": "Mic disabled",
-    "micDisabledNative": "Mic disabled",
-    "subNoLang": "Select a language to enable the mic",
-    "subNative": "Choose a different language to speak",
-    "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "micDisabledNoLang": "Microfono disattivato",
+    "micDisabledNative": "Microfono disattivato",
+    "subNoLang": "Seleziona una lingua per attivare il microfono",
+    "subNative": "Scegli un'altra lingua per parlare",
+    "tooltipNoLang": "Seleziona una lingua per attivare il microfono",
+    "tooltipNative": "Microfono disattivato per la lingua nativa",
+    "filter": "Cerca lingue…"
   },
   "orText": "o digita o incolla le tue parole",
   "textarea": {
     "label": "Le tue parole",
-    "tip": "Parla prima usando Registra sopra — le parole arrivano qui automaticamente. O digita direttamente. O incolla da Wispr Flow. Qualsiasi lingua funziona qui.",
+    "tip": "Parla prima usando Registra sopra. Le parole arrivano qui automaticamente. O digita direttamente. O incolla da Wispr Flow. Qualsiasi lingua funziona qui.",
     "placeholder": "Registra la tua voce o digita qualsiasi cosa: un augurio di compleanno, un ricordo, una ricetta, una lettera d'amore, gratitudine, un consiglio..."
   },
   "resetBtn": "Reimposta tutto",
@@ -52,7 +52,7 @@
   },
   "tone": {
     "label": "Tono",
-    "tip": "Originale mantiene le tue parole esatte — illimitato, senza limite giornaliero. Altri toni vengono riscritti con IA: Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione — non la dimensione o il peso.",
+    "tip": "Originale mantiene le tue parole esatte, illimitato, senza limite giornaliero. Altri toni vengono riscritti con IA: Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione, non la dimensione o il peso.",
     "original": "Originale",
     "warm": "Accogliente",
     "bold": "Audace",
@@ -82,29 +82,36 @@
     "sharp": "Bordi netti",
     "rounded": "Angoli arrotondati"
   },
+  "fontSize": {
+    "label": "Dimensione del testo",
+    "tip": "Ingrandisci il testo breve della scheda per riempirla bene. Disponibile solo quando il testo della scheda è breve.",
+    "info": "Disponibile solo quando il testo della scheda è inferiore a 85 caratteri",
+    "infoOn": "Il testo della scheda è breve: tocca + o − per regolare la dimensione"
+  },
   "actions": {
     "create": "Crea card",
     "share": "Condividi card",
     "createTone": "Crea card {tone}"
   },
-    "rewrite": {
-    "left": "{n} {tone} rewrite left today",
-    "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
-  },"closing": "La tua voce, magnificamente condivisa",
+  "rewrite": {
+    "left": "{n} {tone} riscrittura rimasta oggi",
+    "plural": "{n} {tone} riscritture rimaste oggi",
+    "exhausted": "0 {tone} riscritture rimaste oggi. Prova un altro tono"
+  },
+  "closing": "La tua voce, magnificamente condivisa",
   "preview": {
     "label": "Anteprima dal vivo"
   },
   "upgrade": "Aggiorna",
   "download": "Scarica card",
-  "cardEmpty": "Compila i dettagli —<br />la tua card apparirà qui",
+  "cardEmpty": "Compila i dettagli,<br />la tua card apparirà qui",
   "cardPlaceholder": "La tua storia appare qui mentre parli o digiti.",
   "wcta": {
-    "text": "Usa la tua voce ovunque tu digiti — WhatsApp, Gmail, Slack, qualsiasi app.",
+    "text": "Usa la tua voce ovunque tu digiti: WhatsApp, Gmail, Slack, qualsiasi app.",
     "link": "Prova Wispr Flow gratis →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — fatto per <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Progetto indipendente · Non affiliato con Wispr Flow",
     "copyright": "© 2026"
   },
@@ -120,14 +127,14 @@
     "title": "Passa a Pro",
     "sub": "Riscritture del tono illimitate. Niente più limiti giornalieri.",
     "buyCoffee": "☕ Offrimi un caffè",
-    "or": "— o —",
+    "or": "o",
     "haveKey": "Hai già una chiave sostenitore?",
     "keyPlaceholder": "Incolla la tua chiave...",
     "continue": "Continua",
     "lostKey": "Hai perso la tua chiave?",
     "emailPlaceholder": "Inserisci la tua email",
     "emailSend": "Invia",
-    "disclaimer": "Wispr Stories — creato per Wispr Flow"
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
     "title": "Siamo sommersi d'amore!",
@@ -138,10 +145,10 @@
   "onboarding": {
     "title": "Benvenuto in Wispr Stories",
     "step1": "<strong>Parla o digita</strong> il tuo messaggio. Tocca il microfono o incolla testo.",
-    "step2": "<strong>Personalizza</strong> la tua card — scegli un tono, colore e stile degli angoli.",
-    "step3": "<strong>Crea e condividi</strong> — scarica come PNG o condividi direttamente sui social.",
-    "gotIt": "Ho capito — andiamo!",
-    "hint": "Hai bisogno di aiuto dopo? Tocca l'icona ❓ nella barra superiore."
+    "step2": "<strong>Personalizza</strong> la tua card: scegli un tono, colore e stile degli angoli.",
+    "step3": "<strong>Crea e condividi</strong>: scarica come PNG o condividi direttamente sui social.",
+    "gotIt": "Ho capito, andiamo!",
+    "hint": "Hai bisogno di aiuto dopo? Tocca ❓ nel footer."
   },
   "mobileBar": {
     "create": "Crea",
@@ -150,36 +157,36 @@
   },
   "toasts": {
     "downloaded": "Scaricato!",
-    "exportFailed": "Esportazione fallita — riprova",
-    "uploadFailed": "Caricamento fallito — riprova",
+    "exportFailed": "Esportazione fallita. Riprova",
+    "uploadFailed": "Caricamento fallito. Riprova",
     "linkCopied": "Link copiato!",
     "copyFailed": "Impossibile copiare il link",
-    "imageSaved": "Immagine salvata — apri Foto per incollare",
-    "downloadFailed": "Download fallito — prova Condividi",
+    "imageSaved": "Immagine salvata. Apri Foto per incollare",
+    "downloadFailed": "Download fallito. Prova Condividi",
     "imageCopied": "Immagine copiata!",
     "imageSavedDownloads": "Immagine salvata nei download",
-    "copyNotSupported": "Copia non supportata — prova Scarica",
-    "cardReady": "Card pronta — tocca Condividi per scaricare",
+    "copyNotSupported": "Copia non supportata. Prova Scarica",
+    "cardReady": "Card pronta. Tocca Condividi per scaricare",
     "speakFirst": "Parla o scrivi prima la tua storia",
-    "dailyRewritesUsed": "Riscritture giornaliere usate — mostrato come Originale",
+    "dailyRewritesUsed": "Riscritture giornaliere usate. Mostrato come Originale",
     "rewriteLimit": "Limite giornaliero di riscritture raggiunto",
-    "rewriteFailed": "Riscrittura fallita — mostrato originale",
+    "rewriteFailed": "Riscrittura fallita. Mostrato originale",
     "rewriteApplied": "Riscrittura applicata!",
-    "silence": "Non l'abbiamo catturato — prova a parlare più forte",
+    "silence": "Non l'abbiamo catturato. Prova a parlare più forte",
     "recordingWorks": "Registrazione funzionante! Aggiungi una chiave Deepgram per la trascrizione reale",
-    "transcriptionFailed": "Trascrizione fallita — devi eseguire 'vercel dev' o distribuire",
+    "transcriptionFailed": "Trascrizione fallita. Devi eseguire 'vercel dev' o distribuire",
     "voiceNotSupported": "Voce non supportata su Firefox",
-    "requiresHttps": "La registrazione vocale richiede HTTPS — apri tramite localhost o distribuisci",
+    "requiresHttps": "La registrazione vocale richiede HTTPS. Apri tramite localhost o distribuisci",
     "safariEnglish": "Safari potrebbe supportare solo l'inglese (US) per il riconoscimento vocale",
-    "speechNotResponding": "Il servizio vocale non risponde — riprova o digita",
-    "micDenied": "Accesso al microfono negato — controlla le impostazioni del browser",
-    "speechUnavailable": "Servizio vocale non disponibile — provo un'alternativa...",
-    "couldNotStart": "Impossibile avviare la registrazione — prova a digitare",
-    "noSpeech": "Nessun parlato rilevato — prova a parlare più forte",
-    "speechError": "Errore vocale — riprova",
-    "noMatch": "Impossibile riconoscere il parlato — prova a parlare più chiaramente",
+    "speechNotResponding": "Il servizio vocale non risponde. Riprova o digita",
+    "micDenied": "Accesso al microfono negato. Controlla le impostazioni del browser",
+    "speechUnavailable": "Servizio vocale non disponibile. Provo un'alternativa...",
+    "couldNotStart": "Impossibile avviare la registrazione. Prova a digitare",
+    "noSpeech": "Nessun parlato rilevato. Prova a parlare più forte",
+    "speechError": "Errore vocale. Riprova",
+    "noMatch": "Impossibile riconoscere il parlato. Prova a parlare più chiaramente",
     "couldNotStartMic": "Impossibile avviare il microfono",
-    "doneReview": "Fatto — rivedi le tue parole poi tocca Crea",
+    "doneReview": "Fatto. Rivedi le tue parole poi tocca Crea",
     "freeLimit": "Limite gratuito raggiunto ({max}/giorno). Aggiorna per di più.",
     "proLimit": "Limite Pro raggiunto ({max}/giorno). Torna domani!",
     "cumulativeLimit": "Limite giornaliero di tempo audio raggiunto. Torna domani!",
@@ -192,5 +199,23 @@
     "proUnlocked": "Pro sbloccato! Goditi tutto illimitato.",
     "thankYouEmail": "Grazie! Ti risponderò presto.",
     "validEmail": "Inserisci un indirizzo email valido."
+  },
+  "voice": {
+    "attach": "Allega voce",
+    "attached": "La voce sarà allegata",
+    "detached": "Voce rimossa dalla card",
+    "textChanged": "Testo cambiato. Voce rimossa. Registra di nuovo per allegare.",
+    "webmDone": "WebM con voce scaricato",
+    "webmFailed": "Esportazione WebM fallita",
+    "listen": "Ascolta la voce",
+    "playing": "Riproducendo..."
+  },
+  "exportProgress": {
+    "generating": "Generazione card…"
+  },
+  "dlChoice": {
+    "title": "Scarica la tua card",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> Scarica PNG",
+    "webm": "<i class=\"fa-solid fa-video\"></i> Scarica WebM"
   }
 }

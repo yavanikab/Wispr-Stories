@@ -105,43 +105,4 @@ select {
 }
 
 /* NAV */
-.nav {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  height: 52px;
-  padding: 0 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--nav-bg);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--rule);
-}
-
-.nav-brand {
-  font-family: var(--serif);
-  font-size: clamp(17px, 0.5vw + 15px, 19px);
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-}
-
-.nav-logo {
-  height: 22px;
-  display: block;
-}
-
-.nav-brand-text {
-  font-family: var(--sans);
-  font-size: clamp(17px, 0.5vw + 15px, 19px);
-  font-weight: 700;
-  letter-spacing: -0.3px;
-  color: var(--ink);
-}
-
 /* SHELL, LEFT, RIGHT, FOOTER — defined in layout.css */

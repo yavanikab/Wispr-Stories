@@ -11,11 +11,16 @@
   background: var(--nav-bg);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--rule);
+  transition: box-shadow 0.2s;
+}
+.nav.scrolled {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .nav-right {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
 }
 .theme-toggle {
   background: transparent;
@@ -44,9 +49,8 @@
   transform: scale(0.88);
 }
 .theme-toggle:focus-visible {
-  outline: 1px solid var(--ink3);
-  outline-offset: 3px;
-  border-radius: 50%;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 .nav-brand {
   font-family: var(--serif);

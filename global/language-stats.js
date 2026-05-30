@@ -2,7 +2,7 @@
 
   var saved = localStorage.getItem('theme');
   var html = document.documentElement;
-  if (saved === 'dark') html.classList.add('dark');
+  if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) html.classList.add('dark');
   var themeToggle = document.getElementById('themeToggle');
   function setTheme(mode) {
     if (mode === 'dark') { html.classList.add('dark'); }
@@ -18,7 +18,7 @@
       setTheme(html.classList.contains('dark') ? 'light' : 'dark');
     });
   }
-  setTheme(saved === 'dark' ? 'dark' : 'light');
+  setTheme(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
 
   var LANGUAGES = [
     { code:'hi', label:'Hindi', native:'\u0939\u093F\u0928\u094D\u0926\u0940', flag:'in', region:'South Asia', speakers:600 },
@@ -68,47 +68,70 @@
   ];
 
   var REGION_PALETTE = {
-    'South Asia':              '#c48409',
-    'Europe':                  '#3b82f6',
+    'South Asia':              '#ffa946',
+    'Europe':                  '#3898ec',
     'Southeast Asia':          '#22a85a',
-    'Middle East & Central Asia': '#8b5cf6',
-    'East Asia':               '#dc2626'
+    'Middle East & Central Asia': '#886dc2',
+    'East Asia':               '#ff6c4c'
   };
 
   var REGION_CODES = Object.keys(REGION_PALETTE);
 
   var CHART = null;
-  var SORT_COL = null;
-  var SORT_STATE = 0;
+  var SORT_COL = 'total';
+  var SORT_STATE = 1;
   var regionFilter = null;
   var USAGE = { voice: {}, story: {} };
+  var fetchFailed = false;
+  var loading = true;
 
   function getRegionColor(lang) {
     return REGION_PALETTE[lang.region] || '#999';
   }
 
-  function renderRegions() {
-    var regions = {};
-    LANGUAGES.forEach(function(l) {
-      if (!regions[l.region]) regions[l.region] = [];
-      regions[l.region].push(l);
-    });
-    var html = '';
-    REGION_CODES.forEach(function(r) {
-      html += '<div class="region-group"><strong>' + r + '</strong>';
-      var langs = regions[r] || [];
-      for (var i = 0; i < langs.length; i++) {
-        if (i < langs.length - 1) {
-          html += '<span class="region-chunk">' + langs[i].label + ' \u00b7</span> ';
-        } else {
-          html += '<span class="region-chunk">' + langs[i].label + '</span>';
-        }
-      }
-      html += '</div>';
-    });
-    document.getElementById('regionList').innerHTML = html;
+  function hexToRgba(hex, alpha) {
+    var h = hex.replace('#', '');
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    var r = parseInt(h.substring(0, 2), 16);
+    var g = parseInt(h.substring(2, 4), 16);
+    var b = parseInt(h.substring(4, 6), 16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   }
-  renderRegions();
+
+  function countUp(el, target, duration) {
+    duration = duration || 600;
+    var start = parseInt(el.textContent) || 0;
+    if (start === target) { el.textContent = target; return; }
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(start + (target - start) * eased);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  var lastFetchTime = null;
+  function updateLastFetched() {
+    var updatedEl = document.getElementById('lastUpdated');
+    if (!updatedEl || fetchFailed || loading || !lastFetchTime) {
+      if (updatedEl) updatedEl.textContent = '';
+      return;
+    }
+    var elapsed = Math.floor((Date.now() - lastFetchTime) / 1000);
+    if (elapsed < 60) {
+      updatedEl.textContent = 'Last fetched just now';
+    } else if (elapsed < 3600) {
+      var mins = Math.floor(elapsed / 60);
+      updatedEl.textContent = 'Last fetched ' + mins + 'm ago';
+    } else {
+      var hours = Math.floor(elapsed / 3600);
+      updatedEl.textContent = 'Last fetched ' + hours + 'h ago';
+    }
+  }
 
   function fetchStats() {
     fetch('/api/lang-stats')
@@ -116,9 +139,14 @@
       .then(function(data) {
         USAGE.voice = data.voice || {};
         USAGE.story = data.story || {};
+        fetchFailed = false;
+        loading = false;
+        lastFetchTime = Date.now();
         updateView();
       })
       .catch(function() {
+        fetchFailed = true;
+        loading = false;
         updateView();
       });
   }
@@ -139,10 +167,50 @@
       voice += v;
       story += s;
     });
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statVoice').textContent = voice;
-    document.getElementById('statStory').textContent = story;
-    document.getElementById('statLangsUsed').textContent = langsUsed;
+    var dash = '\u2014';
+    if (fetchFailed || loading) {
+      document.getElementById('statTotal').textContent = dash;
+      document.getElementById('statVoice').textContent = dash;
+      document.getElementById('statStory').textContent = dash;
+      document.getElementById('statLangsUsed').textContent = dash;
+    } else {
+      // Remove skeleton shimmer
+      document.querySelectorAll('.skeleton').forEach(function(el) { el.classList.remove('skeleton'); });
+      countUp(document.getElementById('statTotal'), total);
+      countUp(document.getElementById('statVoice'), voice);
+      countUp(document.getElementById('statStory'), story);
+      countUp(document.getElementById('statLangsUsed'), langsUsed);
+    }
+    // Percentage split
+    var pctV = document.getElementById('pctVoice');
+    var pctS = document.getElementById('pctStory');
+    var splitV = document.getElementById('splitVoice');
+    var splitS = document.getElementById('splitStory');
+    if (!fetchFailed && !loading && total > 0) {
+      var vPct = Math.round((voice / total) * 100);
+      var sPct = 100 - vPct;
+      if (pctV) pctV.textContent = '(' + vPct + '%)';
+      if (pctS) pctS.textContent = '(' + sPct + '%)';
+      if (splitV) { splitV.style.width = vPct + '%'; }
+      if (splitS) { splitS.style.width = sPct + '%'; }
+      // Split bar count labels — only show when segment is wide enough (>12%)
+      var vcEl = document.getElementById('splitVoiceCount');
+      var scEl = document.getElementById('splitStoryCount');
+      if (vcEl) vcEl.textContent = vPct > 12 ? voice.toLocaleString() : '';
+      if (scEl) scEl.textContent = sPct > 12 ? story.toLocaleString() : '';
+    } else {
+      if (pctV) pctV.textContent = '';
+      if (pctS) pctS.textContent = '';
+      if (splitV) splitV.style.width = '0%';
+      if (splitS) splitS.style.width = '0%';
+      var vcEl = document.getElementById('splitVoiceCount');
+      var scEl = document.getElementById('splitStoryCount');
+      if (vcEl) vcEl.textContent = '';
+      if (scEl) scEl.textContent = '';
+    }
+    var errorEl = document.getElementById('fetchError');
+    if (errorEl) errorEl.style.display = fetchFailed ? 'flex' : 'none';
+    updateLastFetched();
   }
 
   function renderChart() {
@@ -164,19 +232,25 @@
 
     var labels = items.map(function(i) { return i.lang.label; });
     var data = items.map(function(i) { return i.total; });
-    var bgColors = items.map(function(i) {
+    var bgColors = items.map(function(i, idx) {
       var base = getRegionColor(i.lang);
       if (regionFilter && i.lang.region !== regionFilter) {
-        return base.replace(')', ' / 0.25)');
+        return hexToRgba(base, 0.25);
       }
-      return base;
+      if (idx === 0 && items.length > 1) {
+        return hexToRgba(base, 1);
+      }
+      return hexToRgba(base, 0.7);
     });
-    var borderColors = items.map(function(i) {
+    var borderColors = items.map(function(i, idx) {
       var base = getRegionColor(i.lang);
       if (regionFilter && i.lang.region !== regionFilter) {
-        return base.replace(')', ' / 0.15)');
+        return hexToRgba(base, 0.15);
       }
-      return base;
+      if (idx === 0 && items.length > 1) {
+        return base;
+      }
+      return hexToRgba(base, 0.5);
     });
 
     var ctx = document.getElementById('langChart').getContext('2d');
@@ -202,6 +276,10 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: {
+          duration: 800,
+          easing: 'easeOutQuart'
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -230,6 +308,9 @@
             ticks: { color: textColor, precision: 0 }
           }
         },
+        onHover: function(e, elements) {
+          e.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+        },
         onClick: function(e, elements) {
           if (elements && elements.length > 0) {
             var idx = elements[0].index;
@@ -240,18 +321,41 @@
             } else {
               regionFilter = lang.region;
             }
-            SORT_COL = null;
-            SORT_STATE = 0;
+            SORT_COL = 'total';
+            SORT_STATE = 1;
             // Defer re-render to avoid Chart.js destroy-while-processing crash
             setTimeout(function() {
               renderChart();
               renderTable();
               updateRegionBadge();
+              updateChips();
             }, 0);
           }
         }
       }
     });
+
+    var legendEl = document.getElementById('chartLegend');
+    if (legendEl) {
+      var legendHtml = '';
+      REGION_CODES.forEach(function(region) {
+        legendHtml += '<span class="legend-item" data-region="' + region + '"><span class="legend-swatch" style="background:' + REGION_PALETTE[region] + '"></span>' + region + '</span>';
+      });
+      legendEl.innerHTML = legendHtml;
+      // Make legend items clickable to filter by region
+      legendEl.querySelectorAll('.legend-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+          var region = this.dataset.region;
+          regionFilter = regionFilter === region ? null : region;
+          SORT_COL = 'total';
+          SORT_STATE = 1;
+          renderChart();
+          renderTable();
+          updateRegionBadge();
+          updateChips();
+        });
+      });
+    }
   }
 
   function updateRegionBadge() {
@@ -260,7 +364,8 @@
     if (!badge || !name) return;
     if (regionFilter) {
       badge.style.display = 'inline-flex';
-      name.textContent = regionFilter;
+      var count = LANGUAGES.filter(function(l) { return l.region === regionFilter; }).length;
+      name.textContent = regionFilter + ' (' + count + ' languages)';
     } else {
       badge.style.display = 'none';
     }
@@ -292,11 +397,17 @@
     }
 
     var hasData = items.some(function(i) { return i.total > 0; });
+    // Hide table when no data
+    var tableWrap = document.getElementById('tableWrap');
+    if (tableWrap) tableWrap.style.display = hasData ? '' : 'none';
+    var badgeNote = document.querySelector('.badge-note');
+    if (badgeNote) badgeNote.style.display = hasData ? '' : 'none';
+    if (!hasData) return;
     var html = '';
     items.forEach(function(i) {
       var v = i.voice, s = i.story, t = i.total;
       var cls = t === 0 ? 'zero-row' : '';
-      html += '<tr class="' + cls + '">';
+      html += '<tr class="' + cls + '" data-region="' + i.lang.region + '">';
       html += '<td><span class="fi fi-' + i.lang.flag + '"></span>' + i.lang.label + ' <span class="native-name">' + i.lang.native + '</span></td>';
       html += '<td class="num-cell">' + (hasData ? v : '\u2014') + '</td>';
       html += '<td class="num-cell">' + (hasData ? s : '\u2014') + '</td>';
@@ -314,27 +425,233 @@
       html += '</tr>';
     }
 
+    // Totals row
+    var totV = 0, totS = 0, totT = 0;
+    items.forEach(function(i) { totV += i.voice; totS += i.story; totT += i.total; });
+    if (!regionFilter) {
+      var nv = getVoice('__native__'), ns = getStory('__native__');
+      totV += nv; totS += ns; totT += nv + ns;
+    }
+    if (totT > 0) {
+      html += '<tr class="totals-row">';
+      html += '<td><strong>Total</strong></td>';
+      html += '<td class="num-cell"><strong>' + totV + '</strong></td>';
+      html += '<td class="num-cell"><strong>' + totS + '</strong></td>';
+      html += '<td class="num-cell"><strong>' + totT + '</strong></td>';
+      html += '</tr>';
+    }
+
     document.getElementById('tableBody').innerHTML = html;
+    // Update row count
+    var countEl = document.getElementById('searchCount');
+    if (countEl) {
+      var visibleRows = document.querySelectorAll('#tableBody tr:not([style*="display: none"])').length;
+      countEl.textContent = visibleRows + ' of ' + LANGUAGES.length;
+    }
   }
 
   function updateView() {
     updateBanner();
+    updateInsights();
     renderChart();
     renderTable();
     updateRegionBadge();
   }
 
+  function updateInsights() {
+    var allItems = LANGUAGES.map(function(l) {
+      return { lang: l, total: getTotal(l.code) };
+    }).filter(function(i) { return i.total > 0; });
+    allItems.sort(function(a, b) { return b.total - a.total; });
+    var top3 = allItems.slice(0, 3);
+    var banner = document.getElementById('insightsBanner');
+    var container = document.getElementById('insightsItems');
+    if (!banner || !container) return;
+    if (top3.length === 0) {
+      banner.style.display = 'grid';
+      container.innerHTML = '<div class="insight-empty">No cards created yet — start creating to see top languages.</div>';
+      return;
+    }
+    banner.style.display = 'grid';
+    // Calculate total across all languages
+    var grandTotal = 0;
+    LANGUAGES.forEach(function(l) { grandTotal += getTotal(l.code); });
+    grandTotal += getTotal('__native__');
+    var medals = ['\uD83E\uDD47', '\uD83E\uDD48', '\uD83E\uDD49'];
+    var html = '';
+    top3.forEach(function(item, i) {
+      var pct = grandTotal > 0 ? Math.round((item.total / grandTotal) * 100) : 0;
+      html += '<div class="insight-item">';
+      html += '<span class="insight-rank">' + medals[i] + '</span>';
+      html += '<span class="insight-flag fi fi-' + item.lang.flag + '"></span>';
+      html += '<span class="insight-info">';
+      html += '<span class="insight-name">' + item.lang.label + '</span>';
+      html += '<span class="insight-count">' + item.total + ' cards (' + pct + '%)</span>';
+      html += '</span></div>';
+    });
+    container.innerHTML = html;
+  }
+
   fetchStats();
   setInterval(fetchStats, 30000);
+  setInterval(updateLastFetched, 30000);
 
   document.getElementById('clearRegionFilter')?.addEventListener('click', function() {
     regionFilter = null;
-    SORT_COL = null;
-    SORT_STATE = 0;
+    SORT_COL = 'total';
+    SORT_STATE = 1;
     renderChart();
     renderTable();
     updateRegionBadge();
+    updateChips();
   });
+
+  // Region chips
+  document.querySelectorAll('.region-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var region = this.dataset.region;
+      regionFilter = region === 'all' ? null : region;
+      SORT_COL = 'total';
+      SORT_STATE = 1;
+      renderChart();
+      renderTable();
+      updateRegionBadge();
+      updateChips();
+    });
+  });
+
+  // Table row click → filter chart by language's region
+  document.getElementById('tableBody').addEventListener('click', function(e) {
+    var row = e.target.closest('tr');
+    if (!row || !row.dataset.region) return;
+    var region = row.dataset.region;
+    regionFilter = regionFilter === region ? null : region;
+    SORT_COL = 'total';
+    SORT_STATE = 1;
+    renderChart();
+    renderTable();
+    updateRegionBadge();
+    updateChips();
+  });
+
+  function updateChips() {
+    // Update active state
+    document.querySelectorAll('.region-chip').forEach(function(chip) {
+      var region = chip.dataset.region;
+      var isActive = (region === 'all' && !regionFilter) || region === regionFilter;
+      chip.classList.toggle('active', isActive);
+    });
+    // Update counts
+    var counts = {};
+    LANGUAGES.forEach(function(l) {
+      counts[l.region] = (counts[l.region] || 0) + 1;
+    });
+    var totalLangs = LANGUAGES.length;
+    var countMap = {
+      'all': totalLangs,
+      'South Asia': counts['South Asia'] || 0,
+      'Europe': counts['Europe'] || 0,
+      'East Asia': counts['East Asia'] || 0,
+      'Southeast Asia': counts['Southeast Asia'] || 0,
+      'Middle East & Central Asia': counts['Middle East & Central Asia'] || 0
+    };
+    Object.keys(countMap).forEach(function(key) {
+      var el = document.getElementById('chip' + key.replace(/[^a-zA-Z]/g, ''));
+      if (el) el.textContent = '(' + countMap[key] + ')';
+    });
+  }
+
+  // Table search
+  var searchInput = document.getElementById('tableSearch');
+  var noResults = document.getElementById('noResults');
+  searchInput?.addEventListener('input', function() {
+    var query = this.value.toLowerCase().trim();
+    var visibleCount = 0;
+    document.querySelectorAll('#tableBody tr').forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      var match = text.includes(query);
+      row.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    });
+    if (noResults) noResults.style.display = visibleCount === 0 && query ? 'flex' : 'none';
+  });
+
+  // Zero rows toggle
+  var zeroToggle = document.getElementById('zeroToggle');
+  var showZeros = false;
+  zeroToggle?.addEventListener('change', function() {
+    showZeros = this.checked;
+    renderTable();
+  });
+
+  // Override renderTable to respect showZeros
+  var origRenderTable = renderTable;
+  renderTable = function() {
+    origRenderTable();
+    if (!showZeros) {
+      document.querySelectorAll('#tableBody tr.zero-row').forEach(function(row) {
+        row.style.display = 'none';
+      });
+    }
+    // Re-apply search filter
+    if (searchInput && searchInput.value.trim()) {
+      var query = searchInput.value.toLowerCase().trim();
+      var visibleCount = 0;
+      document.querySelectorAll('#tableBody tr').forEach(function(row) {
+        var match = row.textContent.toLowerCase().includes(query);
+        row.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      if (noResults) noResults.style.display = visibleCount === 0 ? 'flex' : 'none';
+    }
+  };
+
+  // Insights items clickable
+  document.getElementById('insightsItems')?.addEventListener('click', function(e) {
+    var item = e.target.closest('.insight-item');
+    if (!item) return;
+    var langName = item.querySelector('.insight-name')?.textContent;
+    if (!langName) return;
+    // Find the language code
+    var lang = LANGUAGES.find(function(l) { return l.label === langName; });
+    if (!lang) return;
+    // Filter table to just this language
+    searchInput.value = lang.label;
+    searchInput.dispatchEvent(new Event('input'));
+    // Scroll to table
+    document.getElementById('tableWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Show table header when data loads
+  var tableHeader = document.getElementById('tableHeader');
+  if (tableHeader) {
+    var origUpdateView = updateView;
+    updateView = function() {
+      origUpdateView();
+      var hasData = LANGUAGES.some(function(l) { return getTotal(l.code) > 0; });
+      if (tableHeader) tableHeader.style.display = hasData ? 'flex' : 'none';
+    };
+  }
+
+  // Back to top button
+  var backToTop = document.getElementById('backToTop');
+  if (backToTop) {
+    window.addEventListener('scroll', function() {
+      backToTop.classList.toggle('visible', window.scrollY > 300);
+    });
+    backToTop.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  function showToast(msg) {
+    var t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function() { t.classList.add('show'); }, 10);
+    setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 2000);
+  }
 
   document.querySelectorAll('th[data-sort]').forEach(function(th) {
     th.addEventListener('click', function() {
@@ -347,19 +664,25 @@
       }
       document.querySelectorAll('th').forEach(function(t) {
         t.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+        t.removeAttribute('aria-sort');
       });
       if (SORT_STATE !== 0) {
         th.classList.add('sorted');
-        var isLang = SORT_COL === 'lang';
         var isDesc = SORT_STATE === 1;
-        if (isLang) {
-          th.classList.add(isDesc ? 'sorted-asc' : 'sorted-desc');
-        } else {
-          th.classList.add(isDesc ? 'sorted-desc' : 'sorted-asc');
-        }
+        th.classList.add(isDesc ? 'sorted-desc' : 'sorted-asc');
+        th.setAttribute('aria-sort', isDesc ? 'descending' : 'ascending');
       }
       renderTable();
     });
   });
+
+  // Apply initial sort state to header
+  (function() {
+    var initialTh = document.querySelector('th[data-sort="' + SORT_COL + '"]');
+    if (initialTh && SORT_STATE !== 0) {
+      initialTh.classList.add('sorted', SORT_STATE === 1 ? 'sorted-desc' : 'sorted-asc');
+      initialTh.setAttribute('aria-sort', SORT_STATE === 1 ? 'descending' : 'ascending');
+    }
+  })();
 
 })();

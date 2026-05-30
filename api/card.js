@@ -55,7 +55,6 @@ export default function handler(req, res) {
 
   // Direct image URL mode: use uploaded card PNG as OG image
   const directImg = searchParams.get('img');
-  const imgParam = searchParams.get('img');
 
   let ogUrl, title, desc, sharerLine, appUrl, shareUrl;
 

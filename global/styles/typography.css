@@ -1,20 +1,4 @@
 /* TYPOGRAPHY */
-.hl-eye {
-  font-size: clamp(9px, 0.2vw + 8px, 10px);
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--ink3);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hl-eye::before {
-  content: "";
-  width: 18px;
-  height: 1px;
-  background: var(--ink3);
-}
 .hl-h1 {
   font-family: var(--serif);
   font-size: clamp(30px, 3vw, 45px);
@@ -43,26 +27,6 @@
 .wispr-flow-link:hover {
   border-bottom-color: var(--ink);
 }
-.hl-emotion {
-  font-family: var(--serif);
-  font-size: clamp(14px, 1.2vw, 18px);
-  font-weight: 400;
-  font-style: italic;
-  color: var(--ink3);
-  opacity: 0.6;
-  margin-top: 8px;
-  letter-spacing: 0.01em;
-  line-height: 1.5;
-}
-.intro {
-  font-size: clamp(12px, 0.3vw + 11px, 13px);
-  color: var(--ink2);
-  line-height: 1.65;
-  padding-left: 14px;
-  border-left: 3px solid var(--rule);
-  margin-top: 16px;
-}
-
 /* UNIFIED NOTICE SLOT — replaces the old .shared-cta and .ff-notice
    stacks. Shows one banner at a time (priority handled in JS), with a ×
    dismiss button. Hidden by default via the `hidden` attribute; JS toggles

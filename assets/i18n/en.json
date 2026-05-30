@@ -10,7 +10,7 @@
     "quote": "\"Hold onto memories; they will hold onto you.\""
   },
   "sharedCta": "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.",
-  "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari — or paste your text below.",
+  "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari, or paste your text below.",
   "record": {
     "label": "Your voice",
     "status": "Tap to speak",
@@ -19,7 +19,7 @@
   },
   "speechLang": {
     "title": "Select speech language",
-    "sub": "Choose your speaking language — 44 options",
+    "sub": "Choose your speaking language: 44 options",
     "triggerLabel": "Set language",
     "reminderEmpty": "Select a language for speech detection",
     "reminderNative": "Unsupported languages are treated as the native language",
@@ -28,12 +28,13 @@
     "subNoLang": "Select a language to enable the mic",
     "subNative": "Choose a different language to speak",
     "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "tooltipNative": "Mic is currently disabled for native language",
+    "filter": "Search languages…"
   },
   "orText": "or type or paste your words",
   "textarea": {
     "label": "Your words",
-    "tip": "Speak first using Record above — words land here automatically. Or type directly. Or paste from Wispr Flow. Any language works here.",
+    "tip": "Speak first using Record above. Words land here automatically. Or type directly. Or paste from Wispr Flow. Any language works here.",
     "placeholder": "Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
   },
   "resetBtn": "Start over",
@@ -50,7 +51,7 @@
   },
   "tone": {
     "label": "Tone",
-    "tip": "Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: Warm is gentle, Bold is direct, Poetic flows with rhythm, Playful is light, Reflective is slow, Honest is raw. Changes letter-spacing and slant only — not size or weight.",
+    "tip": "Original preserves your exact words, unlimited, no daily cap. Other tones rewrite via AI: Warm is gentle, Bold is direct, Poetic flows with rhythm, Playful is light, Reflective is slow, Honest is raw. Changes letter-spacing and slant only, not size or weight.",
     "original": "Original",
     "warm": "Warm",
     "bold": "Bold",
@@ -80,6 +81,12 @@
     "sharp": "Sharp corners",
     "rounded": "Rounded corners"
   },
+  "fontSize": {
+    "label": "Font size",
+    "tip": "Make short card text larger so it fills the card nicely. Only available while your card text is short.",
+    "info": "Available only when your card text is under 85 characters",
+    "infoOn": "Your card text is short: tap + or − to adjust the size"
+  },
   "actions": {
     "create": "Create card",
     "share": "Share card",
@@ -88,7 +95,7 @@
   "rewrite": {
     "left": "{n} {tone} rewrite left today",
     "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
+    "exhausted": "0 {tone} rewrites left today. Try another tone"
   },
   "closing": "Your voice, beautifully shared",
   "preview": {
@@ -96,10 +103,18 @@
   },
   "upgrade": "Upgrade",
   "download": "Download card",
-  "cardEmpty": "Fill the details —<br />your card appears here",
+  "exportProgress": {
+    "generating": "Generating card&hellip;"
+  },
+  "dlChoice": {
+    "title": "Download your card",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> Download PNG",
+    "webm": "<i class=\"fa-solid fa-video\"></i> Download WebM"
+  },
+  "cardEmpty": "Fill the details,<br />your card appears here",
   "cardPlaceholder": "Your story appears here as you speak or type.",
   "wcta": {
-    "text": "Use your voice anywhere you type — WhatsApp, Gmail, Slack, any app.",
+    "text": "Use your voice anywhere you type: WhatsApp, Gmail, Slack, any app.",
     "link": "Try Wispr Flow free →"
   },
   "footer": {
@@ -119,7 +134,7 @@
     "title": "Upgrade to Pro",
     "sub": "Unlimited tone rewrites. No more daily limits.",
     "buyCoffee": "☕ Buy me a coffee",
-    "or": "— or —",
+    "or": "or",
     "haveKey": "Already have a supporter key?",
     "keyPlaceholder": "Paste your key...",
     "continue": "Continue",
@@ -137,10 +152,10 @@
   "onboarding": {
     "title": "Welcome to Wispr Stories",
     "step1": "<strong>Speak or type</strong> your message. Tap the microphone or paste text.",
-    "step2": "<strong>Customize</strong> your card — choose a tone, color, and corner style.",
-    "step3": "<strong>Create & share</strong> — download as PNG or share directly on social platforms.",
-    "gotIt": "Got it — let's go!",
-    "hint": "Need help later? Tap the ❓ icon in the top bar."
+    "step2": "<strong>Customize</strong> your card: choose a tone, color, and corner style.",
+    "step3": "<strong>Create & share</strong>: download as PNG or share directly on social platforms.",
+    "gotIt": "Got it, let's go!",
+    "hint": "Need help later? Tap the ❓ in the footer."
   },
   "mobileBar": {
     "create": "Create",
@@ -149,36 +164,36 @@
   },
   "toasts": {
     "downloaded": "Downloaded!",
-    "exportFailed": "Export failed — try again",
-    "uploadFailed": "Upload failed — try again",
+    "exportFailed": "Export failed. Try again",
+    "uploadFailed": "Upload failed. Try again",
     "linkCopied": "Link copied!",
     "copyFailed": "Could not copy link",
-    "imageSaved": "Image saved — open Photos to paste",
-    "downloadFailed": "Download failed — try Share instead",
+    "imageSaved": "Image saved. Open Photos to paste",
+    "downloadFailed": "Download failed. Try Share instead",
     "imageCopied": "Image copied!",
     "imageSavedDownloads": "Image saved to downloads",
-    "copyNotSupported": "Copy not supported — try Download instead",
-    "cardReady": "Card ready — tap Share to download",
+    "copyNotSupported": "Copy not supported. Try Download instead",
+    "cardReady": "Card ready. Tap Share to download",
     "speakFirst": "Speak or write your story first",
-    "dailyRewritesUsed": "Daily rewrites used — showing as Original",
+    "dailyRewritesUsed": "Daily rewrites used. Showing as Original",
     "rewriteLimit": "Daily rewrite limit reached",
-    "rewriteFailed": "Rewrite failed — showing original",
+    "rewriteFailed": "Rewrite failed. Showing original",
     "rewriteApplied": "Rewrite applied!",
-    "silence": "We didn't catch that — try speaking louder",
+    "silence": "We didn't catch that. Try speaking louder",
     "recordingWorks": "Recording works! Add Deepgram key for real transcription",
-    "transcriptionFailed": "Transcription failed — need to run 'vercel dev' or deploy",
+    "transcriptionFailed": "Transcription failed. Need to run 'vercel dev' or deploy",
     "voiceNotSupported": "Voice not supported in Firefox",
-    "requiresHttps": "Voice recording requires HTTPS — open via localhost or deploy to use",
+    "requiresHttps": "Voice recording requires HTTPS. Open via localhost or deploy to use",
     "safariEnglish": "Safari may only support English (US) for voice recognition",
-    "speechNotResponding": "Speech service not responding — try again or type instead",
-    "micDenied": "Microphone access denied — check browser settings",
-    "speechUnavailable": "Speech service unavailable — trying alternative...",
-    "couldNotStart": "Could not start recording — try typing instead",
-    "noSpeech": "No speech detected — try speaking louder",
-    "speechError": "Speech error — try again",
-    "noMatch": "Couldn't match speech — try speaking more clearly",
+    "speechNotResponding": "Speech service not responding. Try again or type instead",
+    "micDenied": "Microphone access denied. Check browser settings",
+    "speechUnavailable": "Speech service unavailable. Trying alternative...",
+    "couldNotStart": "Could not start recording. Try typing instead",
+    "noSpeech": "No speech detected. Try speaking louder",
+    "speechError": "Speech error. Try again",
+    "noMatch": "Couldn't match speech. Try speaking more clearly",
     "couldNotStartMic": "Could not start microphone",
-    "doneReview": "Done — review your words then tap Create",
+    "doneReview": "Done. Review your words then tap Create",
     "freeLimit": "Free limit reached ({max}/day). Upgrade for more.",
     "proLimit": "Pro limit reached ({max}/day). Come back tomorrow!",
     "cumulativeLimit": "Daily audio time limit reached. Come back tomorrow!",
@@ -196,9 +211,9 @@
     "attach": "Attach voice",
     "attached": "Voice will be attached",
     "detached": "Voice removed from card",
-    "textChanged": "Text changed — voice detached. Re-record to attach.",
-    "webmDone": "WebM with voice also downloaded",
-    "webmFailed": "WebM export failed — PNG downloaded",
+    "textChanged": "Text changed. Voice detached. Re-record to attach.",
+    "webmDone": "WebM with voice downloaded",
+    "webmFailed": "WebM export failed",
     "listen": "Listen to voice",
     "playing": "Playing..."
   }

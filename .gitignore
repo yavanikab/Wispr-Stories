@@ -4,7 +4,7 @@ PENDING.md
 remotion-demo/
 assets/i18n/NATIVE-REVIEW.md
 .claude/
-serve.js
+serve.cjs
 mobile.ps1
 start-mobile.ps1
 .bak/

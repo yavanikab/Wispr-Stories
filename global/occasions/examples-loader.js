@@ -29,6 +29,7 @@ async function loadExamples() {
     LANGUAGES = await langRes.json();
     OCCASIONS = await occRes.json();
     renderRandomExamples();
+    window._examplePrompts = LANGUAGES.map(function(l) { return l.normal_example; }).filter(Boolean);
   } catch (error) {
     console.error('Error loading examples:', error);
   }

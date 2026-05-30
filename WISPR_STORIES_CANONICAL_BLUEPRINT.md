@@ -91,29 +91,29 @@ The app prioritises non-technical users first.
 | Emerald | `#059669` |
 | Ocean | `#0284c7` |
 | Rose | `#db2777` |
-| Orange | `#f97316` |
-| Teal | `#14b8a6` |
-| Fuchsia | `#d946ef` |
-| Indigo | `#6366f1` |
+| Orange | `#ea580c` |
+| Teal | `#0d9488` |
+| Fuchsia | `#c026d3` |
+| Indigo | `#4f46e5` |
 
 Card backgrounds are pre-baked WebP images at native resolution (stored in `assets/card-bgs/`). The spiral watermark is pre-rendered into each image — no CSS `mix-blend-mode` compositing needed during export.
 
 ### Typography
-- **Display / brand:** Playfair Display (serif)
-- **Body / UI:** Instrument Sans
+- **Display / brand:** Instrument Serif (serif)
+- **Body / UI:** Inter
 - **Card text:** Instrument Sans, `13px`, `weight 400`, `line-height 1.45` — locked, never varies by tone
 
 ### Tone system
 Tone changes **only** `font-style` and `letter-spacing`. Font size and weight never change.
 
-| Tone | Font style | Letter spacing | Glyph |
-|---|---|---|---|
-| Warm | Normal | 0.01em | " |
-| Bold | Normal | -0.2px | ! |
-| Poetic | Italic | 0.02em | ~ |
-| Playful | Normal | 0.02em | ♪ |
-| Reflective | Normal | 0.01em | · |
-| Honest | Normal | 0 | — |
+| Tone | Font style | Letter spacing | Icon |
+|---|---|---|---|---|
+| Warm | Normal | -0.02em | `fa-heart` |
+| Bold | Normal | -0.01em | `fa-bolt` |
+| Poetic | Normal | -0.02em | `fa-feather` |
+| Playful | Normal | -0.03em | `fa-face-smile` |
+| Reflective | Normal | -0.01em | `fa-moon` |
+| Honest | Normal | 0 | `fa-handshake` |
 
 ### Aspect ratios
 
@@ -152,11 +152,11 @@ Single column: inputs → preview → footer. The preview is not sticky on mobil
 
 ## 7. Language Support
 
-Language selection is a dropdown of 21 languages. It is **only relevant when recording** — typing and pasting work in any language without changing it.
+Speech-language selection opens a modal with 44 languages (including auto-detect) in a 2-column grid. It is **only relevant when recording** — typing and pasting work in any language without changing it.
 
-Supported languages for STT: English, Chinese (Mandarin), Hindi, Spanish, French, Portuguese, Russian, Indonesian, German, Japanese, Punjabi, Korean, Telugu, Tamil, Turkish, Italian, Thai, Gujarati, Kannada, Malayalam, Swedish. Deepgram Nova-3 fallback covers 36+ languages through auto-detection.
+Supported languages for STT: English and 43 others, routed to Deepgram Nova-3 Multilingual (32 languages) or Whisper via OpenRouter (11 languages). See `assets/languages/languages.json` for the full list.
 
-**UI translation locales (20 + English):** 20 non-English locale files cover the same set plus Arabic and Urdu RTL support (currently hidden, infrastructure ready). See `assets/i18n/NATIVE-REVIEW.md` for per-locale review status.
+**UI translation locales (10 + English):** 10 non-English locale files cover Hindi, Spanish, Italian, Japanese, Kannada, Korean, Telugu, Tamil, Thai, and Chinese. Arabic and Urdu locale files were intentionally removed (RTL infrastructure remains for future re-enablement). See `assets/i18n/NATIVE-REVIEW.md` for per-locale review status.
 
 **Browser coverage:** Chrome supports the most languages (~70+). Safari and Edge support a subset. Firefox has no Web Speech API — a notice is shown directing Firefox users to paste instead.
 
@@ -180,9 +180,9 @@ Supported languages for STT: English, Chinese (Mandarin), Hindi, Spanish, French
 | Fonts | Google Fonts CDN | Free |
 | Hosting | Vercel (wisprstories.vercel.app) | Free |
 | State / rate limiting | Upstash Redis (serverless) | Free tier (10K commands/day) |
-| Tone rewriting | DeepSeek V4 Flash Free via OpenRouter (`api/rewrite.js`) | $0 |
+| Tone rewriting | Qwen 3 14B Free via OpenRouter (`api/rewrite.js`) | $0 |
 | Upgrade key validation | Upstash Redis (`api/validate-key.js`) | Free tier |
-| BuyMeACoffee webhook | `api/webhook/bmc.js` — auto key generation | Free |
+| BuyMeACoffee webhook | `api/webhook-bmac.js` — auto key generation, timing-safe HMAC, Brevo email, refund revocation | Free |
 | Blob storage | Vercel Blob — card PNGs + OG images | Free tier (1GB) |
 | Daily cleanup | `api/cleanup.js` — Vercel Cron (3 AM UTC, 36hr retention) | Free |
 
@@ -193,11 +193,11 @@ The app is no longer purely client-side. It uses Vercel serverless functions for
 | Route | Purpose | Auth |
 |---|---|---|
 | `api/stt.js` | Deepgram Nova-3 transcription fallback | `DEEPGRAM_API_KEY` env var |
-| `api/rewrite.js` | LLM tone rewriting (DeepSeek V4 Flash Free) | `OPENROUTER_API_KEY` env var |
+| `api/rewrite.js` | LLM tone rewriting (Qwen 3 14B Free) | `OPENROUTER_API_KEY` env var |
 | `api/usage.js` | Daily user cap counter (99 users/day) | `CRON_SECRET` for cron calls |
 | `api/limits.js` | Per-user recording/rewrite limit enforcement | Session-based |
 | `api/validate-key.js` | Pro upgrade key validation | None (POST with email + key) |
-| `api/webhook/bmc.js` | BuyMeACoffee webhook → auto key generation | BMC webhook signature |
+| `api/webhook-bmac.js` | BuyMeACoffee webhook → auto key generation, timing-safe HMAC, Brevo email, refund revocation | BMC webhook signature |
 | `api/pro-status.js` | Check if user has Pro status | Session-based |
 | `api/upload.js` | Upload card PNG + OG image to Vercel Blob | `BLOB_READ_WRITE_TOKEN` env var |
 | `api/c/[id].js` | Shared card landing page + OG metadata | None (public) |
@@ -212,7 +212,7 @@ The app is no longer purely client-side. It uses Vercel serverless functions for
 | Recordings/user/day | 5 | 50 |
 | Max recording length | 15s | 30s |
 | Cumulative audio/user/day | 75s | 15 min (900s) |
-| Tone rewrites/user/day | 10 | Unlimited |
+| Tone rewrites/tone/day | 5 (30 max across 6 tones) | Unlimited |
 
 ### Occasion system
 
@@ -244,7 +244,7 @@ The app is installable as a Progressive Web App:
   - **Same-origin dynamic** (`/api/*`, `/c/*`): network-only
   - **Cross-origin** (fonts, CDNs): stale-while-revalidate
   - **Same-origin static**: cache-first with offline navigation fallback
-- Cache name: `wispr-stories-v0.9.4`
+- Cache name: `wispr-stories-shell`
 - Offline: manual typing still works; recording, fonts, and image export require connectivity
 
 ### Script-aware font system
@@ -316,7 +316,7 @@ See `docs/cost-architecture.md` for full cost breakdown and scaling scenarios.
 | `api/limits.js` | Per-tone rate-limit lookup (Upstash Redis) |
 | `api/pro-status.js` | Pro key validation against server-side allowlist |
 | `api/validate-key.js` | Pro key validation (stub — always returns "Invalid key") |
-| `api/webhook/bmc.js` | BuyMeACoffee webhook → auto key generation |
+| `api/webhook-bmac.js` | BuyMeACoffee webhook → auto key generation, timing-safe HMAC, Brevo email, refund revocation |
 | `lib/redis.js` | Shared Upstash Redis client + key registry |
 
 ### Documentation

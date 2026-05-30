@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Language Stats — Wispr Stories</title>
+<meta name="description" content="Live card-creation usage statistics across 44 supported languages on Wispr Stories. See which languages are used most and how voice vs story input compares.">
+<meta property="og:title" content="Language Stats — Wispr Stories">
+<meta property="og:description" content="Live card-creation usage statistics across 44 supported languages.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Wispr Stories">
+<link rel="canonical" href="https://wisprstories.vercel.app/language-stats.html">
+<meta property="og:image" content="https://wisprstories.vercel.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="Wispr Stories &mdash; voice-to-card app preview">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Language Stats &mdash; Wispr Stories">
+<meta name="twitter:description" content="Live card-creation usage statistics across 44 supported languages.">
+<meta name="twitter:image" content="https://wisprstories.vercel.app/assets/og-image.png">
+<meta name="twitter:image:alt" content="Wispr Stories &mdash; voice-to-card app preview">
 <link rel="icon" type="image/png" href="assets/ws-logo-whblbg.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,23 +33,33 @@
 <link rel="stylesheet" href="global/styles/language-stats.css">
 <script src="lib/chart.umd.min.js"></script>
 <style>
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar { width: 0; }
 body {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: clip;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+body::-webkit-scrollbar { width: 0; }
 .main {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1 0 auto;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
-.main::-webkit-scrollbar { width: 0; }
-.main { scrollbar-width: none; }
 </style>
+<script src="global/capacity-check.js" defer></script>
 </head>
 <body>
 
-<nav class="nav">
+<nav class="nav" role="navigation" aria-label="Main navigation">
   <a href="/" class="nav-brand">
     <img src="assets/ws-logo-blwbg.png" alt="Wispr Stories" class="nav-logo" />
     <span class="nav-brand-text">Wispr Stories</span>
@@ -46,71 +72,148 @@ body {
 </nav>
 
 <div class="main">
-  <h1>Language Stats</h1>
-  <p class="subtitle">Live card-creation usage across 44 supported languages</p>
+  <h1><i class="fa-solid fa-chart-simple" style="margin-right:10px;font-size:0.65em;color:var(--ink3);vertical-align:middle;"></i>Language Stats</h1>
+  <p class="subtitle">44 languages tracked across voice and story inputs</p>
 
-  <div class="disclaimer-banner">
-    <i class="fa-solid fa-info-circle"></i>
-    <span>These are global, aggregate statistics shared by all users — they show how Wispr Stories is performing across everyone, not your personal usage. See how many cards are being created, which languages are used most and least, and which input method (voice vs story) people prefer.</span>
+  <div class="disclaimer-note">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>These are global, aggregate statistics &mdash; not your personal usage.</span>
   </div>
 
-  <div class="stats-banner">
-    <div class="stat-card">
-      <span class="num" id="statTotal">0</span>
-      <span class="label">Total Cards</span>
-    </div>
-    <div class="stat-card">
-      <span class="num" id="statVoice">0</span>
-      <span class="label">Voice</span>
-    </div>
-    <div class="stat-card">
-      <span class="num" id="statStory">0</span>
-      <span class="label">Story</span>
-    </div>
-    <div class="stat-card">
-      <span class="num">44</span>
-      <span class="label">Languages</span>
-    </div>
-    <div class="stat-card">
-      <span class="num" id="statLangsUsed">0</span>
-      <span class="label">Languages Used</span>
-    </div>
+  <div class="disclaimer-banner error-banner" id="fetchError" style="display:none">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>Could not load usage data. The stats API may be temporarily unavailable.</span>
   </div>
 
-  <div class="region-list" id="regionList"></div>
+  <div class="hero-stats anim-fade-in visible">
+    <div class="hero-total">
+      <span class="hero-num skeleton" id="statTotal">&mdash;</span>
+      <span class="hero-label">Total Cards Created</span>
+    </div>
+    <div class="hero-split">
+      <div class="hero-split-bar" id="splitBar">
+        <div class="split-voice" id="splitVoice" style="width:0%"><span class="split-bar-count" id="splitVoiceCount"></span></div>
+        <div class="split-story" id="splitStory" style="width:0%"><span class="split-bar-count" id="splitStoryCount"></span></div>
+      </div>
+      <div class="hero-split-labels">
+        <span class="split-label voice-label"><i class="fa-solid fa-microphone"></i> <span id="statVoice">&mdash;</span> <span id="pctVoice"></span> Voice</span>
+        <span class="split-label story-label"><i class="fa-solid fa-pen-fancy"></i> <span id="statStory">&mdash;</span> <span id="pctStory"></span> Story</span>
+      </div>
+      <p class="hero-split-hint">Voice = cards created by speaking. Story = cards created by typing or pasting.</p>
+    </div>
+    <div class="hero-meta">
+      <div class="hero-meta-card">
+        <div class="meta-left">
+          <i class="fa-solid fa-microphone meta-icon"></i>
+          <span class="meta-label">Languages Used</span>
+        </div>
+        <div class="meta-right">
+          <span class="meta-num" id="statLangsUsed">&mdash;</span>
+        </div>
+      </div>
+      <div class="hero-meta-card">
+        <div class="meta-left">
+          <i class="fa-solid fa-globe meta-icon"></i>
+          <span class="meta-label">Supported</span>
+        </div>
+        <div class="meta-right">
+          <span class="meta-num">44</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-updated" id="lastUpdated"></div>
+  </div>
 
-  <h2 class="section-heading">Usage by Language</h2>
+  <div class="insights-banner anim-fade-in reveal-delay-1" id="insightsBanner" style="display:none">
+    <span class="insights-label">Top languages</span>
+    <div class="insights-items" id="insightsItems"></div>
+  </div>
+
+  <div class="badge-note anim-fade-in reveal-delay-1">
+    <i class="fa-solid fa-circle-info"></i>
+    <span><strong>How badges work:</strong> Languages are ranked by total cards created (voice + story combined). The most-used language gets gold, second gets silver, third gets bronze.</span>
+  </div>
+
+  <div class="usage-section anim-fade-in reveal-delay-1">
+    <div class="usage-header">
+      <h2 class="section-heading">Usage by <em>Language</em> <span class="chart-hint">Click any bar or use the filters below</span></h2>
+      <div class="region-chips" id="regionChips">
+        <button class="region-chip active" data-region="all" aria-pressed="true">All <span class="chip-count" id="chipAll"></span></button>
+        <button class="region-chip" data-region="South Asia" aria-pressed="false">South Asia <span class="chip-count" id="chipSouthAsia"></span></button>
+        <button class="region-chip" data-region="Europe" aria-pressed="false">Europe <span class="chip-count" id="chipEurope"></span></button>
+        <button class="region-chip" data-region="East Asia" aria-pressed="false">East Asia <span class="chip-count" id="chipEastAsia"></span></button>
+        <button class="region-chip" data-region="Southeast Asia" aria-pressed="false">Southeast Asia <span class="chip-count" id="chipSoutheastAsia"></span></button>
+        <button class="region-chip" data-region="Middle East & Central Asia" aria-pressed="false">Middle East <span class="chip-count" id="chipMiddleEastCentralAsia"></span></button>
+      </div>
+    </div>
 
   <div id="regionBadge" class="region-badge" style="display:none">
     <span>Filtered: <strong id="regionName"></strong></span>
     <button id="clearRegionFilter" aria-label="Clear region filter">&times;</button>
   </div>
 
-  <div class="chart-wrap">
+  <div class="chart-wrap anim-fade-in reveal-delay-2">
     <div id="chartContainer">
-      <canvas id="langChart"></canvas>
+      <canvas id="langChart" role="img" aria-label="Bar chart showing card creation counts by language"></canvas>
+    </div>
+    <div class="chart-legend" id="chartLegend"></div>
+  </div>
+
+  <div class="table-header anim-fade-in reveal-delay-3" id="tableHeader" style="display:none">
+    <div class="table-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="tableSearch" placeholder="Search languages..." aria-label="Search languages">
+      <button class="search-clear" id="searchClear" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="table-controls">
+      <label class="toggle-label" id="zeroToggleWrap">
+        <input type="checkbox" id="zeroToggle">
+        <span class="toggle-switch"></span>
+        <span>Show all languages</span>
+      </label>
     </div>
   </div>
 
-  <div class="table-wrap">
+  <div class="no-results" id="noResults" style="display:none">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <p>No languages match your search</p>
+  </div>
+
+  <div class="table-wrap anim-fade-in reveal-delay-3" id="tableWrap">
     <table>
       <thead>
         <tr>
-          <th data-sort="lang">Language</th>
-          <th data-sort="voice" class="num-cell">Voice</th>
-          <th data-sort="story" class="num-cell">Story</th>
-          <th data-sort="total" class="num-cell">Total</th>
+          <th data-sort="lang" tabindex="0" role="columnheader" aria-sort="none">Language</th>
+          <th data-sort="voice" class="num-cell" tabindex="0" role="columnheader" aria-sort="none">Voice</th>
+          <th data-sort="story" class="num-cell" tabindex="0" role="columnheader" aria-sort="none">Story</th>
+          <th data-sort="total" class="num-cell" tabindex="0" role="columnheader" aria-sort="none">Total</th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
     </table>
+  </div><!-- /usage-section -->
+
+</div>
+
+<div class="stats-hero-cta anim-fade-in reveal-delay-4">
+  <div class="stats-cta-content">
+    <h2 class="stats-cta-title">Your language could be next</h2>
+    <p class="stats-cta-sub">The numbers tell the story. Now create your own.</p>
+    <a href="/" class="stats-cta-btn">Create your Wispr Story <i class="fa-solid fa-arrow-right"></i></a>
+    <p class="stats-flow-line wave-auto">Take your voice beyond cards. <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener">Wispr Flow</a> lets you dictate in any app, anywhere.</p>
   </div>
 </div>
+
+
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>
 
 <footer class="footer">
   <p>
     <a href="/" class="footer-wave wave-on-hover">Wispr Stories</a>
-    — made for
+    &mdash; made for
     <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="footer-wave wave-on-hover"><strong>Wispr Flow</strong></a>
   </p>
   <span>Independent project &middot; Not affiliated with Wispr Flow</span>
@@ -119,12 +222,77 @@ body {
 
 <script src="global/language-stats.js"></script>
 <script>
-document.body.addEventListener('wheel', function(e) {
-  var main = document.querySelector('.main');
-  if (main && !main.contains(e.target)) {
-    main.scrollTop += e.deltaY;
+(function() {
+  /* --- Scroll reveal (IntersectionObserver) --- */
+  var reveals = document.querySelectorAll('.anim-fade-in');
+  if ('IntersectionObserver' in window && reveals.length) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal');
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(function(el) {
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
   }
-}, { passive: true });
+
+  /* --- Search clear button --- */
+  var searchInput = document.getElementById('tableSearch');
+  var searchClear = document.getElementById('searchClear');
+  if (searchInput && searchClear) {
+    searchInput.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        searchClear.classList.add('visible');
+      } else {
+        searchClear.classList.remove('visible');
+      }
+    });
+    searchClear.addEventListener('click', function() {
+      searchInput.value = '';
+      searchClear.classList.remove('visible');
+      searchInput.dispatchEvent(new Event('input'));
+      searchInput.focus();
+    });
+  }
+
+  /* --- Nav scroll shadow --- */
+  var nav = document.querySelector('.nav');
+  if (nav) {
+    window.addEventListener('scroll', function() {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+  }
+
+  /* --- CTA wave auto-animation --- */
+  var waveEl = document.querySelector('.wave-auto');
+  if (waveEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.innerWidth > 640) {
+    var html = waveEl.innerHTML;
+    var tokens = html.split(/(<[^>]*>)/);
+    var out = '';
+    var charIdx = 0;
+    for (var t = 0; t < tokens.length; t++) {
+      if (tokens[t].startsWith('<')) {
+        out += tokens[t];
+      } else {
+        for (var i = 0; i < tokens[t].length; i++) {
+          if (tokens[t][i] === ' ') { out += ' '; }
+          else {
+            out += '<span style="animation-delay:' + (charIdx * 0.05) + 's">' + tokens[t][i] + '</span>';
+            charIdx++;
+          }
+        }
+      }
+    }
+    waveEl.innerHTML = out;
+  }
+})();
 </script>
+
+
 </body>
 </html>

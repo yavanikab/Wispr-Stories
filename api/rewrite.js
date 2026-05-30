@@ -187,7 +187,7 @@ export default async function handler(req) {
       }
     }
 
-    // Call OpenRouter — Gemma 4 (free) / Ling 2.6 Flash (pro)
+    // Call OpenRouter — Qwen 3 14B (free) / Ling 2.6 Flash (pro)
     const openrouterKey = process.env.OPENROUTER_API_KEY;
     if (!openrouterKey) {
       return new Response(JSON.stringify({ error: 'Server not configured' }), {
@@ -206,7 +206,7 @@ export default async function handler(req) {
     // It must never appear in the free-user model list under any circumstance.
     const models = isPro
       ? ['inclusionai/ling-2.6-flash']   // paid model — pro users only
-      : ['google/gemma-4-31b-it:free'];  // free model — free users only
+      : ['qwen/qwen3-14b:free'];  // free model — free users only
     let lastError = null;
     let data = null;
 

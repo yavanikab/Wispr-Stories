@@ -30,7 +30,6 @@ const PRECACHE_URLS = [
   '/site.webmanifest',
   '/assets/ws-logo-blwbg.png',
   '/assets/ws-logo-wh.png',
-  '/assets/ws-logo-blwbg.png',
   '/global/styles/main.css',
 ];
 

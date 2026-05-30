@@ -1,5 +1,94 @@
 # Version History
 
+## [Unreleased] — About Page Polish Follow-up
+
+### Added
+- "About Wispr Stories" eyebrow label above hero heading + intro sentence framing the page as an About page
+- Hero CTA button ("Create your first card →") below hero tagline
+- Feature icon color changes to lavender on hover
+
+### Changed
+- Feature & HIW icons enlarged (20-24px → 26-32px)
+- Mobile mosaic card text: 9px → 10px
+
+### Fixed
+- Smooth scroll enabled on html element
+
+## v0.10.4 — About Page UI/UX Polish (2026-05-29)
+### Added
+- About page reveal animations (formerly broken — CSS rules were missing)
+- Mosaic card stagger entrance (7 cards fade in sequentially)
+- Count-up animation for stat numbers
+- FAQ auto-scroll on open
+- Wispr Flow auto-wave tagline in CTA (continuous letter-bounce, ~2s pause between cycles)
+
+### Changed
+- Hero heading: increased to 700 weight for more impact
+- Feature stat numbers: enlarged (~1.4× previous size)
+- "STT engines (Speech recognition)" → "Speech engines"
+- CTA button hover: now scales up (1.03×) instead of shrinking
+- FAQ max-height: 500px → 800px
+- Step number circles: use lavender accent in dark mode
+
+### Fixed
+- Reveal animation CSS now properly defined in about.css
+- Mosaic card entrance animation no longer conflicts with rotation transforms
+
+## v0.10.3 — Language Stats Page Redesign (2026-05-29)
+
+### Added
+- Language Stats page major UI/UX overhaul to match Wispr Flow design aesthetic
+- Hero section with larger typography, generous spacing, subtle gradient
+- Insights section: visible "Top languages" label, 3-column card layout, clickable
+- Region chips: visible filter buttons with language counts, grouped with heading
+- Chart: Wispr Flow color palette, animation, hover cursor
+- Table: search with row count, "no results" message, zero rows toggle, zebra striping, top-3 highlights
+- Share button, back-to-top button, skeleton loading, count-up animation
+- Disclaimer collapsed to single line, badge note explanation
+- Dark mode support, mobile optimizations, print styles
+
+### Changed
+- Footer moved inside .main (scrolls with content)
+- Chart region colors updated to Wispr Flow palette
+- Hero typography scaled up (h1: 28-36px, section headings: 20-24px)
+- Subtitle text improved for clarity
+- Card borders increased to 1.5px
+- Main padding increased for breathing room
+- Section headings: italic emphasis on "Language"
+
+### Fixed
+- Region filter sync (chart ↔ chips)
+- Insights clickable (filter table by language)
+- Search "no results" message
+- Zero rows toggle
+- Chart hover cursor
+- Table row count indicator
+- Footer alignment (removed grid properties)
+- Mobile insights layout (3-column compact)
+
+## v0.10.2 — UI/UX Polish + Keyboard + Determinate Progress (2026-05-28)
+
+### Added
+- Determinate progress bar driven by ffmpeg.wasm callback
+- File size and time estimates in download choice modal
+- Green flash success animation on download button
+- Toast queue (max 3, 250ms gap)
+- ESC to close any modal; keyboard shortcuts popover (Space, Esc)
+- Focus trapping + Tab cycling inside all modals; modal stack guard prevents overlap
+- Cycling placeholder hints from language examples in empty textarea
+- Haptic `navigator.vibrate()` on mic/create/share
+- Full-width share preview at <=480px
+
+### Changed
+- OR divider text → `fa-keyboard` icon
+- Name row hidden until textarea content or name focus
+- `_vibrate()` helper for mobile tactile feedback
+- ffmpeg URL: `core-st@0.12.6` → `core@0.12.6` (404 fix)
+- i18n key: `shareModal.generating` → `record.generating`
+- About page: separated HTML/CSS/JS into `about.html`, `global/styles/about.css`, `global/about.js`
+- About page: clarity rewrite for 8 jargon strings (model names preserved)
+- About page: hero card replaced with scattered mosaic showing 7 languages and colors
+
 ## v0.10.1 — Bugfix: Download WebM, dark overlay, syntax error (2026-05-27)
 
 ### Fixed
@@ -139,33 +228,6 @@
 - Deleted 3 duplicate HTML doc files
 - Bumped `sw.js` cache to `wispr-stories-v0.9.4`
 - Updated README.md (6→10 palettes, clarified aspect ratios)
-
-## [Unreleased] — i18n cleanup + UI refinements + Remotion demo
-
-### 2026-05-22 — i18n English-leak cleanup + UI refinements
-- Removed English leaks (`tone.tip` prefix, `tone.rewriting`, `actions.createTone`, `record.generating`) in all 20 non-English locales: `de, es, fr, gu, hi, id, it, ja, kn, ko, ml, pa, pt, ru, sv, ta, te, th, tr, zh`
-- Brought `tone.tip` in sync with new English wording ("Original preserves your exact words — unlimited, no daily cap. Other tones rewrite via AI: ...")
-- Added `assets/i18n/NATIVE-REVIEW.md` — per-locale review checklist with confidence levels and per-string questions for native speakers
-- Decision: Arabic (`ar.json`) and Urdu (`ur.json`) intentionally excluded; total UI locales = 20 (older docs claiming 23 are stale)
-- Surfaced (not fixed): `shareModal.generating` vs `record.generating` key mismatch at `wisprstories.js:1845` causes silent English fallback on share-button spinner in all locales
-
-### 2026-05-21 — UI refinements + i18n loader sync helper
-- Added `getI18nSync()` in `i18n.js` for synchronous translation lookups outside the `data-i18n` flow
-- Removed page-hide-during-translation-load (3-second reveal timeout); English renders on first paint and swaps in when translations load
-- Unified notice system: one DOM slot, priority firefox > shared, per-type localStorage dismissal, re-localized on language change
-- Style chip summary in collapsed Style accordion header (live tone/color/shape display, re-localized on language change)
-- Name input: regex allows spaces / hyphens / underscores; max length raised 10 → 18 ("Lola Maria", "Mary-Anne" now valid)
-- Theme toggle: added `aria-pressed` for screen-reader state announcement
-- Record button labels (`recSt`, `recSub`) now read from i18n via `getI18nSync()` instead of hardcoded English
-- ~700 lines of CSS added across 11 style modules (largest: `inputs.css` +253, `card.css` +181) supporting the above
-
-### 2026-05-21 — Remotion promo demo
-- Isolated `remotion-demo/` React/Remotion project with `WisprStoriesPromo` composition (24s, 1080×1080)
-- Two audio-led variants: `WisprStoriesPromoSocial` (19.5s, `electronic-bass.mp3`) and `WisprStoriesPromoWarm` (26s, `warm-vinyl.mp3`); default `WisprStoriesPromo` points at warm
-- Editable variant config at `remotion-demo/src/demoVariants.js` (durations, scene timing, audio start trims, fade-outs, background glow intensity, brand display rules, final CTA copy)
-- Final exports at `remotion-demo/out/wispr-stories-promo-social.mp4` (4.0 MB) and `wispr-stories-promo-warm.mp4` (4.7 MB), both H.264/AAC 1080×1080
-- Visual direction: compact card-forward concept with Wispr Stories cream/ink/amber palette, real logo, logo-first intro, final CTA screen
-- Verified with 11 passing tests (`node --test test/storyPlan.test.mjs`) and visual stills checked at key frames
 
 ## v0.9.3 — Rewrite language fidelity + UI-language decoupling (2026-05-22)
 - Rewrite API (`api/rewrite.js`) now classifies the input script (`detectScript()` returns one of `Japanese`, `Korean`, `Chinese`, `Devanagari (Hindi/Marathi)`, `Bengali`, `Gurmukhi (Punjabi)`, `Gujarati`, `Oriya`, `Tamil`, `Telugu`, `Kannada`, `Malayalam`, `Thai`, `Arabic`, `Cyrillic`, `Greek`, or `Latin`) and embeds the name into a positive `LANGUAGE RULE` so Tamil/Telugu/etc. inputs stay in their native script and English inputs stay in English. System message hardened with "ALWAYS respond in the exact same language and script as the input. You never translate or transliterate."

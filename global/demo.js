@@ -8,6 +8,7 @@
  */
 
 (function () {
+  return; // DISABLED — preserved for restoration. Early exit to avoid parse cost.
   // Curated picks that showcase different scripts. Falls back to random if any
   // are missing from the loaded dataset.
   const PICKS = [
@@ -290,7 +291,7 @@
     if (userHasInputAlready()) return;
     await waitForExamples();
     if (stopped || userHasInputAlready()) return;
-    setPreviewLabel("Watch — type below to make yours");
+    setPreviewLabel("Watch: type below to make yours");
     bindStopTriggers();
     loop();
   }

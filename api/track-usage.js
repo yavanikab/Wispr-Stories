@@ -25,7 +25,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'source must be "voice" or "story"' });
     }
 
-    const redis = getLangStatsRedis();
+    let redis;
+    try {
+      redis = getLangStatsRedis();
+    } catch (_e) {
+      // Redis not configured — tracking is non-critical, succeed silently
+      return res.status(200).json({ ok: true });
+    }
     const field = source + ':' + lang;
     await redis.hincrby('wispr:langstats', field, 1);
 

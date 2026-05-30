@@ -24,30 +24,9 @@
     />
     <meta
       property="og:description"
-      content="Speak naturally in 21 languages. Get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
+      content="Speak naturally in 44 languages. Get a stunning card to share on WhatsApp, Instagram, or anywhere. No account needed."
     />
     <meta property="og:site_name" content="Wispr Stories" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:locale:alternate" content="hi_IN" />
-    <meta property="og:locale:alternate" content="zh_CN" />
-    <meta property="og:locale:alternate" content="es_ES" />
-    <meta property="og:locale:alternate" content="fr_FR" />
-    <meta property="og:locale:alternate" content="pt_BR" />
-    <meta property="og:locale:alternate" content="ru_RU" />
-    <meta property="og:locale:alternate" content="id_ID" />
-    <meta property="og:locale:alternate" content="de_DE" />
-    <meta property="og:locale:alternate" content="ja_JP" />
-    <meta property="og:locale:alternate" content="pa_IN" />
-    <meta property="og:locale:alternate" content="ko_KR" />
-    <meta property="og:locale:alternate" content="te_IN" />
-    <meta property="og:locale:alternate" content="ta_IN" />
-    <meta property="og:locale:alternate" content="tr_TR" />
-    <meta property="og:locale:alternate" content="it_IT" />
-    <meta property="og:locale:alternate" content="th_TH" />
-    <meta property="og:locale:alternate" content="gu_IN" />
-    <meta property="og:locale:alternate" content="kn_IN" />
-    <meta property="og:locale:alternate" content="ml_IN" />
-    <meta property="og:locale:alternate" content="sv_SE" />
     <meta
       property="og:image"
       content="https://wisprstories.vercel.app/assets/og-image.png"
@@ -66,7 +45,7 @@
     />
     <meta
       name="twitter:description"
-      content="Speak naturally in 21 languages. Get a stunning card to share. No account needed."
+      content="Speak naturally in 44 languages. Get a stunning card to share. No account needed."
     />
     <meta
       name="twitter:image"
@@ -88,12 +67,6 @@
     <link rel="icon" type="image/png" href="assets/ws-logo-blwbg.png" />
     <link rel="apple-touch-icon" href="assets/ws-logo-blwbg.png" />
     <link rel="manifest" href="site.webmanifest" />
-    <link
-      rel="search"
-      type="application/opensearchdescription+xml"
-      title="Wispr Stories"
-      href="/opensearch.xml"
-    />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="msapplication-TileColor" content="#ffffeb" />
     <script>
@@ -177,13 +150,8 @@
         "applicationCategory": "Multimedia",
         "operatingSystem": "All",
         "browserRequirements": "Chrome or Safari for voice recording",
-        "availableLanguage": [
-          "English", "Hindi", "Chinese", "Spanish", "French",
-          "Portuguese", "Russian", "Indonesian", "German", "Japanese",
-          "Punjabi", "Korean", "Telugu", "Tamil", "Turkish",
-          "Italian", "Thai", "Gujarati", "Kannada", "Malayalam", "Swedish"
-        ],
-        "featureList": "Voice recording, 21 languages, tone rewriting, card customisation, WhatsApp sharing, Instagram sharing, PNG download",
+        "availableLanguage": "44 languages",
+        "featureList": "Voice recording, 44 languages, tone rewriting, card customisation, WhatsApp sharing, Instagram sharing, PNG download",
         "screenshot": "https://wisprstories.vercel.app/assets/og-image.png",
         "offers": {
           "@type": "Offer",
@@ -298,16 +266,20 @@
                 <div class="rec-sub" id="recSub" data-i18n="record.sub"></div>
                 <div class="rec-counter" id="recCounter"></div>
               </div>
-              <button class="reset-btn" id="resetBtn" aria-label="Start over — clear the form">
+              <button class="reset-btn" id="resetBtn" aria-label="Start over, clear the form">
                 <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> <span data-i18n="resetBtn">Start over</span>
               </button>
+            </div>
+            <div class="mic-select-row" id="micSelectRow" style="display:none;">
+              <i class="fa-solid fa-microphone" aria-hidden="true"></i>
+              <select id="micSelect" aria-label="Choose microphone"></select>
             </div>
             <div class="live-box" id="liveBox"></div>
           </div>
 
           <div class="or">
             <div class="orl"></div>
-            <span class="ort" data-i18n="orText">or type or paste your words</span>
+            <i class="fa-regular fa-keyboard ort-icon"></i>
             <div class="orl"></div>
           </div>
 
@@ -586,6 +558,28 @@
               </button>
             </div>
           </div>
+
+          <!-- 6. FONT SIZE -->
+          <div>
+            <div class="lbl">
+              <span data-i18n="fontSize.label">Font size</span>
+              <span class="iw"
+                ><button type="button" class="ii" aria-label="More info"
+                  ><i class="fa-solid fa-circle-info"></i
+                ></button>
+                <span class="tip" data-i18n="fontSize.tip"
+                  >Make short card text larger so it fills the card nicely. Only
+                  available while your card text is short.</span
+                ></span
+              >
+            </div>
+            <div class="font-size-row" id="fontSizeRow">
+              <button type="button" class="font-step" id="fontMinus" aria-label="Decrease font size">&minus;</button>
+              <span class="font-size-val" id="fontSizeVal" aria-live="polite"></span>
+              <button type="button" class="font-step" id="fontPlus" aria-label="Increase font size">+</button>
+              <span class="font-size-info" id="fontSizeInfo" data-i18n="fontSize.info">Available only when your card text is under 85 characters</span>
+            </div>
+          </div>
         </details>
 
         <!-- ACTIONS (full-width buttons) -->
@@ -651,7 +645,6 @@
                 <div class="card-voice-label" id="voiceLabel">
                   &#128395;&#65039; Story Original
                 </div>
-                <span class="source-nudge" id="sourceNudge">Tap to switch Voice/Story</span>
               </div>
               <div class="card-foot">
                 <div class="card-logo">
@@ -805,30 +798,9 @@
       <div class="sl-modal-content">
         <button class="sl-modal-close" id="slClose">&times;</button>
         <div class="sl-modal-title" data-i18n="speechLang.title">Select speech language</div>
-        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language — 44 options</p>
+        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language: 44 options</p>
+        <input type="text" class="sl-modal-filter" id="slFilter" placeholder="Search languages\u2026" data-i18n-placeholder="speechLang.filter">
         <div class="sl-modal-grid" id="slGrid"></div>
-      </div>
-    </div>
-
-    <!-- CAPACITY PAGE -->
-    <div class="capacity-page" id="capacityPage">
-      <div class="capacity-page-content">
-        <div class="capacity-page-icon">&#10084;</div>
-        <h1 class="capacity-page-title" data-i18n="capacity.title">We're overwhelmed with love!</h1>
-        <p class="capacity-page-text" data-i18n="capacity.text">
-          Thank you for the incredible response. We've reached our daily capacity and need to give our servers a little rest.
-        </p>
-        <p class="capacity-page-reset" id="capacityResetText" data-i18n="capacity.reset">
-          We'll be back at midnight UTC.
-        </p>
-        <div class="capacity-page-actions">
-          <button class="capacity-page-btn" id="capacityNotifyBtn" onclick="window.location.reload()" data-i18n="capacity.btn">
-            Check if we're back
-          </button>
-        </div>
-        <p class="capacity-page-footer">
-          Wispr Stories &mdash; made for <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener"><strong><em>Wispr Flow</em></strong></a>
-        </p>
       </div>
     </div>
 
@@ -850,19 +822,19 @@
           <div class="onboarding-step">
             <span class="onboarding-step-num">2</span>
             <div class="onboarding-step-text" data-i18n="onboarding.step2">
-              <strong>Customize</strong> your card — choose a tone, color, and corner style.
+              <strong>Customize</strong> your card: choose a tone, color, and corner style.
             </div>
           </div>
           <div class="onboarding-step">
             <span class="onboarding-step-num">3</span>
             <div class="onboarding-step-text" data-i18n="onboarding.step3">
-              <strong>Create &amp; share</strong> — download as PNG or share directly on social platforms.
+              <strong>Create &amp; share</strong>: download as PNG or share directly on social platforms.
             </div>
           </div>
         </div>
         <div class="onboarding-footer">
           <button class="onboarding-btn onboarding-btn-primary" id="onboardingGotIt" data-i18n="onboarding.gotIt">
-            Got it — let's go!
+            Got it, let's go!
           </button>
           <p class="onboarding-hint" data-i18n="onboarding.hint">
             Need help later? Tap the <i class="fa-solid fa-circle-question"></i> icon in the top bar.
@@ -874,7 +846,7 @@
     <div class="toast" id="toast"></div>
     <div class="export-progress" id="exportProgress">
       <div class="export-progress-bar"></div>
-      <span class="export-progress-text">Generating card&hellip;</span>
+      <span class="export-progress-text" data-i18n="exportProgress.generating">Generating card&hellip;</span>
     </div>
 
     <div class="mobile-bar" id="mobileBar" aria-label="Card actions">
@@ -902,20 +874,20 @@
       <div class="dl-choice-backdrop" id="dlChoiceBackdrop"></div>
       <div class="dl-choice-content">
         <button class="dl-choice-close" id="dlChoiceClose">&times;</button>
-        <div class="dl-choice-title">Download your card</div>
+        <div class="dl-choice-title" data-i18n="dlChoice.title">Download your card</div>
         <div class="dl-choice-actions">
-          <button class="dl-choice-btn" id="dlChoicePng">&#128247; Download PNG</button>
-          <button class="dl-choice-btn dl-choice-btn-secondary" id="dlChoiceWebm">&#127916; Download WebM</button>
+          <button class="dl-choice-btn" id="dlChoicePng" data-i18n="dlChoice.png"><i class="fa-solid fa-file-image"></i> Download PNG</button>
+          <button class="dl-choice-btn dl-choice-btn-secondary" id="dlChoiceWebm" data-i18n="dlChoice.webm"><i class="fa-solid fa-video"></i> Download WebM</button>
         </div>
       </div>
     </div>
 
+    <script src="global/capacity-check.js" defer></script>
     <script src="assets/i18n/i18n.js"></script>
     <script src="assets/languages/languages-loader.js"></script>
     <script src="global/occasions/examples-loader.js"></script>
     <script src="global/occasions/occasions.js"></script>
     <script src="global/fonts.js"></script>
     <script src="wisprstories.js"></script>
-    <script src="global/demo.js"></script>
   </body>
 </html>

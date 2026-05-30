@@ -7,7 +7,7 @@
 import { list, del } from '@vercel/blob';
 
 const MAX_AGE_HOURS = 36; // 1.5 days — gives ~1–2 day blob lifetime
-const PREFIXES = ['cards/', 'og/', 'voice/'];
+const PREFIXES = ['cards/', 'og/', 'voice/', 'meta/'];
 const DELETE_BATCH = 50;
 
 export default async function handler(req, res) {

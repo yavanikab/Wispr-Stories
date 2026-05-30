@@ -10,32 +10,32 @@
     "quote": "\"Aférrate a los recuerdos; ellos se aferrarán a ti.\""
   },
   "sharedCta": "✨ <strong>¡Recibiste una Wispr Story!</strong> Toca <em>Crear mi tarjeta</em> para hacer la tuya.",
-  "ffNotice": "🌐 La grabación de voz no es compatible con Firefox. Usa Chrome o Safari — o pega tu texto abajo.",
+  "ffNotice": "🌐 La grabación de voz no es compatible con Firefox. Usa Chrome o Safari, o pega tu texto abajo.",
   "record": {
     "label": "Tu voz",
-    "tip": "Presiona grabar y habla naturalmente. Tus palabras aparecen en vivo. Toca de nuevo para detener — tus palabras pasan al cuadro de texto listas para la tarjeta.",
+    "tip": "Presiona grabar y habla naturalmente. Tus palabras aparecen en vivo. Toca de nuevo para detener. Tus palabras pasan al cuadro de texto listas para la tarjeta.",
     "status": "Toca para hablar",
     "sub": "Tus palabras aparecen cuando paras",
     "generating": "Generando…"
   },
-
   "speechLang": {
-    "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy",
+    "title": "Seleccionar idioma de voz",
+    "sub": "Elige tu idioma de habla: 44 opciones",
     "triggerLabel": "Establecer idioma",
     "reminderEmpty": "Selecciona el idioma para el reconocimiento de voz",
     "reminderNative": "Los idiomas no admitidos se tratarán como idioma nativo",
-    "micDisabledNoLang": "Mic disabled",
-    "micDisabledNative": "Mic disabled",
-    "subNoLang": "Select a language to enable the mic",
-    "subNative": "Choose a different language to speak",
-    "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "micDisabledNoLang": "Micrófono desactivado",
+    "micDisabledNative": "Micrófono desactivado",
+    "subNoLang": "Selecciona un idioma para activar el micrófono",
+    "subNative": "Elige otro idioma para hablar",
+    "tooltipNoLang": "Selecciona un idioma para activar el micrófono",
+    "tooltipNative": "Micrófono desactivado para idioma nativo",
+    "filter": "Buscar idiomas…"
   },
   "orText": "o escribe o pega tus palabras",
   "textarea": {
     "label": "Tus palabras",
-    "tip": "Habla primero usando Grabar arriba — las palabras llegan aquí automáticamente. O escribe directamente. O pega desde Wispr Flow. Cualquier idioma funciona aquí.",
+    "tip": "Habla primero usando Grabar arriba. Las palabras llegan aquí automáticamente. O escribe directamente. O pega desde Wispr Flow. Cualquier idioma funciona aquí.",
     "placeholder": "Graba tu voz o escribe lo que sea: un deseo de cumpleaños, un recuerdo, una receta, una carta de amor, gratitud, un consejo..."
   },
   "resetBtn": "Reiniciar todo",
@@ -52,7 +52,7 @@
   },
   "tone": {
     "label": "Tono",
-    "tip": "Original conserva tus palabras exactas — ilimitado, sin límite diario. Otros tonos se reescriben con IA: Cálido es suave. Audaz es directo. Poético fluye con ritmo. Juguetón es ligero. Reflexivo es lento. Honesto es crudo. Cambia solo el espaciado y la inclinación — no el tamaño ni el peso.",
+    "tip": "Original conserva tus palabras exactas, ilimitado, sin límite diario. Otros tonos se reescriben con IA: Cálido es suave. Audaz es directo. Poético fluye con ritmo. Juguetón es ligero. Reflexivo es lento. Honesto es crudo. Cambia solo el espaciado y la inclinación, no el tamaño ni el peso.",
     "original": "Original",
     "warm": "Cálido",
     "bold": "Audaz",
@@ -82,29 +82,36 @@
     "sharp": "Bordes afilados",
     "rounded": "Esquinas redondeadas"
   },
+  "fontSize": {
+    "label": "Tamaño de fuente",
+    "tip": "Agranda el texto corto de la tarjeta para que la llene bien. Solo disponible cuando el texto de la tarjeta es corto.",
+    "info": "Disponible solo cuando el texto de la tarjeta tiene menos de 85 caracteres",
+    "infoOn": "El texto de la tarjeta es corto: toca + o − para ajustar el tamaño"
+  },
   "actions": {
     "create": "Crear tarjeta",
     "share": "Compartir tarjeta",
     "createTone": "Crear tarjeta {tone}"
   },
-    "rewrite": {
-    "left": "{n} {tone} rewrite left today",
-    "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
-  },"closing": "Tu voz, bellamente compartida",
+  "rewrite": {
+    "left": "{n} {tone} reescritura restante hoy",
+    "plural": "{n} {tone} reescrituras restantes hoy",
+    "exhausted": "0 {tone} reescrituras restantes hoy. Prueba otro tono"
+  },
+  "closing": "Tu voz, bellamente compartida",
   "preview": {
     "label": "Vista previa en vivo"
   },
   "upgrade": "Actualizar",
   "download": "Descargar tarjeta",
-  "cardEmpty": "Completa los detalles —<br />tu tarjeta aparecerá aquí",
+  "cardEmpty": "Completa los detalles,<br />tu tarjeta aparecerá aquí",
   "cardPlaceholder": "Tu historia aparece aquí mientras hablas o escribes.",
   "wcta": {
-    "text": "Usa tu voz donde escribas — WhatsApp, Gmail, Slack, cualquier app.",
+    "text": "Usa tu voz donde escribas: WhatsApp, Gmail, Slack, cualquier app.",
     "link": "Prueba Wispr Flow gratis →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — hecho para <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "Proyecto independiente · No afiliado con Wispr Flow",
     "copyright": "© 2026"
   },
@@ -120,14 +127,14 @@
     "title": "Actualizar a Pro",
     "sub": "Reescrituras de tono ilimitadas. Sin más límites diarios.",
     "buyCoffee": "☕ Invítame un café",
-    "or": "— o —",
+    "or": "o",
     "haveKey": "¿Ya tienes una clave de soporte?",
     "keyPlaceholder": "Pega tu clave...",
     "continue": "Continuar",
     "lostKey": "¿Perdiste tu clave?",
     "emailPlaceholder": "Ingresa tu email",
     "emailSend": "Enviar",
-    "disclaimer": "Wispr Stories — hecho para Wispr Flow"
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
     "title": "¡Estamos abrumados de amor!",
@@ -138,10 +145,10 @@
   "onboarding": {
     "title": "Bienvenido a Wispr Stories",
     "step1": "<strong>Habla o escribe</strong> tu mensaje. Toca el micrófono o pega texto.",
-    "step2": "<strong>Personaliza</strong> tu tarjeta — elige un tono, color y estilo de esquina.",
-    "step3": "<strong>Crea y comparte</strong> — descarga como PNG o comparte directamente en redes sociales.",
-    "gotIt": "¡Entendido — vamos!",
-    "hint": "¿Necesitas ayuda después? Toca el icono ❓ en la barra superior."
+    "step2": "<strong>Personaliza</strong> tu tarjeta: elige un tono, color y estilo de esquina.",
+    "step3": "<strong>Crea y comparte</strong>: descarga como PNG o comparte directamente en redes sociales.",
+    "gotIt": "¡Entendido, vamos!",
+    "hint": "¿Necesitas ayuda después? Toca ❓ en el footer."
   },
   "mobileBar": {
     "create": "Crear",
@@ -150,36 +157,36 @@
   },
   "toasts": {
     "downloaded": "¡Descargado!",
-    "exportFailed": "Exportación fallida — intenta de nuevo",
-    "uploadFailed": "Subida fallida — intenta de nuevo",
+    "exportFailed": "Exportación fallida. Intenta de nuevo",
+    "uploadFailed": "Subida fallida. Intenta de nuevo",
     "linkCopied": "¡Enlace copiado!",
     "copyFailed": "No se pudo copiar el enlace",
-    "imageSaved": "Imagen guardada — abre Fotos para pegar",
-    "downloadFailed": "Descarga fallida — intenta Compartir",
+    "imageSaved": "Imagen guardada. Abre Fotos para pegar",
+    "downloadFailed": "Descarga fallida. Intenta Compartir",
     "imageCopied": "¡Imagen copiada!",
     "imageSavedDownloads": "Imagen guardada en descargas",
-    "copyNotSupported": "Copia no soportada — intenta Descargar",
-    "cardReady": "Tarjeta lista — toca Compartir para descargar",
+    "copyNotSupported": "Copia no soportada. Intenta Descargar",
+    "cardReady": "Tarjeta lista. Toca Compartir para descargar",
     "speakFirst": "Habla o escribe tu historia primero",
-    "dailyRewritesUsed": "Reescrituras diarias usadas — mostrando como Original",
+    "dailyRewritesUsed": "Reescrituras diarias usadas. Mostrando como Original",
     "rewriteLimit": "Límite diario de reescrituras alcanzado",
-    "rewriteFailed": "Reescritura fallida — mostrando original",
+    "rewriteFailed": "Reescritura fallida. Mostrando original",
     "rewriteApplied": "¡Reescritura aplicada!",
-    "silence": "No pudimos captar eso — intenta hablar más fuerte",
+    "silence": "No pudimos captar eso. Intenta hablar más fuerte",
     "recordingWorks": "¡La grabación funciona! Agrega una clave Deepgram para transcripción real",
-    "transcriptionFailed": "Transcripción fallida — necesitas ejecutar 'vercel dev' o desplegar",
+    "transcriptionFailed": "Transcripción fallida. Necesitas ejecutar 'vercel dev' o desplegar",
     "voiceNotSupported": "Voz no soportada en Firefox",
-    "requiresHttps": "La grabación de voz requiere HTTPS — abre vía localhost o despliega para usar",
+    "requiresHttps": "La grabación de voz requiere HTTPS. Abre vía localhost o despliega para usar",
     "safariEnglish": "Safari solo puede soportar inglés (US) para reconocimiento de voz",
-    "speechNotResponding": "El servicio de voz no responde — intenta de nuevo o escribe",
-    "micDenied": "Acceso al micrófono denegado — revisa la configuración del navegador",
-    "speechUnavailable": "Servicio de voz no disponible — intentando alternativa...",
-    "couldNotStart": "No se pudo iniciar la grabación — intenta escribir",
-    "noSpeech": "No se detectó voz — intenta hablar más fuerte",
-    "speechError": "Error de voz — intenta de nuevo",
-    "noMatch": "No se pudo reconocer el habla — intenta hablar más claramente",
+    "speechNotResponding": "El servicio de voz no responde. Intenta de nuevo o escribe",
+    "micDenied": "Acceso al micrófono denegado. Revisa la configuración del navegador",
+    "speechUnavailable": "Servicio de voz no disponible. Intentando alternativa...",
+    "couldNotStart": "No se pudo iniciar la grabación. Intenta escribir",
+    "noSpeech": "No se detectó voz. Intenta hablar más fuerte",
+    "speechError": "Error de voz. Intenta de nuevo",
+    "noMatch": "No se pudo reconocer el habla. Intenta hablar más claramente",
     "couldNotStartMic": "No se pudo iniciar el micrófono",
-    "doneReview": "Listo — revisa tus palabras y luego toca Crear",
+    "doneReview": "Listo. Revisa tus palabras y luego toca Crear",
     "freeLimit": "Límite gratuito alcanzado ({max}/día). Actualiza para más.",
     "proLimit": "Límite Pro alcanzado ({max}/día). ¡Vuelve mañana!",
     "cumulativeLimit": "Límite diario de audio alcanzado. ¡Vuelve mañana!",
@@ -192,5 +199,23 @@
     "proUnlocked": "¡Pro desbloqueado! Disfruta todo ilimitado.",
     "thankYouEmail": "¡Gracias! Te responderé pronto.",
     "validEmail": "Por favor ingresa un email válido."
+  },
+  "voice": {
+    "attach": "Adjuntar voz",
+    "attached": "La voz se adjuntará",
+    "detached": "Voz eliminada de la tarjeta",
+    "textChanged": "Texto cambiado. Voz desvinculada. Graba de nuevo para adjuntar.",
+    "webmDone": "WebM con voz descargado",
+    "webmFailed": "Error al exportar WebM",
+    "listen": "Escuchar la voz",
+    "playing": "Reproduciendo..."
+  },
+  "exportProgress": {
+    "generating": "Generando tarjeta…"
+  },
+  "dlChoice": {
+    "title": "Descargar tu tarjeta",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> Descargar PNG",
+    "webm": "<i class=\"fa-solid fa-video\"></i> Descargar WebM"
   }
 }

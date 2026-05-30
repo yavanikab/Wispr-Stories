@@ -1,5 +1,115 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **About-page framing** — "About Wispr Stories" eyebrow label above hero heading, plus intro sentence between tagline and CTA explaining what the app is
+- **Hero CTA button** — "Create your first card →" below hero tagline, light bg with dark text, scale-up hover with shadow
+- **Feature icon hover accent** — icon color changes to lavender when hovering a feature card, with `transition: color 0.2s`
+
+### Changed
+- **Feature & HIW icons**: enlarged from `clamp(20px, 1.8vw, 24px)` to `clamp(26px, 2.4vw, 32px)` to match stat number scale
+- **Mobile mosaic card text**: `font-size` bumped from 9px to 10px for non-Latin script readability
+
+### Fixed
+- **Smooth scroll**: added `scroll-behavior: smooth` on `html` element for anchor navigation
+
+## [v0.10.4] — 2026-05-29
+
+### Added
+- **About page UI/UX polish** — multiple enhancements across HTML, CSS, and JS
+  - Scroll-reveal animations: fixed broken `.reveal` CSS (rules were only in language-stats.css, now duplicated in about.css)
+  - Mosaic card stagger entrance: 7 cards fade in sequentially on page load (40ms staggered delay each)
+  - Count-up animation: stat numbers (44, 2, 7, 36 hrs) animate from 0 to target when scrolled into view
+  - FAQ auto-scroll: opening a FAQ item near the bottom of the viewport auto-scrolls to keep it visible
+  - Wispr Flow auto-wave: "Wispr Flow" in the CTA tagline continuously waves with a letter-bounce animation (~2s pause between cycles)
+  - CTA tagline: new line "Stop typing. Wispr Flow works in every text field — emails, messages, docs. All with your voice." after the email link
+
+### Changed
+- Hero heading: font-weight 400 → 700, letter-spacing -0.02em → -0.01em for more impact
+- Feature stat numbers: enlarged from `clamp(16px, 1.4vw, 20px)` to `clamp(22px, 2.2vw, 28px)`
+- "STT engines (Speech recognition)" → "Speech engines" for cleaner scannability
+- CTA button hover: scale(0.98) → scale(1.03) (grows instead of shrinking)
+- FAQ max-height: 500px → 800px to prevent truncation of longer answers
+
+### Fixed
+- Reveal animations now actually work (missing CSS rules were only in language-stats.css)
+- CardIn animation no longer overrides card rotation transforms (animation now only touches opacity)
+
+### Dark mode
+- `.how-step-num` circles now use lavender accent color instead of near-black for better visibility on dark card backgrounds
+
+## [v0.10.3] — 2026-05-29
+
+### Added
+- **Language Stats page redesign** — Major UI/UX overhaul to match Wispr Flow design aesthetic
+  - Hero section: larger typography (h1 28-36px), generous spacing (40px top padding), subtle gradient background
+  - Insights section: "Top languages" label now visible, 3-column card layout with borders, clickable to filter table
+  - Region chips: visible filter buttons with language counts, grouped with "Usage by Language" heading
+  - Chart: region colors updated to Wispr Flow palette (orange, blue, green, purple, red-orange)
+  - Chart animation: bars animate from 0 to final height with easeOutQuart easing
+  - Chart hover: cursor changes to pointer on bar hover
+  - Table: search input with row count indicator ("12 of 44"), "no results" message, zero rows toggle
+  - Table: zebra striping, top-3 row highlighting with medal badges
+  - Table: sort indicators visible at 50% opacity, aria-sort attributes
+  - Share button: copies stats to clipboard
+  - Back to top button: appears on scroll, smooth scroll to top
+  - Skeleton loading: shimmer animation on hero numbers during data fetch
+  - Count-up animation: numbers animate from 0 to final value on load
+  - Disclaimer: collapsed to single line, always visible
+  - Badge note: explains medal system at bottom of page
+  - Dark mode: all colors use CSS variables, auto-adapts
+  - Mobile: insights stack to 1 column, tighter spacing, responsive table controls
+  - Print: optimized print styles
+
+### Changed
+- **Footer moved inside .main** — Now scrolls with content instead of staying fixed at viewport bottom
+- **Chart region colors** — Updated to Wispr Flow palette: South Asia `#ffa946`, Europe `#3898ec`, Southeast Asia `#22a85a`, Middle East `#886dc2`, East Asia `#ff6c4c`
+- **Hero typography** — h1 scaled from 22-28px to 28-36px, section headings from 16-20px to 20-24px
+- **Subtitle text** — Changed from "Live card-creation usage across 44 supported languages" to "44 languages tracked across voice and story inputs"
+- **Chart hint** — Changed from "Click a bar to filter by region" to "Click any bar or use the filters above"
+- **Card borders** — Increased from 1px to 1.5px on hero and insight cards
+- **Insight card border-radius** — Changed from 8px to 12px for consistency
+- **Main padding** — Increased top padding from 32px to 40px, bottom from 48px to 60px
+- **Section headings** — Added italic emphasis on "Language" in "Usage by *Language*"
+
+### Fixed
+- **Region filter sync** — Chart bar clicks now update region chips and vice versa
+- **Insights clickable** — Clicking a top-3 language fills search box and scrolls to table
+- **Search no results** — Shows "No languages match your search" when filter returns 0 results
+- **Zero rows toggle** — "Show all languages" toggle hides/shows languages with 0 cards
+- **Chart hover cursor** — Cursor changes to pointer on bar hover, default elsewhere
+- **Table row count** — Shows "12 of 44" in search box indicating filtered count
+- **Footer alignment** — Removed grid properties, added full-width span for correct layout
+- **Mobile insights** — Changed from stacked 1-column to compact 3-column layout
+
+## [v0.10.2] — 2026-05-28
+
+### Added
+- **Determinate progress bar** — ffmpeg.wasm progress callback drives `.export-progress-bar` width (0–100%). Indeterminate CSS animation used for non-encode stages.
+- **Download choice shows file size + time estimates** — PNG and WebM buttons show estimated size (KB/MB) and duration (~2s / ~3-6s) in `<small>` text. Updated dynamically from cached blob or audio size.
+- **Success flash on download** — `dlBtn` turns green with checkmark for 1.5s after download completes.
+- **Toast queue** — Multiple toasts don't overlap; up to 3 queued, shown sequentially with 250ms gap.
+- **ESC closes all modals** — Global keydown listener closes share, upgrade, speech, and download-choice modals.
+- **Focus trapping + modal stack** — Tab cycling for all modals (first→last focusable element). Prevents overlapping modals — opening one closes any other.
+- **Keyboard shortcuts popover** — `?` nav button toggles a popover listing Space=record, Esc=close. Click-outside dismissal.
+- **Haptic feedback** — `_vibrate(12)` on mic, create, and share buttons via `navigator.vibrate()`.
+- **Collapsible name row** — Hidden by default, appears when textarea has content or name field is focused.
+- **Cycling placeholder in textarea** — Ghost hints cycle through all `normal_example` prompts from languages.json when textarea is empty.
+- **OR divider → keyboard icon** — Text replaced with `fa-keyboard` icon between horizontal rules.
+- **Full-width share preview on mobile** — At <=480px, `.share-modal-preview` spans full modal width (max-height 50vh).
+- **Upgrade modal close buttons** — `#upgradeClose` and `#upgradeBackdrop` now wired to `closeUpgradeModal()`.
+- **About page separated** — Inline CSS moved to `global/styles/about.css`, inline JS moved to `global/about.js`. HTML reduced from ~1000 lines to ~265 lines.
+- **About page hero mosaic** — Replaced single static card with scattered mosaic of 7 cards in different colors (Violet, Teal, Rose, Amber, Emerald, Ocean, Fuchsia) and languages (Hindi, English, Spanish, Japanese, Russian, Portuguese, Thai).
+
+### Changed
+- **About page clarity rewrite** — Rewrote 8 jargon strings for general audience clarity while keeping technical model names (Deepgram Nova-3, OpenAI Whisper) intact. Examples: "STT engines" → "STT engines (Speech recognition)", "36h" → "36 hrs", "transliterates" → "changes your script".
+
+### Fixed
+- **ffmpeg.wasm URL** — `@ffmpeg/core-st@0.12.6` doesn't exist on npm; changed to `@ffmpeg/core@0.12.6` (single-threaded build was merged into the main package in v0.12.x).
+- **Share-button i18n** — `shareModal.generating` key lookup → `record.generating` (was falling back to English in every locale).
+- **Progress bar state reset** — `showExportProgress()` now resets bar to 0% + indeterminate on each show, preventing stale width from previous run.
+
 ## [v0.10.1] — 2026-05-27
 
 ### Fixed

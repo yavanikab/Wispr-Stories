@@ -9,33 +9,33 @@
     "subtitle": "マイクで録音するか<a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>で音声入力。スタイルし、愛を込めてシェア。",
     "quote": "\"思い出を大切にしよう；思い出もあなたを大切にしてくれる。\""
   },
-    "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のカードも作りましょう。",
-  "ffNotice": "🌐 Firefoxでは音声録音がサポートされていません。ChromeまたはSafariを使用してください — または下にテキストを貼り付けてください。",
+  "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のカードも作りましょう。",
+  "ffNotice": "🌐 Firefoxでは音声録音がサポートされていません。ChromeまたはSafariを使用してください, または下にテキストを貼り付けてください。",
   "record": {
     "label": "あなたの声",
-    "tip": "録音を押して自然に話してください。言葉がリアルタイムで表示されます。もう一度タップして停止 — 言葉がカード用のテキストボックスに移動します。",
+    "tip": "録音を押して自然に話してください。言葉がリアルタイムで表示されます。もう一度タップして停止. 言葉がカード用のテキストボックスに移動します。",
     "status": "タップして話す",
     "sub": "停止すると文字が表示されます",
     "generating": "生成中…"
   },
-
   "speechLang": {
-    "title": "Select speech language",
-    "sub": "Choose your speaking language for better transcription accuracy",
+    "title": "音声言語を選択",
+    "sub": "話す言語を選択：44言語",
     "triggerLabel": "言語設定",
     "reminderEmpty": "音声認識の言語を選択",
     "reminderNative": "非対応の言語は母語として扱われます",
-    "micDisabledNoLang": "Mic disabled",
-    "micDisabledNative": "Mic disabled",
-    "subNoLang": "Select a language to enable the mic",
-    "subNative": "Choose a different language to speak",
-    "tooltipNoLang": "Select a language to enable the mic",
-    "tooltipNative": "Mic is currently disabled for native language"
+    "micDisabledNoLang": "マイク無効",
+    "micDisabledNative": "マイク無効",
+    "subNoLang": "マイクを有効にする言語を選択",
+    "subNative": "別の言語を選択して話す",
+    "tooltipNoLang": "マイクを有効にする言語を選択",
+    "tooltipNative": "ネイティブ言語ではマイクは無効です",
+    "filter": "言語を検索…"
   },
   "orText": "または言葉を入力または貼り付け",
   "textarea": {
     "label": "あなたの言葉",
-    "tip": "まず上の録音を使って話す — 言葉が自動的にここに表示されます。または直接入力。またはWispr Flowから貼り付け。どの言語でも使えます。",
+    "tip": "まず上の録音を使って話す. 言葉が自動的にここに表示されます。または直接入力。またはWispr Flowから貼り付け。どの言語でも使えます。",
     "placeholder": "声を録音するか何でも入力：誕生日の願い、思い出、レシピ、ラブレター、感謝、アドバイス..."
   },
   "resetBtn": "すべてリセット",
@@ -52,7 +52,7 @@
   },
   "tone": {
     "label": "トーン",
-    "tip": "オリジナルはあなたの言葉をそのまま残します — 無制限、毎日の上限なし。他のトーンはAIで書き換えます：暖かいは優しく、大胆は直接的、詩的はリズムを持って流れ、遊び心は軽く、内省的はゆっくり、正直はありのまま。文字間隔と傾きのみを変更 — サイズや太さは変えません。",
+    "tip": "オリジナルはあなたの言葉をそのまま残します, 無制限、毎日の上限なし。他のトーンはAIで書き換えます：暖かいは優しく、大胆は直接的、詩的はリズムを持って流れ、遊び心は軽く、内省的はゆっくり、正直はありのまま。文字間隔と傾きのみを変更, サイズや太さは変えません。",
     "original": "オリジナル",
     "warm": "暖かい",
     "bold": "大胆",
@@ -82,29 +82,36 @@
     "sharp": "シャープな角",
     "rounded": "丸い角"
   },
+  "fontSize": {
+    "label": "文字サイズ",
+    "tip": "短いカードの文字を大きくして、カードをきれいに埋めます。カードの文字が短いときのみ利用できます。",
+    "info": "カードの文字が 85 文字未満のときのみ利用できます",
+    "infoOn": "カードの文字が短いです：+ または − をタップしてサイズを調整します"
+  },
   "actions": {
     "create": "カードを作成",
     "share": "カードを共有",
     "createTone": "{tone}トーンのカードを作成"
   },
-    "rewrite": {
-    "left": "{n} {tone} rewrite left today",
-    "plural": "{n} {tone} rewrites left today",
-    "exhausted": "0 {tone} rewrites left today — try another tone"
-  },"closing": "あなたの声、美しく共有",
+  "rewrite": {
+    "left": "今日の{tone}書き換え残り{n}回",
+    "plural": "今日の{tone}書き換え残り{n}回",
+    "exhausted": "今日の{tone}書き換えは0回です。他のトーンをお試しください"
+  },
+  "closing": "あなたの声、美しく共有",
   "preview": {
     "label": "ライブプレビュー"
   },
   "upgrade": "アップグレード",
   "download": "カードをダウンロード",
-  "cardEmpty": "詳細を入力 —<br />カードがここに表示されます",
+  "cardEmpty": "詳細を入力,<br />カードがここに表示されます",
   "cardPlaceholder": "話したり入力したりすると、ここにストーリーが表示されます。",
   "wcta": {
-    "text": "入力する場所で声を使おう — WhatsApp、Gmail、Slack、どのアプリでも。",
+    "text": "入力する場所で声を使おう: WhatsApp、Gmail、Slack、どのアプリでも。",
     "link": "Wispr Flowを無料で試す →"
   },
   "footer": {
-    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — のために作られました <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
+    "text": "<a href=\"#top\" class=\"footer-wave wave-on-hover\">Wispr Stories</a> — made for <a href=\"https://wisprflow.ai?ref=wispr-stories\" target=\"_blank\" rel=\"noopener\" class=\"footer-wave wave-on-hover\"><strong>Wispr Flow</strong></a>",
     "independent": "独立したプロジェクト · Wispr Flowとは提携していません",
     "copyright": "© 2026"
   },
@@ -120,14 +127,14 @@
     "title": "Proにアップグレード",
     "sub": "無制限のトーン書き換え。もう日次制限はありません。",
     "buyCoffee": "☕ コーヒーをおごって",
-    "or": "— または —",
+    "or": "または",
     "haveKey": "すでにサポーターキーをお持ちですか？",
     "keyPlaceholder": "キーを貼り付け...",
     "continue": "続行",
     "lostKey": "キーを紛失しましたか？",
     "emailPlaceholder": "メールを入力",
     "emailSend": "送信",
-    "disclaimer": "Wispr Stories — Wispr Flowのために作られました"
+    "disclaimer": "Wispr Stories — made for Wispr Flow"
   },
   "capacity": {
     "title": "愛で溢れています！",
@@ -138,9 +145,9 @@
   "onboarding": {
     "title": "Wispr Storiesへようこそ",
     "step1": "メッセージを<strong>話すか入力</strong>してください。マイクをタップするかテキストを貼り付けます。",
-    "step2": "カードを<strong>カスタマイズ</strong> — トーン、色、角のスタイルを選択します。",
-    "step3": "<strong>作成して共有</strong> — PNGでダウンロードするか、ソーシャルプラットフォームで直接共有します。",
-    "gotIt": "了解 — 始めましょう！",
+    "step2": "カードを<strong>カスタマイズ</strong>: トーン、色、角のスタイルを選択します。",
+    "step3": "<strong>作成して共有</strong>: PNGでダウンロードするか、ソーシャルプラットフォームで直接共有します。",
+    "gotIt": "了解, 始めましょう！",
     "hint": "後でヘルプが必要ですか？上部バーの❓アイコンをタップしてください。"
   },
   "mobileBar": {
@@ -150,36 +157,36 @@
   },
   "toasts": {
     "downloaded": "ダウンロード完了！",
-    "exportFailed": "エクスポート失敗 — もう一度試してください",
-    "uploadFailed": "アップロード失敗 — もう一度試してください",
+    "exportFailed": "エクスポート失敗. もう一度試してください",
+    "uploadFailed": "アップロード失敗. もう一度試してください",
     "linkCopied": "リンクコピー完了！",
     "copyFailed": "リンクをコピーできませんでした",
-    "imageSaved": "画像保存完了 — 写真アプリを開いて貼り付け",
-    "downloadFailed": "ダウンロード失敗 — 共有を試してください",
+    "imageSaved": "画像保存完了. 写真アプリを開いて貼り付け",
+    "downloadFailed": "ダウンロード失敗. 共有を試してください",
     "imageCopied": "画像コピー完了！",
     "imageSavedDownloads": "画像はダウンロードに保存されました",
-    "copyNotSupported": "コピーはサポートされていません — ダウンロードを試してください",
-    "cardReady": "カード準備完了 — ダウンロードするには共有をタップ",
+    "copyNotSupported": "コピーはサポートされていません. ダウンロードを試してください",
+    "cardReady": "カード準備完了. ダウンロードするには共有をタップ",
     "speakFirst": "まずストーリーを話すか書いてください",
-    "dailyRewritesUsed": "日次書き換えを使用済み — オリジナルとして表示",
+    "dailyRewritesUsed": "日次書き換えを使用済み. オリジナルとして表示",
     "rewriteLimit": "日次書き換え制限に達しました",
-    "rewriteFailed": "書き換え失敗 — オリジナルを表示",
+    "rewriteFailed": "書き換え失敗. オリジナルを表示",
     "rewriteApplied": "書き換え適用完了！",
-    "silence": "捉えられませんでした — もっと大きく話してみてください",
+    "silence": "捉えられませんでした. もっと大きく話してみてください",
     "recordingWorks": "録音は正常です！実際のトランスクリプションにはDeepgramキーを追加してください",
-    "transcriptionFailed": "トランスクリプション失敗 — 'vercel dev'の実行またはデプロイが必要です",
+    "transcriptionFailed": "トランスクリプション失敗. 'vercel dev'の実行またはデプロイが必要です",
     "voiceNotSupported": "Firefoxでは音声がサポートされていません",
-    "requiresHttps": "音声録音にはHTTPSが必要です — localhostで開くかデプロイして使用してください",
+    "requiresHttps": "音声録音にはHTTPSが必要です. Localhostで開くかデプロイして使用してください",
     "safariEnglish": "Safariは音声認識に英語（米国）のみをサポートする可能性があります",
-    "speechNotResponding": "音声サービスが応答しません — もう一度試すか入力してください",
-    "micDenied": "マイクアクセスが拒否されました — ブラウザ設定を確認してください",
-    "speechUnavailable": "音声サービスが利用できません — 代替手段を試しています...",
-    "couldNotStart": "録音を開始できませんでした — 入力を試してください",
-    "noSpeech": "音声が検出されませんでした — もっと大きく話してみてください",
-    "speechError": "音声エラー — もう一度試してください",
-    "noMatch": "音声を一致できませんでした — もっとはっきり話してみてください",
+    "speechNotResponding": "音声サービスが応答しません. もう一度試すか入力してください",
+    "micDenied": "マイクアクセスが拒否されました. ブラウザ設定を確認してください",
+    "speechUnavailable": "音声サービスが利用できません. 代替手段を試しています...",
+    "couldNotStart": "録音を開始できませんでした. 入力を試してください",
+    "noSpeech": "音声が検出されませんでした. もっと大きく話してみてください",
+    "speechError": "音声エラー. もう一度試してください",
+    "noMatch": "音声を一致できませんでした. もっとはっきり話してみてください",
     "couldNotStartMic": "マイクを起動できませんでした",
-    "doneReview": "完了 — 言葉を確認してから作成をタップ",
+    "doneReview": "完了. 言葉を確認してから作成をタップ",
     "freeLimit": "無料制限に達しました（{max}/日）。アップグレードして増やしましょう。",
     "proLimit": "Pro制限に達しました（{max}/日）。明日また来てください！",
     "cumulativeLimit": "日次オーディオ時間制限に達しました。明日また来てください！",
@@ -192,5 +199,23 @@
     "proUnlocked": "Proが解除されました！無制限のすべてをお楽しみください。",
     "thankYouEmail": "ありがとうございます！すぐにお返しします。",
     "validEmail": "有効なメールアドレスを入力してください。"
+  },
+  "voice": {
+    "attach": "音声を添付",
+    "attached": "音声が添付されます",
+    "detached": "カードから音声が削除されました",
+    "textChanged": "テキストが変更されました。音声は削除されました。再録音してください。",
+    "webmDone": "音声付きWebMをダウンロードしました",
+    "webmFailed": "WebMエクスポートに失敗しました",
+    "listen": "音声を聞く",
+    "playing": "再生中..."
+  },
+  "exportProgress": {
+    "generating": "カードを生成中…"
+  },
+  "dlChoice": {
+    "title": "カードをダウンロード",
+    "png": "<i class=\"fa-solid fa-file-image\"></i> PNGをダウンロード",
+    "webm": "<i class=\"fa-solid fa-video\"></i> WebMをダウンロード"
   }
 }

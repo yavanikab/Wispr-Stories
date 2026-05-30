@@ -15,7 +15,7 @@
 <p align="center">
   Turn your voice into shareable cards, in your language, in seconds.
   <br>
-  No account · No install · 21 languages · speak or type in any language your browser supports
+  No account · No install · 44 languages · speak or type in any language your browser supports
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Vanilla-HTML%2FCSS%2FJS-blue?style=flat-square" alt="Vanilla HTML/CSS/JS">
   <img src="https://img.shields.io/badge/Deployed-Vercel-000?style=flat-square&logo=vercel" alt="Vercel">
-  <img src="https://img.shields.io/badge/21-UI%20locales-orange?style=flat-square" alt="21 UI locales">
+  <img src="https://img.shields.io/badge/11-UI%20locales-orange?style=flat-square" alt="11 UI locales">
 </p>
 
 ---
@@ -58,10 +58,10 @@ Wispr Stories is an independent fan project — not affiliated, not sponsored. [
 - ✨ **AI tone rewriting** — tap a tone (Warm, Bold, Poetic, Playful, Reflective, Honest) and your message is rewritten to match
 - 🎨 **10 color palettes** — Violet, Amber, Crimson, Emerald, Ocean, Rose, Orange, Teal, Fuchsia, Indigo
 - 📐 **2:2 square ratio** — optimized for WhatsApp large preview (4:5, 16:9, 3:4, 9:16 designed but not yet built)
-- 🌍 **21 languages** — the app interface and your card both work in your language
+- 🌍 **44 speech languages** — speak in any of 44 languages; the app UI translates to 11 languages
 - 📱 **Built for phones** — full mobile-first design with native share
 - 🌙 **Dark mode** — follows your system preference
-- 🔒 **Privacy-first** — your audio never leaves your browser. Shared-link cards auto-expire after a couple of days. No accounts, no tracking.
+- 🔒 **Privacy-first** — audio is sent to Deepgram or OpenRouter Whisper for transcription only; no recordings are stored. Shared-link cards auto-expire after a couple of days. No accounts, no tracking.
 
 ## Try It
 
@@ -84,7 +84,6 @@ Works in Chrome, Edge, and Safari. Firefox supports typing and paste only — vo
 
 ## What's Next
 
-- 🎧 **Voice-attached cards** — tap the waveform on a shared card to hear the original voice
 - 🔗 **Animated shareable links** — open a card as a live web page, not just a static image
 
 ## Acknowledgments

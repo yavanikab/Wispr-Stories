@@ -3,6 +3,14 @@ let allLanguages = [];
 // Languages that use Latin script (wave animation is safe)
 const LATIN_LANGS = ['en', 'es', 'fr', 'pt', 'id', 'de', 'tr', 'it', 'sv', 'el', 'ca', 'cs', 'nl', 'da', 'fi', 'pl', 'hu', 'vi', 'ms', 'tl'];
 
+// Languages shown in the nav-bar PAGE-LANGUAGE (i18n) dropdown — ONLY those that
+// have a translation file in assets/i18n/. This is deliberately a small subset
+// and is COMPLETELY SEPARATE from the speech-language picker, which offers every
+// language in languages.json. Do not confuse the two: editing this list changes
+// only the page-translation dropdown, never the speech languages.
+const I18N_DISPLAY_LANGS = ['en', 'zh', 'hi', 'es', 'ja', 'ko', 'te', 'ta', 'it', 'th', 'kn'];
+window.I18N_DISPLAY_LANGS = I18N_DISPLAY_LANGS;
+
 window.isLatinScript = function(code) {
   return LATIN_LANGS.indexOf(code) !== -1;
 };
@@ -21,7 +29,17 @@ async function loadLanguages() {
   var input = document.getElementById('langSel');
 
   if (dropdown && btn && input) {
-    allLanguages.forEach(function(lang) {
+    // Only the translated languages appear here (English pinned first, the rest
+    // alphabetical by English label). The speech picker is built separately from
+    // the full list and is unaffected by this filtering.
+    var displayLangs = allLanguages
+      .filter(function(lang) { return I18N_DISPLAY_LANGS.indexOf(lang.code) !== -1; })
+      .sort(function(a, b) {
+        if (a.code === 'en') return -1;
+        if (b.code === 'en') return 1;
+        return a.label.localeCompare(b.label);
+      });
+    displayLangs.forEach(function(lang) {
       var item = document.createElement('button');
       item.className = 'lang-dropdown-item';
       item.type = 'button';
@@ -43,9 +61,13 @@ async function loadLanguages() {
       dropdown.appendChild(item);
     });
 
-    // Restore saved language or default to English
+    // Restore saved language or default to English. Ignore a saved language that
+    // is no longer in the translated set (e.g. left over from before this list
+    // was trimmed) so the page doesn't show a stale flag with English text.
     var savedLang = localStorage.getItem('wsLang');
-    var defaultLang = savedLang ? allLanguages.find(function(l) { return l.code === savedLang; }) : null;
+    var defaultLang = (savedLang && I18N_DISPLAY_LANGS.indexOf(savedLang) !== -1)
+      ? allLanguages.find(function(l) { return l.code === savedLang; })
+      : null;
     if (!defaultLang) defaultLang = allLanguages.find(function(l) { return l.code === 'en'; }) || allLanguages[0];
     setLanguage(defaultLang, btn, input);
   }

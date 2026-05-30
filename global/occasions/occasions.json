@@ -1116,7 +1116,7 @@
       "maligayang pagbati"
     ],
     "examples": {
-      "en-US": "Congratulations! This is such wonderful news—you truly deserve it.",
+      "en-US": "Congratulations! This is such wonderful news. You truly deserve it.",
       "hi-IN": "बधाई हो! यह आपके लिए बहुत गर्व का क्षण है।",
       "es-ES": "¡Felicidades! Este logro es solo el comienzo de grandes cosas.",
       "fr-FR": "Félicitations! Tout ce travail acharné a porté ses fruits.",
@@ -1430,7 +1430,7 @@
       "pagpalain ka sana"
     ],
     "examples": {
-      "en-US": "Good luck! You've got this—give it your best and shine bright.",
+      "en-US": "Good luck! You've got this. Give it your best and shine bright.",
       "hi-IN": "शुभकामनाएं! आपको सफलता मिले, यही दुआ है।",
       "es-ES": "¡Buena suerte! Estoy seguro de que lo harás increíble.",
       "fr-FR": "Bonne chance! Je crois en toi, tu vas tout déchirer.",
@@ -1843,18 +1843,7 @@
   {
     "id": "holi",
     "img": "assets/occasions/holi.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy holi",
       "holi wishes",
@@ -1899,18 +1888,7 @@
   {
     "id": "ugadi",
     "img": "assets/occasions/ugadi.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy ugadi",
       "ugadi wishes",
@@ -1947,18 +1925,7 @@
   {
     "id": "sankranti",
     "img": "assets/occasions/sankranti.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy sankranti",
       "makar sankranti",
@@ -2004,18 +1971,7 @@
   {
     "id": "onam",
     "img": "assets/occasions/onam.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy onam",
       "onam wishes",
@@ -2048,18 +2004,7 @@
   {
     "id": "ganesh-chaturthi",
     "img": "assets/occasions/ganesh-chaturthi.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy ganesh chaturthi",
       "ganesh chaturthi wishes",
@@ -2096,18 +2041,7 @@
   {
     "id": "navratri",
     "img": "assets/occasions/navratri.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy navratri",
       "navratri wishes",
@@ -2147,18 +2081,7 @@
   {
     "id": "dussehra",
     "img": "assets/occasions/dussehra.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy dussehra",
       "dussehra wishes",
@@ -2196,18 +2119,7 @@
   {
     "id": "vijayadashami",
     "img": "assets/occasions/vijayadashami.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy vijayadashami",
       "vijayadashami wishes",
@@ -2240,18 +2152,7 @@
   {
     "id": "raksha-bandhan",
     "img": "assets/occasions/raksha-bandhan.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy raksha bandhan",
       "raksha bandhan wishes",
@@ -2289,18 +2190,7 @@
   {
     "id": "janmashtami",
     "img": "assets/occasions/janmashtami.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy janmashtami",
       "janmashtami wishes",
@@ -2337,18 +2227,7 @@
   {
     "id": "maha-shivaratri",
     "img": "assets/occasions/maha-shivaratri.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy mahashivaratri",
       "maha Shivaratri",
@@ -2386,18 +2265,7 @@
   {
     "id": "rama-navami",
     "img": "assets/occasions/rama-navami.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy rama navami",
       "rama navami wishes",
@@ -2434,18 +2302,7 @@
   {
     "id": "bathukamma",
     "img": "assets/occasions/bathukamma.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy bathukamma",
       "bathukamma wishes",
@@ -2468,18 +2325,7 @@
   {
     "id": "bonalu",
     "img": "assets/occasions/bonalu.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy bonalu",
       "bonalu festival",
@@ -2503,18 +2349,7 @@
   {
     "id": "dhanteras",
     "img": "assets/occasions/dhanteras.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy dhanteras",
       "dhanteras wishes",
@@ -2549,18 +2384,7 @@
   {
     "id": "republic-day",
     "img": "assets/occasions/republic-day.png",
-    "languages": [
-      "en",
-      "hi",
-      "bn",
-      "gu",
-      "kn",
-      "ml",
-      "mr",
-      "pa",
-      "ta",
-      "te"
-    ],
+    "languages": ["en", "hi", "bn", "gu", "kn", "ml", "mr", "pa", "ta", "te"],
     "triggers": [
       "happy republic day",
       "republic day wishes",
@@ -2918,6 +2742,8 @@
       "pride",
       "lgbtq pride",
       "pride month wishes",
+      "สุขสันต์เดือนไพรด์",
+      "ไพรด์",
       "feliz mes del orgullo",
       "feliz orgullo",
       "orgullo lgbt",
@@ -2935,6 +2761,7 @@
       "glücklichen pride monat",
       "frohen pride month",
       "frohen juni pride",
+      "Buon mese del Pride",
       "buon pride month",
       "buon orgoglio lgbt",
       "mese dell'orgoglio",
@@ -3082,10 +2909,7 @@
   {
     "id": "la-tomatina",
     "img": "assets/occasions/la-tomatina.png",
-    "languages": [
-      "es",
-      "en"
-    ],
+    "languages": ["es", "en"],
     "triggers": [
       "la tomatina",
       "happy tomatina",
@@ -3111,10 +2935,7 @@
   {
     "id": "dia-de-los-muertos",
     "img": "assets/occasions/dia-de-los-muertos.png",
-    "languages": [
-      "es",
-      "en"
-    ],
+    "languages": ["es", "en"],
     "triggers": [
       "day of the dead",
       "día de muertos",
@@ -3140,10 +2961,7 @@
   {
     "id": "songkran",
     "img": "assets/occasions/songkran.png",
-    "languages": [
-      "th",
-      "en"
-    ],
+    "languages": ["th", "en"],
     "triggers": [
       "happy songkran",
       "songkran",
@@ -3169,10 +2987,7 @@
   {
     "id": "loi-krathong",
     "img": "assets/occasions/loi-krathong.png",
-    "languages": [
-      "th",
-      "en"
-    ],
+    "languages": ["th", "en"],
     "triggers": [
       "happy loi krathong",
       "loi krathong",
@@ -3198,10 +3013,7 @@
   {
     "id": "hanami",
     "img": "assets/occasions/hanami.png",
-    "languages": [
-      "ja",
-      "en"
-    ],
+    "languages": ["ja", "en"],
     "triggers": [
       "happy hanami",
       "hanami",
@@ -3236,10 +3048,7 @@
   {
     "id": "obon",
     "img": "assets/occasions/obon.png",
-    "languages": [
-      "ja",
-      "en"
-    ],
+    "languages": ["ja", "en"],
     "triggers": [
       "happy obon",
       "obon",

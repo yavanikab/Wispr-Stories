@@ -108,12 +108,6 @@
       flex-shrink: 0;
     }
 
-    @media (max-width: 768px) {
-      .fmenu-root {
-        display: none;
-      }
-    }
-
     .fmenu-version {
       display: none;
       padding: 10px 16px 8px;
@@ -218,7 +212,11 @@
     }
   });
 
-  wrapper.querySelector("#fmenu-help")?.addEventListener("click", (e) => {
+  var helpLink = wrapper.querySelector("#fmenu-help");
+  if (typeof window.showOnboarding !== "function" && helpLink) {
+    helpLink.style.display = "none";
+  }
+  helpLink?.addEventListener("click", (e) => {
     e.preventDefault();
     panel.classList.add("hidden");
     toggle.setAttribute("aria-expanded", "false");

@@ -1,17 +1,27 @@
 import { getLangStatsRedis } from '../lib/lang-stats-redis.js';
 
-export default async function handler(req, res) {
-  // CORS headers for Vercel
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export const config = { runtime: 'edge' };
 
+export default async function handler(req) {
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+    });
   }
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
 
   try {
@@ -19,17 +29,27 @@ export default async function handler(req, res) {
     try {
       redis = getLangStatsRedis();
     } catch (_e) {
-      // Redis not configured — return empty data
-      return res.status(200).json({ voice: {}, story: {} });
+      return new Response(JSON.stringify({ voice: {}, story: {} }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     }
 
     const raw = await redis.hgetall('wispr:langstats');
 
     if (!raw || typeof raw !== 'object') {
-      return res.status(200).json({ voice: {}, story: {} });
+      return new Response(JSON.stringify({ voice: {}, story: {} }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     }
 
-    // Parse flat hash into voice: {} and story: {} objects
     const voice = {};
     const story = {};
 
@@ -46,9 +66,21 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ voice, story });
+    return new Response(JSON.stringify({ voice, story }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   } catch (e) {
     console.error('[LangStats] Error:', e);
-    return res.status(200).json({ voice: {}, story: {} });
+    return new Response(JSON.stringify({ voice: {}, story: {} }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
 }
