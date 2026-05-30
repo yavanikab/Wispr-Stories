@@ -13,6 +13,8 @@
 
 ### Fixed
 - Smooth scroll enabled on html element
+- **Recording→STT pipeline**: WebM Opus → 16kHz WAV conversion with `_audioBufferToWav()`; `api/stt.js` rewritten to accept raw binary; `runtime: 'edge'` restored
+- **CSP service worker font blocking**: added Google Fonts domains to `connect-src` in `vercel.json`
 
 ## v0.10.4 — About Page UI/UX Polish (2026-05-29)
 ### Added

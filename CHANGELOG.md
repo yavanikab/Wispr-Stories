@@ -13,6 +13,8 @@
 
 ### Fixed
 - **Smooth scroll**: added `scroll-behavior: smooth` on `html` element for anchor navigation
+- **Recording→STT pipeline**: WebM Opus audio now converted to 16kHz WAV client-side before Deepgram submission (WebM Opus returned empty transcripts). `_audioBufferToWav()` resamples to 16kHz keeping payload ~470KB. `api/stt.js` rewritten to accept raw binary via `req.arrayBuffer()` with parameters as headers. `runtime: 'edge'` restored.
+- **CSP service worker font blocking**: added `https://fonts.googleapis.com` and `https://fonts.gstatic.com` to `connect-src` in `vercel.json` — service worker `fetch()` calls for Google Fonts were blocked, flooding console with CSP errors
 
 ## [v0.10.4] — 2026-05-29
 
