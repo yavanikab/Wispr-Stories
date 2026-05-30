@@ -205,8 +205,8 @@ export default async function handler(req) {
     // STRICT RULE: inclusionai/ling-2.6-flash is ONLY for verified pro users.
     // It must never appear in the free-user model list under any circumstance.
     const models = isPro
-      ? ['inclusionai/ling-2.6-flash']   // paid model — pro users only
-      : ['qwen/qwen3-14b:free'];  // free model — free users only
+      ? ['inclusionai/ling-2.6-flash']          // paid model — pro users only
+      : ['qwen/qwen3-14b:free', 'qwen/qwen3-8b:free'];  // free models with fallback
     let lastError = null;
     let data = null;
 
@@ -241,16 +241,19 @@ export default async function handler(req) {
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        // Fall back to next model on 429 (rate-limit)
-        if (res.status === 429) {
-          lastError = await res.text();
-          console.warn(`[Rewrite] Model ${model} rate-limited, trying fallback`);
+        const errText = await res.text();
+        // Fall back to next model on rate-limit or model-not-found errors.
+        // 429 = rate-limited; 404 = model unavailable on this provider.
+        if (res.status === 429 || res.status === 404) {
+          lastError = errText;
+          console.warn(`[Rewrite] Model ${model} returned ${res.status}, trying fallback`);
           continue;
         }
-        // Non-429 error — return immediately
-        const err = await res.text();
-        return new Response(JSON.stringify({ error: 'LLM API error', detail: err }), {
-          status: res.status,
+        // Other upstream errors — return as 502 Bad Gateway so the client
+        // never sees a confusing "404 Not Found" for this route.
+        console.error(`[Rewrite] Model ${model} error ${res.status}:`, errText);
+        return new Response(JSON.stringify({ error: 'LLM API error', detail: errText }), {
+          status: 502,
           headers: { 'Content-Type': 'application/json' },
         });
       }
