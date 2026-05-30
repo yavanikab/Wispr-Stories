@@ -18,7 +18,7 @@
 //   online. Only change CACHE_NAME when you want to force a full cache
 //   flush across all existing users (rare — major structural changes only).
 
-const CACHE_NAME = 'wispr-stories-shell-v2';
+const CACHE_NAME = 'wispr-stories-shell-v3';
 
 // Files seeded into the cache on install so the app works on first
 // offline visit. Keep this list to the true shell only — every entry
@@ -56,6 +56,10 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
+  // Skip non-HTTP(S) schemes (e.g. chrome-extension://) — Cache API doesn't
+  // support them and trying to put() these URLs throws unhandled rejections.
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
+
   // Same-origin dynamic routes — always go to network. Never cache API
   // responses or share-link lookups.
   if (url.origin === self.location.origin) {
@@ -72,10 +76,14 @@ self.addEventListener('fetch', (event) => {
         cache.match(req).then((cached) => {
           const fetchPromise = fetch(req)
             .then((resp) => {
-              if (resp && resp.status === 200) cache.put(req, resp.clone());
+              // Only cache non-opaque responses (opaque responses have status 0
+              // and can silently fill the cache quota).
+              if (resp && resp.status === 200 && resp.type !== 'opaque') {
+                cache.put(req, resp.clone());
+              }
               return resp;
             })
-            .catch(() => cached);
+            .catch(() => cached || new Response('', { status: 503, statusText: 'Offline' }));
           return cached || fetchPromise;
         })
       )
