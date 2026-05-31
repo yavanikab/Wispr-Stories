@@ -114,40 +114,80 @@
     requestAnimationFrame(step);
   }
 
-  var lastFetchTime = null;
+  // Timestamp tracks when the DATA last changed (a new card was created),
+  // not when we last polled the server. It stays null until we actually
+  // observe a change during this session — so an idle/new user never sees
+  // a misleading "just now".
+  var lastChangeTime = null;
+  var prevSignature = null;
+  var hasRenderedOnce = false;
+
+  // Order-independent signature of the counts, so a mere reordering of
+  // Redis hash fields between polls is never mistaken for a real change.
+  function statsSignature() {
+    var parts = [];
+    ['voice', 'story'].forEach(function(src) {
+      var obj = USAGE[src] || {};
+      Object.keys(obj).sort().forEach(function(k) {
+        parts.push(src + ':' + k + '=' + obj[k]);
+      });
+    });
+    return parts.join('|');
+  }
+
   function updateLastFetched() {
     var updatedEl = document.getElementById('lastUpdated');
-    if (!updatedEl || fetchFailed || loading || !lastFetchTime) {
-      if (updatedEl) updatedEl.textContent = '';
+    if (!updatedEl) return;
+    if (fetchFailed || loading || lastChangeTime === null) {
+      updatedEl.textContent = '';
       return;
     }
-    var elapsed = Math.floor((Date.now() - lastFetchTime) / 1000);
-    if (elapsed < 60) {
-      updatedEl.textContent = 'Last fetched just now';
+    var elapsed = Math.floor((Date.now() - lastChangeTime) / 1000);
+    var msg;
+    if (elapsed < 10) {
+      msg = 'Updated just now';
+    } else if (elapsed < 60) {
+      msg = 'Updated a few seconds ago';
+    } else if (elapsed < 120) {
+      msg = 'Updated 1 minute ago';
     } else if (elapsed < 3600) {
-      var mins = Math.floor(elapsed / 60);
-      updatedEl.textContent = 'Last fetched ' + mins + 'm ago';
+      msg = 'Updated ' + Math.floor(elapsed / 60) + ' minutes ago';
+    } else if (elapsed < 7200) {
+      msg = 'Updated 1 hour ago';
     } else {
-      var hours = Math.floor(elapsed / 3600);
-      updatedEl.textContent = 'Last fetched ' + hours + 'h ago';
+      msg = 'Updated ' + Math.floor(elapsed / 3600) + ' hours ago';
     }
+    updatedEl.textContent = msg;
   }
 
   function fetchStats() {
     fetch('/api/lang-stats')
       .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function(data) {
+        var wasFailed = fetchFailed;
         USAGE.voice = data.voice || {};
         USAGE.story = data.story || {};
         fetchFailed = false;
         loading = false;
-        lastFetchTime = Date.now();
-        updateView();
+        var sig = statsSignature();
+        // Only treat as "changed" if we have a prior poll to compare against,
+        // so the first successful load doesn't count as a change.
+        var changed = (prevSignature !== null && sig !== prevSignature);
+        if (changed) lastChangeTime = Date.now();
+        prevSignature = sig;
+        // Re-render only on first load, real data change, or recovery from a
+        // failed poll. Avoids the chart re-animating on every 30s poll.
+        if (!hasRenderedOnce || changed || wasFailed) {
+          updateView();
+          hasRenderedOnce = true;
+        }
+        updateLastFetched();
       })
       .catch(function() {
         fetchFailed = true;
         loading = false;
         updateView();
+        updateLastFetched();
       });
   }
 
@@ -494,7 +534,9 @@
 
   fetchStats();
   setInterval(fetchStats, 30000);
-  setInterval(updateLastFetched, 30000);
+  // Tick the relative-time label more often than we poll so it progresses
+  // promptly (just now → a few seconds ago → minutes) without extra fetches.
+  setInterval(updateLastFetched, 15000);
 
   document.getElementById('clearRegionFilter')?.addEventListener('click', function() {
     regionFilter = null;
