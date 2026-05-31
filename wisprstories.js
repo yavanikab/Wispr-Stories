@@ -510,7 +510,9 @@ function countCard() {
 }
 
 function trackCardUsage() {
-  var lang = speechLang || (typeof autoDetectLangFromText === "function" ? autoDetectLangFromText(document.getElementById("sta").value) : null) || (typeof curLang !== "undefined" ? curLang : null) || "en";
+  // "__native__" means auto-detect — not a real language code, so skip it
+  var effectiveSpeechLang = (speechLang && speechLang !== "__native__") ? speechLang : null;
+  var lang = effectiveSpeechLang || (typeof autoDetectLangFromText === "function" ? autoDetectLangFromText(document.getElementById("sta").value) : null) || (typeof curLang !== "undefined" ? curLang : null) || "en";
   var source = inputSource || "story";
   fetch("/api/track-usage", {
     method: "POST",

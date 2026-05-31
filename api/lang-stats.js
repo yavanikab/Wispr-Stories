@@ -58,6 +58,8 @@ export default async function handler(req) {
       if (colonIdx === -1) continue;
       const source = field.slice(0, colonIdx);
       const lang = field.slice(colonIdx + 1);
+      // Skip sentinel values that are not real language codes
+      if (!lang || lang === '__native__') continue;
       const num = Number(count) || 0;
       if (source === 'voice') {
         voice[lang] = num;
