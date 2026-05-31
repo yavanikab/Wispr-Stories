@@ -595,14 +595,15 @@
         row.style.display = 'none';
       });
     }
-    // Re-apply search filter
+    // Re-apply search filter, still respecting showZeros
     if (searchInput && searchInput.value.trim()) {
       var query = searchInput.value.toLowerCase().trim();
       var visibleCount = 0;
       document.querySelectorAll('#tableBody tr').forEach(function(row) {
         var match = row.textContent.toLowerCase().includes(query);
-        row.style.display = match ? '' : 'none';
-        if (match) visibleCount++;
+        var shouldShow = match && (showZeros || !row.classList.contains('zero-row'));
+        row.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) visibleCount++;
       });
       if (noResults) noResults.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
