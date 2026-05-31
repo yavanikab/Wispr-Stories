@@ -275,13 +275,10 @@ h1 {
   border: 1.5px solid var(--rule);
   border-radius: 12px;
   white-space: nowrap;
-  transition: all 0.15s;
-  cursor: pointer;
+  cursor: default;
 }
 .insight-item:hover {
-  background: var(--rule);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  background: var(--cream2);
 }
 .insight-rank {
   font-size: 20px;
