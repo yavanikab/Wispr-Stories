@@ -197,6 +197,16 @@
   function getVoice(lang) { return USAGE.voice[lang] || 0; }
   function getStory(lang) { return USAGE.story[lang] || 0; }
 
+  // Ranking comparator (for top-3 badges and the chart). Wispr Stories is a
+  // voice-first product, so ties on total cards are broken by voice cards
+  // (more spoken cards ranks higher), then alphabetically for stability.
+  // Each item must expose { total, voice, lang:{ label } }.
+  function rankCompare(a, b) {
+    return (b.total - a.total)
+      || (b.voice - a.voice)
+      || a.lang.label.localeCompare(b.lang.label);
+  }
+
   function updateBanner() {
     var total = 0, voice = 0, story = 0, langsUsed = 0;
     LANGUAGES.forEach(function(l) {
@@ -257,7 +267,7 @@
     var allItems = LANGUAGES.map(function(l) {
       return { lang: l, total: getTotal(l.code), voice: getVoice(l.code), story: getStory(l.code) };
     });
-    allItems.sort(function(a, b) { return b.total - a.total || a.lang.label.localeCompare(b.lang.label); });
+    allItems.sort(rankCompare);
     var hasData = allItems.some(function(i) { return i.total > 0; });
     // Chart shows only languages with data to keep x-axis readable
     var items = allItems.filter(function(i) { return i.total > 0; });
@@ -500,9 +510,9 @@
 
   function updateInsights() {
     var allItems = LANGUAGES.map(function(l) {
-      return { lang: l, total: getTotal(l.code) };
+      return { lang: l, total: getTotal(l.code), voice: getVoice(l.code) };
     }).filter(function(i) { return i.total > 0; });
-    allItems.sort(function(a, b) { return b.total - a.total; });
+    allItems.sort(rankCompare);
     var top3 = allItems.slice(0, 3);
     var banner = document.getElementById('insightsBanner');
     var container = document.getElementById('insightsItems');
