@@ -510,10 +510,16 @@ function countCard() {
 }
 
 function trackCardUsage() {
-  // "__native__" means auto-detect — not a real language code, so skip it
   var effectiveSpeechLang = (speechLang && speechLang !== "__native__") ? speechLang : null;
-  var lang = effectiveSpeechLang || (typeof autoDetectLangFromText === "function" ? autoDetectLangFromText(document.getElementById("sta").value) : null) || (typeof curLang !== "undefined" ? curLang : null) || "en";
+  var effectiveCurLang = (typeof curLang !== "undefined" && curLang) ? curLang : null;
   var source = inputSource || "story";
+  // Voice cards: speechLang is authoritative (set by the mic language picker).
+  // Story/example cards: curLang is authoritative (set explicitly from the example's
+  // data-lang or from script detection on typed text). speechLang is the user's mic
+  // preference and should not override the card's actual content language.
+  var lang = source === "voice"
+    ? (effectiveSpeechLang || effectiveCurLang || "en")
+    : (effectiveCurLang || effectiveSpeechLang || "en");
   fetch("/api/track-usage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

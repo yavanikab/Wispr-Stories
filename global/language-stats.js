@@ -570,8 +570,10 @@
     document.querySelectorAll('#tableBody tr').forEach(function(row) {
       var text = row.textContent.toLowerCase();
       var match = text.includes(query);
-      row.style.display = match ? '' : 'none';
-      if (match) visibleCount++;
+      // Respect the zero-rows toggle: never show a zero-row when showZeros is off
+      var shouldShow = match && (showZeros || !row.classList.contains('zero-row'));
+      row.style.display = shouldShow ? '' : 'none';
+      if (shouldShow) visibleCount++;
     });
     if (noResults) noResults.style.display = visibleCount === 0 && query ? 'flex' : 'none';
   });
@@ -606,21 +608,7 @@
     }
   };
 
-  // Insights items clickable
-  document.getElementById('insightsItems')?.addEventListener('click', function(e) {
-    var item = e.target.closest('.insight-item');
-    if (!item) return;
-    var langName = item.querySelector('.insight-name')?.textContent;
-    if (!langName) return;
-    // Find the language code
-    var lang = LANGUAGES.find(function(l) { return l.label === langName; });
-    if (!lang) return;
-    // Filter table to just this language
-    searchInput.value = lang.label;
-    searchInput.dispatchEvent(new Event('input'));
-    // Scroll to table
-    document.getElementById('tableWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  // Top language badges are display-only — no click interaction.
 
   // Show table header when data loads
   var tableHeader = document.getElementById('tableHeader');
