@@ -34,11 +34,13 @@ export default async function handler(req) {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store',
         },
       });
     }
 
     const raw = await redis.hgetall('wispr:langstats');
+    console.log('[LangStats] raw from Redis:', JSON.stringify(raw));
 
     if (!raw || typeof raw !== 'object') {
       return new Response(JSON.stringify({ voice: {}, story: {} }), {
@@ -46,6 +48,7 @@ export default async function handler(req) {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-store',
         },
       });
     }
