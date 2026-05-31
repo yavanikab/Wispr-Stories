@@ -794,6 +794,28 @@ td .native-name {
 }
 .badge-note strong { color: var(--ink2); }
 
+/* Closing line that bridges the table into the CTA */
+.usage-outro {
+  text-align: center;
+  margin: 44px auto 0;
+  max-width: 520px;
+}
+.usage-outro-rule {
+  display: block;
+  width: 48px;
+  height: 2px;
+  margin: 0 auto 18px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+.usage-outro-line {
+  font-size: clamp(13px, 1.1vw, 15px);
+  line-height: 1.6;
+  color: var(--ink2);
+  font-style: italic;
+  margin: 0;
+}
+
 /* === Footer === */
 .footer {
   border-top: 1px solid var(--rule);
