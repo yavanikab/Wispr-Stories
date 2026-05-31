@@ -18,7 +18,7 @@
 //   online. Only change CACHE_NAME when you want to force a full cache
 //   flush across all existing users (rare — major structural changes only).
 
-const CACHE_NAME = 'wispr-stories-shell-v3';
+const CACHE_NAME = 'wispr-stories-shell-v4';
 
 // Files seeded into the cache on install so the app works on first
 // offline visit. Keep this list to the true shell only — every entry
@@ -76,10 +76,11 @@ self.addEventListener('fetch', (event) => {
         cache.match(req).then((cached) => {
           const fetchPromise = fetch(req)
             .then((resp) => {
-              // Only cache non-opaque responses (opaque responses have status 0
-              // and can silently fill the cache quota).
-              if (resp && resp.status === 200 && resp.type !== 'opaque') {
-                cache.put(req, resp.clone());
+              // Only cache explicit CORS responses (type === 'cors', status 200).
+              // Opaque (no-cors), opaque-redirect, and error responses must not
+              // be passed to cache.put() — they throw NetworkError unhandled.
+              if (resp && resp.status === 200 && resp.type === 'cors') {
+                cache.put(req, resp.clone()).catch(() => {});
               }
               return resp;
             })
@@ -103,7 +104,7 @@ self.addEventListener('fetch', (event) => {
         .then((resp) => {
           if (resp && resp.status === 200 && resp.type === 'basic') {
             const clone = resp.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
           }
           return resp;
         })
@@ -124,7 +125,7 @@ self.addEventListener('fetch', (event) => {
       return fetch(req).then((resp) => {
         if (resp && resp.status === 200 && resp.type === 'basic') {
           const respClone = resp.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, respClone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, respClone)).catch(() => {});
         }
         return resp;
       }).catch(() => {
