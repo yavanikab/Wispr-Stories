@@ -68,13 +68,11 @@ export default async function handler(req, res) {
     ? `${origin}/#text=${enc(metaText)}&name=${enc(metaName)}&tone=${metaTone}&p=${metaP}&r=${metaR}`
     : homeUrl;
 
-  // Use the dynamic OG renderer (/api/og) which always produces a correct
-  // 1200×630 PNG on the same origin. This is more reliable than the Vercel
-  // Blob JPEG for WhatsApp and Instagram large-image previews.
-  // Fall back to the blob JPEG only for old cards with no metadata sidecar.
-  const ogUrl = (metaText || metaName)
-    ? `${origin}/api/og?text=${enc(metaText)}&name=${enc(metaName)}&p=${metaP}&r=${metaR}`
-    : `https://${BLOB_HOST}/og/${id}.jpg`;
+  // OG image = the actual card, padded to 1200×630 JPEG by api/upload.js.
+  // Verified: this blob is true landscape (1200×630, ~30KB), which is what
+  // triggers the WhatsApp/Instagram large preview. It is a static CDN file,
+  // so the scraper fetches it instantly with no serverless cold start.
+  const ogUrl = `https://${BLOB_HOST}/og/${id}.jpg`;
 
   const safeOgUrl = escapeHtml(ogUrl);
   const safeCardUrl = escapeHtml(cardUrl);
@@ -122,6 +120,7 @@ export default async function handler(req, res) {
 <meta property="og:image:secure_url" content="${safeOgUrl}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="${ogAltText}">
 <meta property="og:url" content="${safeShareUrl}">
 <meta property="og:type" content="website">
