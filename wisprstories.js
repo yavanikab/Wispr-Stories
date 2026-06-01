@@ -2693,12 +2693,19 @@ document.getElementById("shareNative").addEventListener("click", async function 
     try { if (navigator.clipboard) navigator.clipboard.writeText(shareUrl); } catch (ce) {}
     var blobToShare = _shareSocialBlob || _shareBlob;
     var shareFile = new File([blobToShare], "wispr-story.png", { type: "image/png" });
+    // Put the link in `text`, not `url`. When sharing an image file, WhatsApp
+    // (and Telegram) attach the image and use `text` as the caption — and they
+    // linkify URLs in captions, so the link rides along as a tappable link
+    // beneath the big image. This is how Spotify's mobile share behaves.
+    // The card image is a real attachment, so it always renders large — it is
+    // NOT a scraped link preview, which is the flaky path.
+    var shareCaption = shareTitle + "\n" + shareUrl;
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) {
-      navigator.share({ files: [shareFile], url: shareUrl, title: shareTitle }).catch(function () {});
+      navigator.share({ files: [shareFile], text: shareCaption }).catch(function () {});
     } else {
-      navigator.share({ url: shareUrl, title: shareTitle }).catch(function () {});
+      navigator.share({ text: shareCaption }).catch(function () {});
     }
-    showToast("Link copied — add it with the Link sticker in your Story");
+    showToast("Shared — image with your link attached");
   } catch (e) {
     showToast("Upload failed. Try again");
   }
