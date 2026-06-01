@@ -10,7 +10,6 @@ start-mobile.ps1
 .bak/
 legacy/
 docs/*
-!docs/TECH-STACK.md
 Birthday cake-pana.svg
 server.log
 *.log
