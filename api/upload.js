@@ -87,10 +87,19 @@ export default async function handler(req, res) {
       cacheControlMaxAge: 60 * 60 * 24 * 5, // 5 days
     });
 
-    // Re-encode the original card as JPEG for the OG image.
-    // mozjpeg + quality 82 typically lands ~30–60 KB for a 1080×1080 card.
+    // Re-encode the original card as a 1200×630 JPEG for the OG image.
+    // Padding to 1.91:1 landscape is required for WhatsApp, Instagram, and
+    // Twitter to show the large full-width preview (the Spotify-style card).
+    // A square image triggers only a small thumbnail on these platforms.
+    // mozjpeg + quality 82 typically lands ~30–60 KB.
     const ogBuffer = await sharp(pngBuffer)
       .flatten({ background: '#ffffff' }) // strip alpha so JPEG bg is predictable
+      .resize({
+        width: 1200,
+        height: 630,
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 235, alpha: 1 } // #ffffeb warm cream
+      })
       .jpeg({ quality: 82, mozjpeg: true, chromaSubsampling: '4:2:0' })
       .toBuffer();
 

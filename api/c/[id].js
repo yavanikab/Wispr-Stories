@@ -115,6 +115,8 @@ export default async function handler(req, res) {
 <meta property="og:description" content="${ogDesc}">
 <meta property="og:image" content="${safeOgUrl}">
 <meta property="og:image:secure_url" content="${safeOgUrl}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="${ogAltText}">
 <meta property="og:url" content="${safeShareUrl}">

@@ -2599,6 +2599,7 @@ document.getElementById("mobileBtnS")?.addEventListener("click", () => {
 
 // Share modal
 let _shareBlob = null;
+let _shortId = null;
 document.getElementById("btnS").addEventListener("click", async () => {
   _vibrate();
   if (!cardReady) { document.getElementById("btnC").click(); return; }
@@ -2606,6 +2607,7 @@ document.getElementById("btnS").addEventListener("click", async () => {
   const generatingLabel = typeof getI18nSync === "function" ? getI18nSync("record.generating") : "Generating\u2026";
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + generatingLabel;
   btn.disabled = true;
+  _shortId = null;
   try {
     await window.ensureHtml2canvas();
     if (!window.html2canvas) throw new Error("html2canvas not loaded");
@@ -2637,16 +2639,24 @@ document.getElementById("shareNative").addEventListener("click", async function 
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
-    if (!res.ok) throw new Error("Upload failed");
-    var data = await res.json();
-    if (voiceAttached && audioBlob) {
-      try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": data.shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+    if (!_shortId) {
+      var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
+      if (!res.ok) throw new Error("Upload failed");
+      var data = await res.json();
+      _shortId = data.shortId;
+      if (voiceAttached && audioBlob) {
+        try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": _shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+      }
     }
-    var shareUrl = "https://wisprstories.vercel.app/c/" + data.shortId;
+    var shareUrl = "https://wisprstories.vercel.app/c/" + _shortId;
     var sharerName = document.getElementById("nin").value || "";
-    var shareText = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
-    navigator.share({ url: shareUrl, text: shareText }).catch(function () {});
+    var shareTitle = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
+    var shareFile = new File([_shareBlob], "wispr-story.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+      navigator.share({ files: [shareFile], url: shareUrl, title: shareTitle }).catch(function () {});
+    } else {
+      navigator.share({ url: shareUrl, title: shareTitle }).catch(function () {});
+    }
   } catch (e) {
     showToast("Upload failed. Try again");
   }
@@ -2681,13 +2691,16 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
   btn.disabled = true;
   try {
-    var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
-    if (!res.ok) throw new Error("Upload failed");
-    var data = await res.json();
-    if (voiceAttached && audioBlob) {
-      try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": data.shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+    if (!_shortId) {
+      var res = await fetch("/api/upload", { method: "POST", body: _shareBlob, headers: { "Content-Type": "image/png", "X-Card-Text": encodeURIComponent(document.getElementById("sta").value), "X-Card-Name": encodeURIComponent(document.getElementById("nin").value), "X-Card-Tone": curTone || "", "X-Card-P": String(curP), "X-Card-R": useRounded ? "rounded" : "sharp" } });
+      if (!res.ok) throw new Error("Upload failed");
+      var data = await res.json();
+      _shortId = data.shortId;
+      if (voiceAttached && audioBlob) {
+        try { await fetch("/api/voice", { method: "POST", body: audioBlob, headers: { "Content-Type": audioBlob.type || "audio/webm", "X-Short-Id": _shortId } }); } catch (ve) { console.error("[Voice] Upload failed:", ve); }
+      }
     }
-    var url = "https://wisprstories.vercel.app/c/" + data.shortId;
+    var url = "https://wisprstories.vercel.app/c/" + _shortId;
     navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
   } catch (e) {
     showToast("Upload failed. Try again");
