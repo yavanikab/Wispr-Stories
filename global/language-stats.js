@@ -694,26 +694,36 @@
     setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 2000);
   }
 
+  function applySort(th) {
+    var key = th.dataset.sort;
+    if (SORT_COL === key) {
+      SORT_STATE = (SORT_STATE + 1) % 3;
+    } else {
+      SORT_COL = key;
+      SORT_STATE = 1;
+    }
+    document.querySelectorAll('th').forEach(function(t) {
+      t.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+      t.removeAttribute('aria-sort');
+    });
+    if (SORT_STATE !== 0) {
+      th.classList.add('sorted');
+      var isDesc = SORT_STATE === 1;
+      th.classList.add(isDesc ? 'sorted-desc' : 'sorted-asc');
+      th.setAttribute('aria-sort', isDesc ? 'descending' : 'ascending');
+    }
+    renderTable();
+  }
+
   document.querySelectorAll('th[data-sort]').forEach(function(th) {
-    th.addEventListener('click', function() {
-      var key = th.dataset.sort;
-      if (SORT_COL === key) {
-        SORT_STATE = (SORT_STATE + 1) % 3;
-      } else {
-        SORT_COL = key;
-        SORT_STATE = 1;
+    th.addEventListener('click', function() { applySort(th); });
+    // Keyboard support: headers are focusable (tabindex=0), so Enter/Space
+    // must trigger the same sort a click does.
+    th.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        applySort(th);
       }
-      document.querySelectorAll('th').forEach(function(t) {
-        t.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
-        t.removeAttribute('aria-sort');
-      });
-      if (SORT_STATE !== 0) {
-        th.classList.add('sorted');
-        var isDesc = SORT_STATE === 1;
-        th.classList.add(isDesc ? 'sorted-desc' : 'sorted-asc');
-        th.setAttribute('aria-sort', isDesc ? 'descending' : 'ascending');
-      }
-      renderTable();
     });
   });
 
