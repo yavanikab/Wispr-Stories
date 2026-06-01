@@ -68,6 +68,13 @@ self.addEventListener('fetch', (event) => {
     }
   }
 
+  // Vercel Blob storage — bypass the SW entirely. The browser loads these
+  // directly via <img> (covered by img-src CSP). Intercepting them here
+  // causes fetch() calls that hit connect-src and get blocked.
+  if (url.hostname.endsWith('.blob.vercel-storage.com')) {
+    return; // browser handles it; we don't intercept
+  }
+
   // Cross-origin (Google Fonts, etc.) — stale-while-revalidate so updates
   // arrive on the next visit but offline still works.
   if (url.origin !== self.location.origin) {
