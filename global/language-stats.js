@@ -278,7 +278,16 @@
       if (CHART) { CHART.destroy(); CHART = null; }
       return;
     }
-    container.innerHTML = '<canvas id="langChart"></canvas>';
+    // On narrow screens, give each bar a minimum width so labels stay legible
+    // when many languages are present; the chart then scrolls horizontally
+    // inside #chartContainer (the legend lives outside it, so it stays put).
+    // On wider screens the chart simply fits its container (no scroll).
+    var isNarrow = (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 640px)').matches;
+    var boxHeight = isNarrow ? 300 : 400;
+    var minBarPx = isNarrow ? 34 : 0;
+    var neededWidth = items.length * minBarPx;
+    var boxStyle = 'height:' + boxHeight + 'px;' + (neededWidth > 0 ? ('min-width:' + neededWidth + 'px;') : '');
+    container.innerHTML = '<div class="chart-canvas-box" style="' + boxStyle + '"><canvas id="langChart"></canvas></div>';
 
     var labels = items.map(function(i) { return i.lang.label; });
     var data = items.map(function(i) { return i.total; });

@@ -208,6 +208,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
   flex: 1;
   min-width: 0;
   padding: 10px 16px;
@@ -605,9 +606,17 @@ h1 {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-.chart-wrap canvas {
-  min-width: 600px;
-  max-height: 400px;
+/* The box is sized by JS (height always, plus a min-width on mobile that scales
+   with the number of bars). The canvas fills it exactly, so Chart.js renders at
+   the true display size — no stretching/blurring. */
+.chart-canvas-box {
+  position: relative;
+  height: 400px;
+}
+.chart-canvas-box canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 .chart-legend {
   display: flex;
@@ -1037,7 +1046,6 @@ button:focus-visible {
 
 /* === Tablet === */
 @media (max-width: 1024px) {
-  .chart-wrap canvas { min-width: 500px; }
   .hero-split-labels { gap: 16px; }
 }
 
@@ -1079,13 +1087,16 @@ button:focus-visible {
   .back-to-top { bottom: 16px; right: 16px; width: 36px; height: 36px; }
   .badge-note { font-size: 11px; padding: 10px 12px; }
   .disclaimer-note { font-size: 10px; }
-  /* Chart: fit the screen width instead of a forced 500-600px (which looked
-     stretched and forced horizontal scroll). A definite container height keeps
-     proportions sane with Chart.js maintainAspectRatio:false. */
+  /* Chart: box height set by JS; with few languages it fits the screen (no
+     scroll, not stretched). With many languages the box gets a min-width so
+     each bar stays legible and only the canvas scrolls — the legend, sitting
+     outside #chartContainer, stays centered and fully visible. */
   .chart-wrap { padding: 14px; }
-  #chartContainer { height: 300px; }
-  .chart-wrap canvas { min-width: 0; max-height: 300px; }
+  .chart-canvas-box { height: 300px; }
   /* Legend: compact, centered, fully visible — no longer inside the scroll. */
   .chart-legend { gap: 8px 12px; font-size: 10px; margin-top: 14px; }
+  /* Stack the two hero meta cards so the number never jams against the label
+     (side-by-side leaves no slack for space-between at this width). */
+  .hero-meta { flex-direction: column; }
   .stats-hero-cta { padding: clamp(60px, 10vw, 120px) 16px clamp(48px, 8vw, 100px); }
 }
