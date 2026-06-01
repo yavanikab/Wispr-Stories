@@ -2599,7 +2599,40 @@ document.getElementById("mobileBtnS")?.addEventListener("click", () => {
 
 // Share modal
 let _shareBlob = null;
+let _shareSocialBlob = null;
 let _shortId = null;
+
+// Build a 1080×1920 (9:16) social image: the card centered on a solid
+// background in its own palette colour. The raw card PNG has a transparent
+// background and rounded corners; Instagram/WhatsApp fill transparency with
+// black, which is the ugly black border the user sees. Flattening onto a
+// solid 9:16 canvas removes the black entirely and gives a clean full-bleed
+// Story background. Falls back to the original blob if anything fails.
+async function _makeSocialBlob(srcBlob) {
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = URL.createObjectURL(srcBlob);
+    });
+    const CW = 1080, CH = 1920, margin = 96;
+    const canvas = document.createElement("canvas");
+    canvas.width = CW;
+    canvas.height = CH;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = (typeof PALS !== "undefined" && PALS[curP]) ? PALS[curP] : "#1a1a1a";
+    ctx.fillRect(0, 0, CW, CH);
+    const scale = Math.min((CW - margin * 2) / img.width, (CH - margin * 2) / img.height);
+    const w = img.width * scale, h = img.height * scale;
+    ctx.drawImage(img, (CW - w) / 2, (CH - h) / 2, w, h);
+    URL.revokeObjectURL(img.src);
+    return await new Promise((resolve) => canvas.toBlob((b) => resolve(b || srcBlob), "image/png"));
+  } catch (e) {
+    return srcBlob;
+  }
+}
+
 document.getElementById("btnS").addEventListener("click", async () => {
   _vibrate();
   if (!cardReady) { document.getElementById("btnC").click(); return; }
@@ -2608,11 +2641,13 @@ document.getElementById("btnS").addEventListener("click", async () => {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + generatingLabel;
   btn.disabled = true;
   _shortId = null;
+  _shareSocialBlob = null;
   try {
     await window.ensureHtml2canvas();
     if (!window.html2canvas) throw new Error("html2canvas not loaded");
     await document.fonts.ready;
     _shareBlob = await generateBlobWithProgress();
+    _shareSocialBlob = await _makeSocialBlob(_shareBlob);
     btn.innerHTML = '<i class="fas fa-share-nodes"></i> Share card';
     btn.disabled = false;
     const preview = document.getElementById("sharePreview");
@@ -2651,12 +2686,19 @@ document.getElementById("shareNative").addEventListener("click", async function 
     var shareUrl = "https://wisprstories.vercel.app/c/" + _shortId;
     var sharerName = document.getElementById("nin").value || "";
     var shareTitle = sharerName ? "A Wispr Story by " + sharerName : "A Wispr Story";
-    var shareFile = new File([_shareBlob], "wispr-story.png", { type: "image/png" });
+    // Auto-copy the link to the clipboard. A Story image cannot carry a
+    // clickable link automatically (platform limit), so we pre-load the link
+    // into the clipboard — the user taps Instagram's Link sticker and pastes
+    // it in one step. Fire-and-forget so it never blocks the share gesture.
+    try { if (navigator.clipboard) navigator.clipboard.writeText(shareUrl); } catch (ce) {}
+    var blobToShare = _shareSocialBlob || _shareBlob;
+    var shareFile = new File([blobToShare], "wispr-story.png", { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [shareFile] })) {
       navigator.share({ files: [shareFile], url: shareUrl, title: shareTitle }).catch(function () {});
     } else {
       navigator.share({ url: shareUrl, title: shareTitle }).catch(function () {});
     }
+    showToast("Link copied — add it with the Link sticker in your Story");
   } catch (e) {
     showToast("Upload failed. Try again");
   }
