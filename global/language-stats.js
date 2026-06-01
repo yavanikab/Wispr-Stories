@@ -16,6 +16,8 @@
   if (themeToggle) {
     themeToggle.addEventListener('click', function() {
       setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+      // Canvas chart can't follow CSS theme changes on its own — recolor it.
+      if (typeof refreshChartTheme === 'function') refreshChartTheme();
     });
   }
   setTheme(saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
@@ -415,6 +417,23 @@
         });
       });
     }
+  }
+
+  // The chart is painted on a <canvas>, so (unlike the HTML table/badges that
+  // use CSS variables) it can't pick up a dark/light theme switch on its own.
+  // Recolor the axis ticks/grid in place when the theme changes. Bar colors are
+  // region-based (theme-independent), so only the axis colors need updating.
+  function refreshChartTheme() {
+    if (!CHART) return;
+    var style = getComputedStyle(document.documentElement);
+    var gridColor = style.getPropertyValue('--rule').trim() || 'rgba(26,26,26,0.1)';
+    var textColor = style.getPropertyValue('--ink').trim() || '#1a1a1a';
+    if (CHART.options.scales.x) CHART.options.scales.x.ticks.color = textColor;
+    if (CHART.options.scales.y) {
+      CHART.options.scales.y.ticks.color = textColor;
+      CHART.options.scales.y.grid.color = gridColor;
+    }
+    CHART.update('none');
   }
 
   function updateRegionBadge() {
