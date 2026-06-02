@@ -159,10 +159,10 @@
       <a href="#" class="fmenu-link" id="fmenu-help">
         <i class="fa-solid fa-circle-question"></i> How to Use
       </a>
-      <a href="about.html" class="fmenu-link">
+      <a href="/about" class="fmenu-link">
         <i class="fa-solid fa-book-open"></i> About
       </a>
-      <a href="language-stats.html" class="fmenu-link">
+      <a href="/language-stats" class="fmenu-link">
         <i class="fa-solid fa-chart-simple"></i> Lang Stats
       </a>
       <a href="#" class="fmenu-link">

@@ -382,12 +382,15 @@ h2 {
 
 /* === Tone grid === */
 .tone-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   margin: 32px 0 8px;
 }
 .tone-card {
+  flex: 0 1 calc(25% - 8px);
+  min-width: 130px;
   padding: 16px 12px;
   border-radius: 10px;
   border: 1px solid var(--rule);
@@ -424,6 +427,15 @@ h2 {
   text-align: center;
   font-style: italic;
   margin-bottom: 40px;
+}
+
+/* === Section eyebrow label (used above stats grid) === */
+.section-eyebrow {
+  margin-top: 40px;
+  margin-bottom: 4px;
+}
+.section-eyebrow + .features {
+  margin-top: 8px;
 }
 
 /* === Modes grid === */
@@ -733,7 +745,7 @@ button:focus-visible {
   .how-steps { grid-template-columns: 1fr; gap: 12px; }
   .how-step::after, .how-step::before { display: none; }
   .examples-grid { grid-template-columns: 1fr 1fr; }
-  .tone-grid { grid-template-columns: repeat(2, 1fr); }
+  .tone-card { flex: 0 1 calc(50% - 6px); }
   .back-to-top { bottom: 20px; right: 20px; width: 36px; height: 36px; }
   h2 { margin-top: 40px; }
 }

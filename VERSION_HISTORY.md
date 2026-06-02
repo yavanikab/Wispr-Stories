@@ -1,11 +1,43 @@
 # Version History
 
-## [Unreleased] — Tone Counter & WhatsApp Fixes + Recording Flow Spec
+## v0.10.4.2 — Stage 1 Recording Flow Bug Fixes (2026-06-02)
+
+Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel button, 2.2 one-tick 00:00, 2.3 retry state). Stages 2–4 (VAD, streaming STT, Wispr Flow learnings) are data-gated and not in this milestone. Design doc was deleted after Stage 1 reached 100% completion.
+
+### Added
+- **Onboarding Quick Reference** — collapsible `<details>` in onboarding modal footer with 7 tips. Replaces inline info-tooltip buttons for first-time users
+- **`record.processing` i18n key** + **shorter textarea placeholder** in all 11 locales
+- **`record.cancel` i18n key** (liveBox cancel button during mic-startup) in all 11 locales
+- **`record.couldntRetry` i18n key** (liveBox retry state after STT failure) in all 11 locales
+- **Module-level STT health-check cache** (10-min TTL, 1 retry on network error)
+- **`_startRecTimer()` helper** — drift-corrected MM:SS countdown
+- **STT health + getUserMedia in parallel (2.1)**: `_getMicStream()` helper, `Promise.all` in `startRec()`, mic-error toasts (NotAllowedError, NotFoundError, generic)
+- **Cancel button during mic-startup (2.1)**: `_micStartCancelled` flag checked in 3 places (Promise.all continuation, startDeepgramRecording().then() continuation, 2 s watchdog); mic stream tracks stopped on cancel; liveBox renders "Starting…" + Cancel button
+- **STT retry state (2.3)**: `_lastSttWav` + `_lastSttLang` + `_lastSttSessionId` saved in `stopDeepgramRecording()`; `_showSttRetryState()` shows clickable "↻ Couldn't transcribe. Tap to retry" in liveBox; `_retryLastStt()` re-sends same WAV to `/api/stt` with 15 s timeout; `_sttRetrying` flag prevents double-tap
+
+### Fixed
+- **Record button — double-fire on slow mic permission** (2.1): Synchronous `recBtn.disabled = true` + 2 s watchdog re-enable
+- **Recording timer — drift over time** (2.2): `setTimeout` chain + `performance.now()` correction, MM:SS format
+- **Timer — "00:00" lands for one tick before Processing (2.2)**: helper renders "00:00" then defers `onExpire` by 1000 ms so the browser repaints "00:00" before transitioning
+- **Stop tap — silent wait during transcription** (2.3): "Processing your audio…" spinner in liveBox
+- **WebM export — silent zero-byte upload** (2.7): Caller-level `blob.size > 0` check with user-visible "Voice didn't capture. Try again" toast
+- **Orphaned `record.tip` i18n key in 10 non-English locales**: removed in lockstep with en.json
+
+### Changed
+- **Info tooltips removed from form** (2.5): 5 inline `?` icons gone, ~55 lines of JS removed, `tooltips.css` deleted
+- **Duplicate `record` i18n key in 10 non-English locales** — merged into single object
+
+### Removed
+- **`global/styles/tooltips.css`** (orphaned after 2.5) + its import in `main.css`
+
+---
+
+## v0.10.4.1 — Tone Counter & WhatsApp Share Fixes (2026-06-02)
 
 ### Added
 - **`api/rewrite-confirm.js`** — new commit endpoint for tone rewrites
 - **Test scripts**: `scripts/stress-test-99-cap.mjs`, `scripts/verify-cron-cleanup.mjs` + markdown explainers in `docs/test-plans/`
-- **Recording flow redesign spec** at `docs/superpowers/specs/2026-06-01-recording-ui-redesign-design.md` (Stage 1–4)
+- (Removed) **Recording flow redesign spec** (Stage 1–4) — local-only design doc, deleted after Stage 1 reached 100% completion
 
 ### Fixed
 - **Tone rewrite counter** — preview-then-commit refactor (counter ticks on Accept/Create, not on tone pick). Server is source of truth

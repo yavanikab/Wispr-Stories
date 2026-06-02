@@ -807,6 +807,54 @@ body.modal-open .rewrite-bar {
   font-size: clamp(12px, 0.3vw + 11px, 13px);
   vertical-align: middle;
 }
+.onboarding-quick-ref {
+  text-align: left;
+  margin: 0 0 16px;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 0;
+  background: rgba(0,0,0,0.02);
+}
+.onboarding-quick-ref > summary {
+  cursor: pointer;
+  padding: 10px 16px;
+  font-size: clamp(13px, 0.3vw + 12px, 14px);
+  font-weight: 600;
+  color: var(--ink2);
+  list-style: none;
+  user-select: none;
+}
+.onboarding-quick-ref > summary::-webkit-details-marker {
+  display: none;
+}
+.onboarding-quick-ref > summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 11px;
+  transition: transform 0.2s;
+}
+.onboarding-quick-ref[open] > summary::before {
+  transform: rotate(90deg);
+}
+.onboarding-quick-ref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.onboarding-quick-ref-list dd {
+  margin: 0;
+  font-size: clamp(12px, 0.3vw + 11px, 13px);
+  line-height: 1.5;
+  color: var(--ink3);
+}
+.onboarding-quick-ref-list dd strong {
+  color: var(--ink2);
+  font-weight: 600;
+}
 :root.dark .onboarding-banner {
   background: #2a2a2a;
 }
@@ -821,6 +869,19 @@ body.modal-open .rewrite-bar {
 }
 :root.dark .onboarding-hint {
   color: rgba(255,255,235,0.4);
+}
+:root.dark .onboarding-quick-ref {
+  border-color: rgba(255,255,235,0.08);
+  background: rgba(255,255,235,0.02);
+}
+:root.dark .onboarding-quick-ref > summary {
+  color: rgba(255,255,235,0.7);
+}
+:root.dark .onboarding-quick-ref-list dd {
+  color: rgba(255,255,235,0.5);
+}
+:root.dark .onboarding-quick-ref-list dd strong {
+  color: rgba(255,255,235,0.8);
 }
 
 /* DOWNLOAD CHOICE MODAL */

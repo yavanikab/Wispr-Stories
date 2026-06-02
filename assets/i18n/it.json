@@ -13,10 +13,12 @@
   "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari, o incolla il tuo testo qui sotto.",
   "record": {
     "label": "La tua voce",
-    "tip": "Premi registra e parla naturalmente. Le tue parole appaiono in diretta. Tocca di nuovo per fermare. Le tue parole si spostano nella casella di testo pronte per la card.",
     "status": "Tocca per parlare",
     "sub": "Le tue parole appaiono quando ti fermi",
-    "generating": "Generazione…"
+    "generating": "Generazione…",
+    "processing": "Elaborazione del tuo audio…",
+    "cancel": "Annulla",
+    "couldntRetry": "Impossibile trascrivere. Tocca per riprovare"
   },
   "speechLang": {
     "title": "Seleziona lingua vocale",
@@ -35,8 +37,7 @@
   "orText": "o digita o incolla le tue parole",
   "textarea": {
     "label": "Le tue parole",
-    "tip": "Parla prima usando Registra sopra. Le parole arrivano qui automaticamente. O digita direttamente. O incolla da Wispr Flow. Qualsiasi lingua funziona qui.",
-    "placeholder": "Registra la tua voce o digita qualsiasi cosa: un augurio di compleanno, un ricordo, una ricetta, una lettera d'amore, gratitudine, un consiglio..."
+    "placeholder": "Parla o digita il tuo messaggio..."
   },
   "resetBtn": "Reimposta tutto",
   "nameRow": {
@@ -52,7 +53,6 @@
   },
   "tone": {
     "label": "Tono",
-    "tip": "Originale mantiene le tue parole esatte, illimitato, senza limite giornaliero. Altri toni vengono riscritti con IA: Caldo è gentile. Audace è diretto. Poetico scorre con ritmo. Giocoso è leggero. Riflessivo è lento. Onesto è crudo. Cambia solo la spaziatura e l'inclinazione, non la dimensione o il peso.",
     "original": "Originale",
     "warm": "Accogliente",
     "bold": "Audace",
@@ -64,7 +64,6 @@
   },
   "color": {
     "label": "Colore della card",
-    "tip": "Imposta lo sfondo della card. L'anteprima dal vivo si aggiorna istantaneamente.",
     "violet": "Viola",
     "amber": "Ambra",
     "crimson": "Cremisi",
@@ -78,13 +77,11 @@
   },
   "shape": {
     "label": "Forma",
-    "tip": "I bordi netti funzionano meglio per WhatsApp. Gli angoli arrotondati sono ideali per gallerie e web.",
     "sharp": "Bordi netti",
     "rounded": "Angoli arrotondati"
   },
   "fontSize": {
     "label": "Dimensione del testo",
-    "tip": "Ingrandisci il testo breve della scheda per riempirla bene. Disponibile solo quando il testo della scheda è breve.",
     "info": "Disponibile solo quando il testo della scheda è inferiore a 85 caratteri",
     "infoOn": "Il testo della scheda è breve: tocca + o − per regolare la dimensione"
   },
@@ -148,7 +145,15 @@
     "step2": "<strong>Personalizza</strong> la tua card: scegli un tono, colore e stile degli angoli.",
     "step3": "<strong>Crea e condividi</strong>: scarica come PNG o condividi direttamente sui social.",
     "gotIt": "Ho capito, andiamo!",
-    "hint": "Hai bisogno di aiuto dopo? Tocca ❓ nel footer."
+    "hint": "Hai bisogno di aiuto dopo? Tocca ❓ nel footer.",
+    "refTitle": "Riferimento rapido",
+    "refToggle": "<strong>Cambia modalità</strong>: tocca l'icona del microfono per passare tra modalità registrazione e testo.",
+    "refVoice": "<strong>Lingue vocali</strong>: 29 lingue + rilevamento automatico. Scegli dal pulsante della lingua.",
+    "refText": "<strong>Modifica testo</strong>: l'area di testo accetta fino a 150 caratteri. Modifica liberamente.",
+    "refTone": "<strong>Riscrittura tono</strong>: 6 toni. Gli utenti gratuiti ottengono 5 per tono al giorno. Gli utenti Pro ottengono illimitato.",
+    "refColor": "<strong>Colore</strong>: scegli una palette per impostare lo sfondo della card.",
+    "refShape": "<strong>Forma</strong>: bordi netti per la messaggistica, arrotondati per le gallerie.",
+    "refFontSize": "<strong>Dimensione testo</strong>: aumenta il testo della card per messaggi brevi."
   },
   "mobileBar": {
     "create": "Crea",

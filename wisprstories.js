@@ -123,6 +123,13 @@ let recStartTime = null,
   recMaxDuration = FREE_MAX_RECORDING_SEC,
   recDurationTimer = null,
   recGraceTimer = null;
+let _sttHealthCache = null;
+const STT_HEALTH_TTL_MS = 10 * 60 * 1000;
+let _micStartCancelled = false;
+let _lastSttWav = null;
+let _lastSttLang = "";
+let _lastSttSessionId = "";
+let _sttRetrying = false;
 const isSafari =
   navigator.vendor === "Apple Computer, Inc." &&
   !navigator.userAgent.includes("CriOS");
@@ -546,6 +553,8 @@ function closeUpgradeModal() {
 }
 document.getElementById("upgradeClose")?.addEventListener("click", closeUpgradeModal);
 document.getElementById("upgradeBackdrop")?.addEventListener("click", closeUpgradeModal);
+document.getElementById("upgradeBtn")?.addEventListener("click", openUpgradeModal);
+document.getElementById("mobileBtnUpgrade")?.addEventListener("click", openUpgradeModal);
 async function handleUpgradeKey() {
   const input = document.getElementById("upgradeKeyInput");
   const msg = document.getElementById("upgradeKeyMsg");
@@ -1072,24 +1081,10 @@ async function refreshMicList() {
   refreshMicList();
 })();
 
-async function startDeepgramRecording() {
+async function startDeepgramRecording(stream) {
   try {
-    // Use the user-selected mic if one was chosen; otherwise the system default.
-    // If the saved device is gone (OverconstrainedError), clear it and retry default.
-    var savedMicId = localStorage.getItem("wsMicDevice") || "";
-    var stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: savedMicId ? { deviceId: { exact: savedMicId } } : true,
-      });
-    } catch (constraintErr) {
-      if (savedMicId) {
-        console.warn("[Mic] Saved device unavailable, falling back to default:", constraintErr && constraintErr.name);
-        localStorage.removeItem("wsMicDevice");
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      } else {
-        throw constraintErr;
-      }
+    if (!stream) {
+      stream = await _getMicStream();
     }
     const audioTrack = stream.getAudioTracks()[0];
     if (audioTrack) {
@@ -1121,39 +1116,29 @@ async function startDeepgramRecording() {
       finishRec();
     };
 
-    // Show initial max duration before first timer tick
-    document.getElementById("recSub").textContent = recMaxDuration + "s remaining";
-    recDurationTimer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - deepgramStartTime) / 1000);
-      const remaining = recMaxDuration - elapsed;
-      if (remaining <= 0) {
-        clearInterval(recDurationTimer);
-        recDurationTimer = null;
-        isRec = false;
-        showToast("Max recording time reached (" + recMaxDuration + "s)");
-        console.log("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
-        if (mediaRec && mediaRec.state !== "inactive") {
-          stopDeepgramRecording().then(function(result) {
-            fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-            var preview = (result.text || "").slice(0, 30) + ((result.text || "").length > 30 ? "..." : "");
-            console.log("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
-            if (!fullTx) showToast("We didn\u2019t catch that \u2014 check your mic and try again");
-            if (audioBlob) {
-              _computeWaveform(audioBlob).then(function(h) {
-                _cardWaveform = h;
-                if (document.getElementById("sta").value.trim()) {
-                  wave(document.getElementById("sta").value);
-                }
-              }).catch(function() { _cardWaveform = null; });
-            }
-            var actualDuration = finishRec();
-            reportRecordingDuration(actualDuration || result.duration);
-          });
-        }
-        return;
+    _startRecTimer(recMaxDuration, function() {
+      isRec = false;
+      showToast("Max recording time reached (" + recMaxDuration + "s)");
+      console.log("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
+      if (mediaRec && mediaRec.state !== "inactive") {
+        stopDeepgramRecording().then(function(result) {
+          fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+          var preview = (result.text || "").slice(0, 30) + ((result.text || "").length > 30 ? "..." : "");
+          console.log("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
+          if (!fullTx) showToast("We didn\u2019t catch that \u2014 check your mic and try again");
+          if (audioBlob) {
+            _computeWaveform(audioBlob).then(function(h) {
+              _cardWaveform = h;
+              if (document.getElementById("sta").value.trim()) {
+                wave(document.getElementById("sta").value);
+              }
+            }).catch(function() { _cardWaveform = null; });
+          }
+          var actualDuration = finishRec();
+          reportRecordingDuration(actualDuration || result.duration);
+        });
       }
-      document.getElementById("recSub").textContent = remaining + "s remaining";
-    }, 1000);
+    });
 
     mediaRec.start(250);
     return true;
@@ -1221,6 +1206,9 @@ function stopDeepgramRecording() {
           return _w;
         })();
         var fetchBlob = new Blob([_wavArrBuf], { type: "audio/wav" });
+        _lastSttWav = fetchBlob;
+        _lastSttLang = speechLang;
+        _lastSttSessionId = localStorage.getItem("wsSessionId") || "";
         console.log("[STT] Sending WAV: size=" + fetchBlob.size);
         var controller = new AbortController();
         var sttTimeout = setTimeout(function() { controller.abort(); }, 15000);
@@ -1240,21 +1228,19 @@ function stopDeepgramRecording() {
           if (!res.ok) {
             const err = await res.text();
             console.error("[STT] API error:", err);
-            showToast("Transcription failed \u2014 tap record to try again");
             resolve({ text: "", duration });
             return;
           }
           const data = await res.json();
           if (!data.text) console.warn("[STT] Empty response, full data:", JSON.stringify(data));
+          else _lastSttWav = null;
           resolve({ text: data.text || "", duration });
         } catch (e) {
           clearTimeout(sttTimeout);
           if (e.name === 'AbortError') {
             console.warn("[STT] Request timed out");
-            showToast("Transcription timed out \u2014 tap record to try again");
           } else {
             console.error("[STT] Error:", e);
-            showToast("Transcription failed \u2014 tap record to try again");
           }
           resolve({ text: "", duration });
         }
@@ -1262,6 +1248,100 @@ function stopDeepgramRecording() {
       mediaRec.stop();
     });
   }
+
+function _showSttRetryState() {
+  var liveBoxEl = document.getElementById("liveBox");
+  var couldntMsg = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+  liveBoxEl.textContent = "";
+  var msgSpan = document.createElement("span");
+  msgSpan.textContent = couldntMsg;
+  liveBoxEl.appendChild(msgSpan);
+  liveBoxEl.classList.remove("processing");
+  liveBoxEl.classList.add("show", "retry");
+  liveBoxEl.onclick = function() {
+    if (_sttRetrying) return;
+    _retryLastStt();
+  };
+}
+
+async function _retryLastStt() {
+  if (!_lastSttWav || _sttRetrying) return;
+  _sttRetrying = true;
+  var liveBoxEl = document.getElementById("liveBox");
+  var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
+  liveBoxEl.textContent = processingMsg;
+  liveBoxEl.classList.remove("retry");
+  liveBoxEl.classList.add("show", "processing");
+  var controller = new AbortController();
+  var sttTimeout = setTimeout(function() { controller.abort(); }, 15000);
+  try {
+    const res = await fetch("/api/stt", {
+      method: "POST",
+      headers: Object.assign({
+        "Content-Type": "audio/wav",
+        "X-Language": _lastSttLang === "__native__" ? "" : _lastSttLang,
+        "X-Session-Id": _lastSttSessionId,
+      }, getAdminHeaders()),
+      body: _lastSttWav,
+      signal: controller.signal,
+    });
+    clearTimeout(sttTimeout);
+    if (!res.ok) {
+      console.error("[STT retry] API error, status=" + res.status);
+      _lastSttWav = null;
+      _sttRetrying = false;
+      liveBoxEl.classList.remove("processing");
+      liveBoxEl.classList.add("show", "retry");
+      var retryMsg = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+      liveBoxEl.textContent = retryMsg;
+      showToast("Still couldn't transcribe. Tap to re-record");
+      return;
+    }
+    const data = await res.json();
+    _sttRetrying = false;
+    if (data.text) {
+      fullTx = data.text.trim().slice(0, 150);
+      _lastSttWav = null;
+      liveBoxEl.textContent = "";
+      liveBoxEl.classList.remove("show", "processing", "retry");
+      liveBoxEl.onclick = null;
+      const actualDuration = finishRec();
+      await reportRecordingDuration(actualDuration);
+    } else {
+      console.warn("[STT retry] Empty text");
+      _lastSttWav = null;
+      liveBoxEl.classList.remove("processing");
+      liveBoxEl.classList.add("show", "retry");
+      var retryMsg2 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+      liveBoxEl.textContent = retryMsg2;
+      showToast("Still couldn't transcribe. Tap to re-record");
+    }
+  } catch (e) {
+    clearTimeout(sttTimeout);
+    console.error("[STT retry] Error:", e);
+    _lastSttWav = null;
+    _sttRetrying = false;
+    liveBoxEl.classList.remove("processing");
+    liveBoxEl.classList.add("show", "retry");
+    var retryMsg3 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+    liveBoxEl.textContent = retryMsg3;
+    showToast("Still couldn't transcribe. Tap to re-record");
+  }
+}
+
+function _getMicStream() {
+  var savedMicId = localStorage.getItem("wsMicDevice") || "";
+  return navigator.mediaDevices.getUserMedia({
+    audio: savedMicId ? { deviceId: { exact: savedMicId } } : true,
+  }).catch(function(err) {
+    if (savedMicId) {
+      console.warn("[Mic] Saved device unavailable, falling back to default:", err && err.name);
+      localStorage.removeItem("wsMicDevice");
+      return navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+    throw err;
+  });
+}
 
 function startRec() {
   if (location.protocol === "file:") {
@@ -1271,42 +1351,83 @@ function startRec() {
     return;
   }
 
-  // Server STT health check — routes to Deepgram or Whisper based on language
-  fetch("/api/stt?check=1").then(function(r) { return r.json(); }).then(function(data) {
-    if (data.available) {
-      usingDeepgram = true;
-      startDeepgramRecording().then(function(ok) {
-        if (ok) {
-          isRec = true;
-          document.getElementById("recBtn").classList.add("on");
-          document.getElementById("recSt").textContent = "Recording\u2026";
-          document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
-          document.getElementById("recSub").classList.add("live");
-          document.getElementById("liveBox").textContent = "Recording\u2026";
-        } else {
-          // mic permission denied — try WSA fallback
-          usingDeepgram = false;
-          trySpeechFallback();
-        }
+  // Server STT health check — routes to Deepgram or Whisper based on language.
+  // Cached for 10 minutes to avoid pinging the server on every record tap.
+  function _runSttHealth() {
+    if (_sttHealthCache && (Date.now() - _sttHealthCache.ts) < STT_HEALTH_TTL_MS) {
+      return Promise.resolve(_sttHealthCache.value);
+    }
+    return fetch("/api/stt?check=1").then(function(r) { return r.json(); }).then(function(data) {
+      _sttHealthCache = { value: data, ts: Date.now() };
+      return data;
+    }).catch(function() {
+      // Network error — try one retry after 2s before falling back.
+      return new Promise(function(resolve) {
+        setTimeout(function() {
+          fetch("/api/stt?check=1").then(function(r) { return r.json(); }).then(function(d) {
+            _sttHealthCache = { value: d, ts: Date.now() };
+            resolve(d);
+          }).catch(function() { resolve(null); });
+        }, 2000);
       });
-    } else {
-      // Deepgram not configured — fall back to Web Speech API
-      trySpeechFallback();
-    }
-  }).catch(function() {
-    // Network error checking Deepgram — try WSA
-    trySpeechFallback();
-  });
-
-  function trySpeechFallback() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      showToast("Voice recording unavailable \u2014 try typing instead");
-      finishRec();
-      return;
-    }
-    startWebSpeechAPI();
+    });
   }
+  // Run STT health check and getUserMedia in parallel — the user may be
+  // waiting up to ~2 s on a slow mic permission prompt, so don't make them
+  // also wait for the health check to complete first.
+  Promise.all([_runSttHealth(), _getMicStream().then(function(s) { return s; }).catch(function(e) { return { __micError: e }; })])
+    .then(function(results) {
+      if (_micStartCancelled) {
+        var cancelledStream = results[1];
+        if (cancelledStream && !cancelledStream.__micError && typeof cancelledStream.getTracks === "function") {
+          cancelledStream.getTracks().forEach(function(t) { t.stop(); });
+        }
+        return;
+      }
+      var data = results[0];
+      var streamOrErr = results[1];
+      if (streamOrErr && streamOrErr.__micError) {
+        var name = streamOrErr.__micError && streamOrErr.__micError.name;
+        if (name === "NotAllowedError" || name === "SecurityError") {
+          showToast("Mic permission denied. Allow mic access and try again.");
+        } else if (name === "NotFoundError") {
+          showToast("No microphone found. Plug one in and try again.");
+        } else {
+          showToast("Couldn't access mic. Try again.");
+        }
+        var recBtnEl = document.getElementById("recBtn");
+        recBtnEl.disabled = false;
+        recBtnEl.classList.remove("on");
+        var liveBoxEl = document.getElementById("liveBox");
+        liveBoxEl.classList.remove("show", "processing");
+        return;
+      }
+      var stream = streamOrErr;
+      if (data && data.available) {
+        usingDeepgram = true;
+        startDeepgramRecording(stream).then(function(ok) {
+          if (_micStartCancelled) {
+            if (stream) stream.getTracks().forEach(function(t) { t.stop(); });
+            return;
+          }
+          if (ok) {
+            isRec = true;
+            document.getElementById("recBtn").classList.add("on");
+            document.getElementById("recSt").textContent = "Recording\u2026";
+            document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
+            document.getElementById("recSub").classList.add("live");
+            document.getElementById("liveBox").textContent = "Recording\u2026";
+          } else {
+            if (stream) stream.getTracks().forEach(function(t) { t.stop(); });
+            usingDeepgram = false;
+            trySpeechFallback();
+          }
+        });
+      } else {
+        if (stream) stream.getTracks().forEach(function(t) { t.stop(); });
+        trySpeechFallback();
+      }
+    });
 }
 
 function startWebSpeechAPI() {
@@ -1342,19 +1463,11 @@ function startWebSpeechAPI() {
     document.getElementById("recSub").classList.add("live");
     document.getElementById("liveBox").classList.add("show");
     console.log("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
-    recDurationTimer = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
-      const remaining = recMaxDuration - elapsed;
-      if (remaining <= 0) {
-        clearInterval(recDurationTimer);
-        recDurationTimer = null;
-        showToast("Max recording time reached (" + recMaxDuration + "s)");
-        isRec = false;
-        recog.stop();
-        return;
-      }
-      document.getElementById("recSub").textContent = remaining + "s remaining";
-    }, 1000);
+    _startRecTimer(recMaxDuration, function() {
+      showToast("Max recording time reached (" + recMaxDuration + "s)");
+      isRec = false;
+      recog.stop();
+    });
     recogTimeout = setTimeout(() => {
       console.warn("[Speech] Timeout \u2014 no results after 8s");
       showToast(
@@ -1463,7 +1576,10 @@ function finishRec() {
   const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
   recStartTime = null;
   usingDeepgram = false;
-  document.getElementById("recBtn").classList.remove("on");
+  _sttRetrying = false;
+  var recBtnFin = document.getElementById("recBtn");
+  recBtnFin.classList.remove("on");
+  recBtnFin.disabled = false;
   document.getElementById("recSt").textContent =
     (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
   document.getElementById("recSub").textContent =
@@ -1474,18 +1590,60 @@ function finishRec() {
     inputSource = "voice";
     userOverride = false;
     setTimeout(
-      () => document.getElementById("liveBox").classList.remove("show"),
+      () => {
+        var lb = document.getElementById("liveBox");
+        lb.classList.remove("show", "processing", "retry");
+        lb.onclick = null;
+      },
       500,
     );
     updateCard();
     saveDraft();
     showToast("Done \u2014 review your words then tap Create");
     fullTx = "";
+  } else {
+    var lb2 = document.getElementById("liveBox");
+    lb2.classList.remove("show", "processing", "retry");
+    lb2.onclick = null;
   }
   updateSlNudge();
   updateMicState();
   updateVoiceBar();
   return actualDuration;
+}
+
+// Recording timer with drift correction. Renders MM:SS in the recSub element
+// starting at the cap (e.g. "00:15") and counting down to "00:00". Uses a
+// setTimeout chain (not setInterval) and performance.now() so each tick
+// re-anchors to the start time, eliminating drift across long recordings.
+// When remaining hits 0, onExpire is invoked and recDurationTimer is cleared.
+function _startRecTimer(maxSec, onExpire) {
+  var recSub = document.getElementById("recSub");
+  function formatMMSS(s) {
+    s = Math.max(0, Math.ceil(s));
+    var mm = Math.floor(s / 60);
+    var ss = s % 60;
+    return (mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss;
+  }
+  var startTime = performance.now();
+  recSub.textContent = formatMMSS(maxSec);
+  function tick() {
+    var elapsed = (performance.now() - startTime) / 1000;
+    var remaining = maxSec - elapsed;
+    if (remaining <= 0) {
+      recSub.textContent = "00:00";
+      recDurationTimer = null;
+      recDurationTimer = setTimeout(function() {
+        recDurationTimer = null;
+        if (onExpire) onExpire();
+      }, 1000);
+      return;
+    }
+    recSub.textContent = formatMMSS(remaining);
+    var drift = (performance.now() - startTime) % 1000;
+    recDurationTimer = setTimeout(tick, 1000 - drift);
+  }
+  recDurationTimer = setTimeout(tick, 1000);
 }
 
 // Haptic feedback helper
@@ -1498,17 +1656,21 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   if (isRec) {
     isRec = false;
     if (recDurationTimer) {
-      clearInterval(recDurationTimer);
+      clearTimeout(recDurationTimer);
       recDurationTimer = null;
     }
     if (recGraceTimer) {
       clearTimeout(recGraceTimer);
       recGraceTimer = null;
     }
+    var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
+    var liveBoxEl = document.getElementById("liveBox");
+    liveBoxEl.textContent = processingMsg;
+    liveBoxEl.classList.add("show", "processing");
     if (usingDeepgram) {
       const result = await stopDeepgramRecording();
+      liveBoxEl.classList.remove("processing");
       fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-      if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
       if (audioBlob) {
         _computeWaveform(audioBlob).then(function(h) {
           _cardWaveform = h;
@@ -1517,6 +1679,11 @@ document.getElementById("recBtn").addEventListener("click", async () => {
           }
         }).catch(function() { _cardWaveform = null; });
       }
+      if (!fullTx && _lastSttWav) {
+        _showSttRetryState();
+        return;
+      }
+      if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
       const actualDuration = finishRec();
       await reportRecordingDuration(actualDuration || result.duration);
       return;
@@ -1541,12 +1708,59 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     return;
   }
 
-  // Show immediate feedback before any async setup
-  document.getElementById("recBtn").classList.add("on");
+  // Show immediate feedback before any async setup. Disable the button
+  // synchronously so a double-tap can't fire two record starts in parallel.
+  var recBtnEl = document.getElementById("recBtn");
+  recBtnEl.classList.add("on");
+  recBtnEl.disabled = true;
   document.getElementById("recSt").textContent = "Starting\u2026";
   document.getElementById("recSub").textContent = "Setting up mic\u2026";
   document.getElementById("recSub").classList.add("live");
-  document.getElementById("liveBox").textContent = "Starting\u2026";
+  var liveBoxEl = document.getElementById("liveBox");
+  liveBoxEl.textContent = "";
+  liveBoxEl.classList.remove("show", "processing", "retry");
+  liveBoxEl.onclick = null;
+  _lastSttWav = null;
+  _sttRetrying = false;
+  var startingText = document.createElement("span");
+  startingText.textContent = "Starting\u2026";
+  var cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.className = "live-box-cancel";
+  cancelBtn.id = "recStartCancel";
+  cancelBtn.textContent = (typeof getI18nSync === "function" && getI18nSync("record.cancel")) || "Cancel";
+  liveBoxEl.appendChild(startingText);
+  liveBoxEl.appendChild(cancelBtn);
+  _micStartCancelled = false;
+  cancelBtn.addEventListener("click", function() {
+    _micStartCancelled = true;
+    clearTimeout(readyTimer);
+    recBtnEl.disabled = false;
+    recBtnEl.classList.remove("on");
+    document.getElementById("recSt").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+    document.getElementById("recSub").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+    document.getElementById("recSub").classList.remove("live");
+    liveBoxEl.textContent = "";
+    liveBoxEl.classList.remove("show", "processing");
+  });
+
+  var readyTimer = setTimeout(function() {
+    if (_micStartCancelled) return;
+    if (!isRec) {
+      recBtnEl.disabled = false;
+      recBtnEl.classList.remove("on");
+      document.getElementById("recSt").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+      document.getElementById("recSub").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+      document.getElementById("recSub").classList.remove("live");
+      liveBoxEl.textContent = "";
+      liveBoxEl.classList.remove("show", "processing");
+      showToast("Mic taking longer than expected. Try again");
+    }
+  }, 2000);
 
   // Server-side limit check before starting recording (check only, don't increment)
   const sessionId = localStorage.getItem("wsSessionId");
@@ -1566,8 +1780,9 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     const data = await res.json();
 
     if (!data.allowed) {
-      // Revert button state on failure
-      document.getElementById("recBtn").classList.remove("on");
+      clearTimeout(readyTimer);
+      recBtnEl.disabled = false;
+      recBtnEl.classList.remove("on");
       document.getElementById("recSt").textContent =
         (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
       document.getElementById("recSub").textContent =
@@ -1591,6 +1806,12 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   }
 
   startRec();
+  // startRec() sets isRec=true synchronously on its first synchronous
+  // branch (the Web Speech path) or asynchronously via startDeepgramRecording
+  // (which polls audio tracks). If neither path sets isRec=true within the
+  // 2 s readiness window, the timeout above resets the UI.
+  // We don't clear readyTimer here because the timer self-checks isRec —
+  // it'll no-op if startRec succeeded.
 });
 
 async function reportRecordingDuration(actualDuration) {
@@ -2621,6 +2842,10 @@ async function _downloadWebmWithAudio() {
   try {
     _setExportStage("Rendering card…");
     var webmBlob = await generateWebm();
+    if (!webmBlob || !webmBlob.size) {
+      showToast("Voice didn't capture. Try again");
+      return;
+    }
     var v = document.createElement("a");
     v.download = "wispr-story.webm";
     v.href = URL.createObjectURL(webmBlob);
@@ -2629,7 +2854,11 @@ async function _downloadWebmWithAudio() {
     showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
   } catch (webmErr) {
     console.error("[WebM]", webmErr);
-    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed");
+    if (webmErr && /0 bytes/.test(webmErr.message || "")) {
+      showToast("Voice didn't capture. Try again");
+    } else {
+      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed");
+    }
   } finally {
     hideExportProgress();
   }
@@ -2832,6 +3061,10 @@ document.getElementById("shareDownload").addEventListener("click", async functio
   if (voiceAttached && audioBlob && webmCodecString) {
     try {
       var webmBlob = await generateWebm();
+      if (!webmBlob || !webmBlob.size) {
+        showToast("Voice didn't capture. Try again");
+        return;
+      }
       var v = document.createElement("a");
       v.download = "wispr-story.webm";
       v.href = URL.createObjectURL(webmBlob);
@@ -2840,6 +3073,9 @@ document.getElementById("shareDownload").addEventListener("click", async functio
       showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
     } catch (e) {
       console.error("[WebM] Share download failed:", e);
+      if (e && /0 bytes/.test(e.message || "")) {
+        showToast("Voice didn't capture. Try again");
+      }
     }
   }
 });
@@ -2918,62 +3154,6 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
   btn.innerHTML = origHTML;
   btn.disabled = false;
 });
-
-// Tooltips
-document.querySelectorAll(".ii").forEach((icon) => {
-  icon.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const tip = icon.nextElementSibling;
-    const open = tip.classList.contains("open");
-    document
-      .querySelectorAll(".tip.open")
-      .forEach((t) => t.classList.remove("open"));
-    document
-      .querySelectorAll(".ii.tip-open")
-      .forEach((i) => i.classList.remove("tip-open"));
-    if (!open) {
-      tip.classList.add("open");
-      icon.classList.add("tip-open");
-      setTimeout(() => adjustTooltipPosition(tip), 0);
-    }
-  });
-  icon.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      icon.click();
-    }
-  });
-});
-document.addEventListener("click", () => {
-  document
-    .querySelectorAll(".tip.open")
-    .forEach((t) => t.classList.remove("open"));
-  document
-    .querySelectorAll(".ii.tip-open")
-    .forEach((i) => i.classList.remove("tip-open"));
-});
-
-function adjustTooltipPosition(tip) {
-  // Reset prior overrides so measurement starts from the default position.
-  tip.style.left = "";
-  tip.style.right = "";
-  tip.style.maxWidth = "";
-  tip.style.transform = "";
-  const margin = 8;
-  // Hard-cap width to viewport so a long tooltip never wider than the screen.
-  const maxW = Math.min(280, window.innerWidth - margin * 2);
-  tip.style.maxWidth = maxW + "px";
-  // Measure, then translate horizontally to keep both edges inside the viewport.
-  const r = tip.getBoundingClientRect();
-  let shift = 0;
-  if (r.right > window.innerWidth - margin) {
-    shift = window.innerWidth - margin - r.right;
-  } else if (r.left < margin) {
-    shift = margin - r.left;
-  }
-  if (shift !== 0) tip.style.transform = "translateX(" + shift + "px)";
-  if (r.bottom > window.innerHeight) tip.style.top = "auto";
-}
 
 var _toastQueue = [], _toastShowing = false;
 function showToast(msg) {

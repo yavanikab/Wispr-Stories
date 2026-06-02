@@ -1,13 +1,44 @@
 # Changelog
 
-## [Unreleased]
+## [v0.10.4.2] — Stage 1 Recording Flow Bug Fixes (2026-06-02)
+
+Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel button, 2.2 one-tick 00:00, 2.3 retry state). Stages 2–4 (VAD, streaming STT, Wispr Flow learnings) are data-gated and not in this milestone. Design doc was deleted after Stage 1 reached 100% completion.
+
+### Added
+- **Onboarding Quick Reference** — collapsible `<details>` block in the onboarding modal footer with 7 tips (voice, text, tone, color, shape, font size, share). Replaces the 5 inline info-tooltip buttons that cluttered the form for first-time users. Markup in `wisprstories.html`; CSS in `global/styles/overlays.css`; i18n keys under `onboarding.ref*` in all 11 locales.
+- **`record.processing` i18n key** — "Processing your audio…" string used by the liveBox while the server is transcribing after a stop tap. Merged into the existing top-level `record` object in all 11 locales.
+- **`record.cancel` i18n key** — "Cancel" string for the liveBox cancel button shown during the mic-starting state. Added in all 11 locales.
+- **`record.couldntRetry` i18n key** — "Couldn't transcribe. Tap to retry" string for the liveBox retry state shown when Deepgram STT returns empty text. Added in all 11 locales.
+- **Shorter textarea placeholder** — `textarea.placeholder` updated to "Speak or type your message…" in all 11 locales (was a longer, modal-tier string).
+- **Module-level STT health-check cache** in `wisprstories.js` — `_sttHealthCache` + `STT_HEALTH_TTL_MS = 10 * 60 * 1000` (10-minute TTL). Avoids pinging `/api/stt?check=1` on every record tap. On network error, one retry after 2 s before falling back to WSA.
+- **`_startRecTimer(maxSec, onExpire)` helper** in `wisprstories.js` — `setTimeout` chain (not `setInterval`) with `performance.now()` drift correction. Renders `00:15` → `00:00` in MM:SS format. Used by both Deepgram and Web Speech API recording paths.
+- **STT health check + getUserMedia in parallel (2.1 deep fix)** — `_getMicStream()` helper extracted; `startRec()` now runs `Promise.all([_runSttHealth(), _getMicStream()])` so the user is not blocked on a slow mic permission prompt while the server health check completes. Mic-permission errors (`NotAllowedError`, `NotFoundError`, generic) are surfaced as specific toasts instead of falling silently to the Web Speech API fallback. The stream obtained before cancel is properly stopped via `getTracks().forEach(t => t.stop())`.
+- **Cancel button during mic-startup (2.1 deep fix)** — Module-level `_micStartCancelled` flag set by either (a) the new "Cancel" button rendered inside the liveBox during the Starting state, or (b) the 2 s readiness watchdog. The flag is checked in three places: the Promise.all continuation in `startRec()`, the `startDeepgramRecording().then()` continuation, and the 2 s watchdog. When set, the mic stream tracks are stopped and the UI is reset to the idle state. Cancel button uses a calm `<button class="live-box-cancel">` styled in `global/styles/inputs.css`; i18n key `record.cancel` in all 11 locales.
+- **STT retry state after transcription failure (2.3 deep fix)** — When Deepgram returns empty text, the liveBox transitions to a clickable retry state (`.live-box.retry`, with ↻ icon and hover background) showing "Couldn't transcribe. Tap to retry". The WAV blob is saved to module-level `_lastSttWav` (with `_lastSttLang` + `_lastSttSessionId`) in `stopDeepgramRecording()`. A new `_retryLastStt()` async function re-sends the same WAV to `/api/stt` (15 s AbortController timeout, same headers as the original request). On retry success, the textarea is populated and `finishRec()` runs. On retry failure, a toast suggests re-recording and the retry state is dismissed. `_sttRetrying` flag prevents double-tap. Cleared on new recording start, on `finishRec()`, and on the limit-check failure path.
+
+### Fixed
+- **Record button — double-fire on slow mic permission** (2.1): `recBtn` is now `disabled = true` synchronously inside the click handler, and a 2 s watchdog re-enables the UI if `isRec` never becomes true. `finishRec()` re-enables the button. Prevents the "press once, get two recordings" race when the user taps the mic while a slow mic-permission prompt is open.
+- **Recording timer — drift over time** (2.2): Replaced the old `setInterval` timer (which drifted by 1–2 seconds over a 15–30 s session) with a `setTimeout` chain and `performance.now()` drift correction. Display format is now `MM:SS` (`00:15` → `00:00`) instead of raw seconds. Both Deepgram and WSA paths use the same helper.
+- **Timer — "00:00" lands for one tick before Processing (2.2 deep fix)**: After the countdown hits 00:00, the helper renders "00:00" and then defers the `onExpire` callback by 1000 ms (one full tick) so the browser repaints "00:00" before transitioning to the Processing state. Previously the transition could happen mid-frame.
+- **Stop tap — silent wait during transcription** (2.3): The liveBox now shows a "Processing your audio…" message with a spinner (dashed border, no breathing animation) for the duration of the server-side transcription. Replaces the previous silent gap where the user had no idea if the app was still working.
+- **WebM export — silent zero-byte upload** (2.7): Both callers of `generateWebm()` (`_downloadWebmWithAudio` and `shareDownload`) now check `webmBlob.size > 0` after generation. On zero-byte output, the user sees a "Voice didn't capture. Try again" toast instead of an empty `.webm` being downloaded/uploaded. The internal `generateWebm` checks were retained as a second line of defense.
+- **Orphaned `record.tip` i18n key in 10 non-English locales**: en.json had `record.tip` removed in the initial Stage 1 work, but the 10 non-English locales were missed. All 10 still carried the original long tooltip string. Removed in lockstep with en.json.
+
+### Changed
+- **Info tooltips removed from form** (2.5): The 5 inline `?` icon tooltip buttons (next to Textarea, Tone, Color, Shape, Font Size) have been removed from `wisprstories.html`. All tooltip-related JS (~55 lines, including `adjustTooltipPosition` and the scroll/resize listeners) was removed from `wisprstories.js`. Mobile `.iw`/`.ii`/`.tip` overrides removed from `global/styles/responsive.css`. The orphaned `global/styles/tooltips.css` was deleted and its import removed from `global/styles/main.css`. The information they conveyed now lives in the Quick Reference at the bottom of the onboarding modal.
+- **Duplicate `record` i18n key in non-English locales**: PowerShell `ConvertFrom-Json` was silently keeping the last duplicate value. en.json had a single `record` object that was correct; all 10 non-English locales were carrying two `record` keys (the second with the new `processing` field). Fixed by merging `processing` into the existing top-level `record` object in all 10 locales.
+
+### Removed
+- **`global/styles/tooltips.css`**: Orphaned after the 2.5 tooltip removal. Was only imported from `global/styles/main.css`; that import is now also gone. No other file referenced it.
+
+## [v0.10.4.1] — Tone Counter & WhatsApp Share Fixes (2026-06-02)
 
 ### Added
 - **`api/rewrite-confirm.js`** — new tone rewrite commit endpoint. The per-tone Redis counter is incremented here, not in `api/rewrite.js`. Called by the client when the user Accepts a rewrite preview, or auto-called when the user clicks Create without Accepting.
 - **`scripts/stress-test-99-cap.mjs`** — Node.js verification script (built-in `fetch`, no deps). Fires 120 unique sessions at `/api/usage` and asserts 5 conditions: zero errors, cap == 99, allowed + blocked == count, allowed ≤ 99, grandfather re-hit allowed.
 - **`scripts/verify-cron-cleanup.mjs`** — Node.js verification script. Asserts `/api/cleanup` returns 401 for no/wrong auth and 200 + valid body for correct `CRON_SECRET`. Reads secret from `--secret=` flag or env var.
 - **`docs/test-plans/stress-test-99-cap.md`** + **`docs/test-plans/verify-cron-cleanup.md`** — markdown explainers for the test scripts.
-- **`docs/superpowers/specs/2026-06-01-recording-ui-redesign-design.md`** — 9-section recording flow redesign spec (Stage 1–4). Stage 1 = 7 bug fixes, Stage 2 = VAD + pre-warm + caps, Stage 3 = streaming STT, Stage 4 = Wispr Flow learnings with honest "proud implementation" answer.
+- (Removed) **`docs/superpowers/specs/2026-06-01-recording-ui-redesign-design.md`** — 9-section recording flow redesign spec (Stage 1–4). Stage 1 = 7 bug fixes + 4 deep sub-fixes, Stage 2 = VAD + pre-warm + caps, Stage 3 = streaming STT, Stage 4 = Wispr Flow learnings. Deleted after Stage 1 reached 100% completion (all 11 fixes verified in `wisprstories.js`, all 11 locales updated, all 3 docs synced).
 
 ### Fixed
 - **Tone rewrite counter — preview-then-commit refactor**: Counter no longer ticks on tone pick. `api/rewrite.js` is now preview-only (checks per-tone limit but doesn't increment; response no longer carries `used`/`max`/`remaining`). New `api/rewrite-confirm.js` performs the atomic INCR on Accept or auto-Create. Client uses `_rewriteConfirmed` flag to prevent double-increment. Server is now the source of truth; localStorage mirrors via `setToneUsed(tone, serverReturnedUsed)`.

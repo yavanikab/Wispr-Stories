@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/wisprstories.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/language-stats", "destination": "/language-stats.html" },
     { "source": "/card", "destination": "/api/card" },
     { "source": "/c/:id", "destination": "/api/c/[id]" }
   ],

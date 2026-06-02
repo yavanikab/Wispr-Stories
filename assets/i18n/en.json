@@ -15,7 +15,10 @@
     "label": "Your voice",
     "status": "Tap to speak",
     "sub": "",
-    "generating": "Generating…"
+    "generating": "Generating…",
+    "processing": "Processing your audio…",
+    "cancel": "Cancel",
+    "couldntRetry": "Couldn't transcribe. Tap to retry"
   },
   "speechLang": {
     "title": "Select speech language",
@@ -34,8 +37,7 @@
   "orText": "or type or paste your words",
   "textarea": {
     "label": "Your words",
-    "tip": "Speak first using Record above. Words land here automatically. Or type directly. Or dictate with Wispr Flow. Any language works here.",
-    "placeholder": "Record your voice or type anything: a birthday wish, memory, recipe, love letter, gratitude, advice..."
+    "placeholder": "Speak or type your message..."
   },
   "resetBtn": "Start over",
   "nameRow": {
@@ -51,7 +53,6 @@
   },
   "tone": {
     "label": "Tone",
-    "tip": "Original preserves your exact words, unlimited, no daily cap. Other tones rewrite via AI: Warm is gentle, Bold is direct, Poetic flows with rhythm, Playful is light, Reflective is slow, Honest is raw. Changes letter-spacing and slant only, not size or weight.",
     "original": "Original",
     "warm": "Warm",
     "bold": "Bold",
@@ -63,7 +64,6 @@
   },
   "color": {
     "label": "Card color",
-    "tip": "Sets the card background. The live preview updates instantly.",
     "violet": "Violet",
     "amber": "Amber",
     "crimson": "Crimson",
@@ -77,13 +77,11 @@
   },
   "shape": {
     "label": "Shape",
-    "tip": "Sharp edges work best for WhatsApp. Rounded corners suit galleries and web.",
     "sharp": "Sharp corners",
     "rounded": "Rounded corners"
   },
   "fontSize": {
     "label": "Font size",
-    "tip": "Make short card text larger so it fills the card nicely. Only available while your card text is short.",
     "info": "Available only when your card text is under 85 characters",
     "infoOn": "Your card text is short: tap + or − to adjust the size"
   },
@@ -153,9 +151,17 @@
     "title": "Welcome to Wispr Stories",
     "step1": "<strong>Speak or type</strong> your message. Tap the microphone or paste text.",
     "step2": "<strong>Customize</strong> your card: choose a tone, color, and corner style.",
-    "step3": "<strong>Create & share</strong>: download as PNG or share directly on social platforms.",
+    "step3": "<strong>Create &amp; share</strong>: download as PNG or share directly on social platforms.",
     "gotIt": "Got it, let's go!",
-    "hint": "Need help later? Tap the ❓ in the footer."
+    "hint": "Need help later? Tap the ❓ in the footer.",
+    "refTitle": "Quick reference",
+    "refToggle": "<strong>Switch modes</strong>: tap the mic icon to toggle between record and text mode.",
+    "refVoice": "<strong>Voice languages</strong>: 29 languages + auto-detect. Pick from the language button.",
+    "refText": "<strong>Text editing</strong>: the textarea accepts up to 150 characters. Edit freely.",
+    "refTone": "<strong>Tone rewriting</strong>: 6 tones. Free users get 5 per tone per day. Pro users get unlimited.",
+    "refColor": "<strong>Color</strong>: choose a palette to set the card background.",
+    "refShape": "<strong>Shape</strong>: sharp edges for messaging, rounded for galleries.",
+    "refFontSize": "<strong>Font size</strong>: bump the card text up for short messages."
   },
   "mobileBar": {
     "create": "Create",

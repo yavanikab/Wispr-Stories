@@ -13,10 +13,12 @@
   "ffNotice": "🌐 La grabación de voz no es compatible con Firefox. Usa Chrome o Safari, o pega tu texto abajo.",
   "record": {
     "label": "Tu voz",
-    "tip": "Presiona grabar y habla naturalmente. Tus palabras aparecen en vivo. Toca de nuevo para detener. Tus palabras pasan al cuadro de texto listas para la tarjeta.",
     "status": "Toca para hablar",
     "sub": "Tus palabras aparecen cuando paras",
-    "generating": "Generando…"
+    "generating": "Generando…",
+    "processing": "Procesando tu audio…",
+    "cancel": "Cancelar",
+    "couldntRetry": "No se pudo transcribir. Toca para reintentar"
   },
   "speechLang": {
     "title": "Seleccionar idioma de voz",
@@ -35,8 +37,7 @@
   "orText": "o escribe o pega tus palabras",
   "textarea": {
     "label": "Tus palabras",
-    "tip": "Habla primero usando Grabar arriba. Las palabras llegan aquí automáticamente. O escribe directamente. O pega desde Wispr Flow. Cualquier idioma funciona aquí.",
-    "placeholder": "Graba tu voz o escribe lo que sea: un deseo de cumpleaños, un recuerdo, una receta, una carta de amor, gratitud, un consejo..."
+    "placeholder": "Habla o escribe tu mensaje..."
   },
   "resetBtn": "Reiniciar todo",
   "nameRow": {
@@ -52,7 +53,6 @@
   },
   "tone": {
     "label": "Tono",
-    "tip": "Original conserva tus palabras exactas, ilimitado, sin límite diario. Otros tonos se reescriben con IA: Cálido es suave. Audaz es directo. Poético fluye con ritmo. Juguetón es ligero. Reflexivo es lento. Honesto es crudo. Cambia solo el espaciado y la inclinación, no el tamaño ni el peso.",
     "original": "Original",
     "warm": "Cálido",
     "bold": "Audaz",
@@ -64,7 +64,6 @@
   },
   "color": {
     "label": "Color de tarjeta",
-    "tip": "Establece el fondo de la tarjeta. La vista previa en vivo se actualiza al instante.",
     "violet": "Violeta",
     "amber": "Ámbar",
     "crimson": "Carmesí",
@@ -78,13 +77,11 @@
   },
   "shape": {
     "label": "Forma",
-    "tip": "Los bordes afilados funcionan mejor para WhatsApp. Las esquinas redondeadas son ideales para galerías y web.",
     "sharp": "Bordes afilados",
     "rounded": "Esquinas redondeadas"
   },
   "fontSize": {
     "label": "Tamaño de fuente",
-    "tip": "Agranda el texto corto de la tarjeta para que la llene bien. Solo disponible cuando el texto de la tarjeta es corto.",
     "info": "Disponible solo cuando el texto de la tarjeta tiene menos de 85 caracteres",
     "infoOn": "El texto de la tarjeta es corto: toca + o − para ajustar el tamaño"
   },
@@ -148,7 +145,15 @@
     "step2": "<strong>Personaliza</strong> tu tarjeta: elige un tono, color y estilo de esquina.",
     "step3": "<strong>Crea y comparte</strong>: descarga como PNG o comparte directamente en redes sociales.",
     "gotIt": "¡Entendido, vamos!",
-    "hint": "¿Necesitas ayuda después? Toca ❓ en el footer."
+    "hint": "¿Necesitas ayuda después? Toca ❓ en el footer.",
+    "refTitle": "Referencia rápida",
+    "refToggle": "<strong>Cambiar modos</strong>: toca el ícono del micrófono para alternar entre modo de grabación y texto.",
+    "refVoice": "<strong>Idiomas de voz</strong>: 29 idiomas + detección automática. Elige desde el botón de idioma.",
+    "refText": "<strong>Edición de texto</strong>: el área de texto acepta hasta 150 caracteres. Edita libremente.",
+    "refTone": "<strong>Reescritura de tono</strong>: 6 tonos. Los usuarios gratuitos obtienen 5 por tono al día. Los usuarios Pro obtienen ilimitado.",
+    "refColor": "<strong>Color</strong>: elige una paleta para establecer el fondo de la tarjeta.",
+    "refShape": "<strong>Forma</strong>: bordes afilados para mensajería, redondeados para galerías.",
+    "refFontSize": "<strong>Tamaño de fuente</strong>: aumenta el texto de la tarjeta para mensajes cortos."
   },
   "mobileBar": {
     "create": "Crear",

@@ -13,10 +13,12 @@
   "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari, 或在下方粘贴你的文字。",
   "record": {
     "label": "你的声音",
-    "tip": "按下录音并自然地说话。你的文字会实时显示。再次点击停止. 你的文字将移入文本框准备制作卡片。",
     "status": "点击说话",
-    "sub": "停止后文字会出现",
-    "generating": "生成中…"
+    "sub": "停止后文字会显示",
+    "generating": "正在生成…",
+    "processing": "正在处理你的音频…",
+    "cancel": "取消",
+    "couldntRetry": "转录失败，点击重试"
   },
   "speechLang": {
     "title": "选择语音语言",
@@ -35,8 +37,7 @@
   "orText": "或输入或粘贴你的文字",
   "textarea": {
     "label": "你的文字",
-    "tip": "先使用上方的录音功能. 文字会自动出现在这里。或直接输入。或从 Wispr Flow 粘贴。任何语言都可以。",
-    "placeholder": "录制你的声音或输入任何内容：生日祝福、回忆、食谱、情书、感恩、建议..."
+    "placeholder": "说话或输入你的消息..."
   },
   "resetBtn": "全部重置",
   "nameRow": {
@@ -52,7 +53,6 @@
   },
   "tone": {
     "label": "语气",
-    "tip": "原文保留您的原话, 无限制，无每日上限。其他语气通过 AI 重写：温暖是温柔的。大胆是直接的。诗意有韵律感。活泼是轻松的。反思是缓慢的。诚实是直白的。只改变字间距和倾斜度, 不改变大小或粗细。",
     "original": "原始",
     "warm": "温暖",
     "bold": "大胆",
@@ -64,7 +64,6 @@
   },
   "color": {
     "label": "卡片颜色",
-    "tip": "设置卡片背景。实时预览会立即更新。",
     "violet": "紫色",
     "amber": "琥珀色",
     "crimson": "深红色",
@@ -78,13 +77,11 @@
   },
   "shape": {
     "label": "形状",
-    "tip": "锐利边缘最适合 WhatsApp。圆角适合画廊和网页。",
     "sharp": "锐利边缘",
     "rounded": "圆角"
   },
   "fontSize": {
     "label": "字体大小",
-    "tip": "放大较短的卡片文字，使其更好地填满卡片。仅在卡片文字较短时可用。",
     "info": "仅当卡片文字少于 85 个字符时可用",
     "infoOn": "卡片文字较短：点按 + 或 − 调整大小"
   },
@@ -148,7 +145,15 @@
     "step2": "<strong>自定义</strong>你的卡片: 选择语气、颜色和边角样式。",
     "step3": "<strong>创建和分享</strong>: 下载为 PNG 或直接分享到社交平台。",
     "gotIt": "明白了, 开始吧！",
-    "hint": "稍后需要帮助？点击页脚的 ❓ 图标。"
+    "hint": "稍后需要帮助？点击页脚的 ❓ 图标。",
+    "refTitle": "快速参考",
+    "refToggle": "<strong>切换模式</strong>: 点击麦克风图标在录音模式和文字模式之间切换。",
+    "refVoice": "<strong>语音语言</strong>: 29 种语言 + 自动检测。从语言按钮选择。",
+    "refText": "<strong>文字编辑</strong>: 文本区域最多接受 150 个字符。可自由编辑。",
+    "refTone": "<strong>语气改写</strong>: 6 种语气。免费用户每个语气每天 5 次。Pro 用户无限次。",
+    "refColor": "<strong>颜色</strong>: 选择调色板以设置卡片背景。",
+    "refShape": "<strong>形状</strong>: 消息用锐利边缘, 画廊用圆角。",
+    "refFontSize": "<strong>字体大小</strong>: 短消息可放大卡片文字。"
   },
   "mobileBar": {
     "create": "创建",

@@ -21,10 +21,6 @@
   .shell.has-card .actions {
     position: sticky;
     bottom: 0;
-    /* Must exceed .iw's z-index: 500 (see tooltips.css) so info-icon
-       wrappers scrolling behind the sticky bar don't poke through on top
-       of the CTA buttons. Tooltips themselves (.tip, z-index 9999) still
-       render above the bar on hover, which is the correct behavior. */
     z-index: 600;
     background: var(--cream);
     padding: 14px 0 18px;

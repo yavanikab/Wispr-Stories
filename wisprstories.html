@@ -335,16 +335,6 @@
           <div>
             <label class="lbl" for="sta"
               ><span data-i18n="textarea.label">Your words</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-                <span class="tip" data-i18n="textarea.tip"
-                  >Speak first using Record above &mdash; words land here
-                  automatically. Or type directly. Or dictate with Wispr Flow.
-                  Any language works here.</span
-                ></span
-              >
             </label>
             <textarea
               class="sta"
@@ -420,17 +410,6 @@
           <div>
             <div class="lbl">
               <span data-i18n="tone.label">Tone</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-                <span class="tip" data-i18n="tone.tip"
-                  >Changes how your words feel on the card. Warm is gentle. Bold
-                  is direct. Poetic flows with rhythm. Playful is light.
-                  Reflective is slow. Honest is raw. Changes letter-spacing and
-                  slant only &mdash; not size or weight.</span
-                ></span
-              >
             </div>
             <div
               class="tone-row"
@@ -487,15 +466,6 @@
           <div>
             <div class="lbl">
               <span data-i18n="color.label">Card color</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-                <span class="tip" data-i18n="color.tip"
-                  >Sets the card background. The live preview updates
-                  instantly.</span
-                ></span
-              >
             </div>
             <div
               class="pal-row"
@@ -600,15 +570,6 @@
           <div>
             <div class="lbl">
               <span data-i18n="shape.label">Shape</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-                <span class="tip" data-i18n="shape.tip"
-                  >Sharp edges work best for WhatsApp. Rounded corners suit
-                  galleries and web.</span
-                ></span
-              >
             </div>
             <div
               class="sz-row"
@@ -639,15 +600,6 @@
           <div>
             <div class="lbl">
               <span data-i18n="fontSize.label">Font size</span>
-              <span class="iw"
-                ><button type="button" class="ii" aria-label="More info">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-                <span class="tip" data-i18n="fontSize.tip"
-                  >Make short card text larger so it fills the card nicely. Only
-                  available while your card text is short.</span
-                ></span
-              >
             </div>
             <div class="font-size-row" id="fontSizeRow">
               <button
@@ -1022,6 +974,18 @@
           </div>
         </div>
         <div class="onboarding-footer">
+          <details class="onboarding-quick-ref">
+            <summary data-i18n="onboarding.refTitle">Quick reference</summary>
+            <dl class="onboarding-quick-ref-list">
+              <dd data-i18n="onboarding.refToggle"><strong>Switch modes</strong>: tap the mic icon to toggle between record and text mode.</dd>
+              <dd data-i18n="onboarding.refVoice"><strong>Voice languages</strong>: 29 languages + auto-detect. Pick from the language button.</dd>
+              <dd data-i18n="onboarding.refText"><strong>Text editing</strong>: the textarea accepts up to 150 characters. Edit freely.</dd>
+              <dd data-i18n="onboarding.refTone"><strong>Tone rewriting</strong>: 6 tones. Free users get 5 per tone per day. Pro users get unlimited.</dd>
+              <dd data-i18n="onboarding.refColor"><strong>Color</strong>: choose a palette to set the card background.</dd>
+              <dd data-i18n="onboarding.refShape"><strong>Shape</strong>: sharp edges for messaging, rounded for galleries.</dd>
+              <dd data-i18n="onboarding.refFontSize"><strong>Font size</strong>: bump the card text up for short messages.</dd>
+            </dl>
+          </details>
           <button
             class="onboarding-btn onboarding-btn-primary"
             id="onboardingGotIt"
