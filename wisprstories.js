@@ -55,6 +55,10 @@ function hasCardContent() {
   const card = document.getElementById("card");
   return card && !card.classList.contains("card-empty");
 }
+function stripControls(str) {
+  return str.replace(/[\x00-\x1F\x7F\u200B\u200C\u200D\uFEFF]/g, "");
+}
+
 // RTL intentionally disabled — page layout stays LTR always
 
 // Map script codes (from fonts.js detectScript) to language codes (from languages.json)
@@ -307,8 +311,8 @@ function loadDraft() {
     const raw = sessionStorage.getItem("wisprDraft");
     if (!raw) return false;
     const draft = JSON.parse(raw);
-    if (draft.text) document.getElementById("sta").value = draft.text;
-    if (draft.name) document.getElementById("nin").value = [...String(draft.name)].slice(0, 18).join("");
+    if (draft.text) document.getElementById("sta").value = stripControls(String(draft.text)).slice(0, 150);
+    if (draft.name) document.getElementById("nin").value = stripControls([...String(draft.name)].slice(0, 20).join(""));
     inputSource = draft.inputSource === "voice" ? "voice" : "story";
     if (draft.tone) applyTone(draft.tone);
     if (draft.palette != null) applyPal(draft.palette);
@@ -498,15 +502,6 @@ function isAllTonesExhausted() {
 // Many callers use this as "remaining for what the user is doing right now".
 function getCardsLeft() {
   return getRewritesLeftForTone(curTone);
-}
-
-function countCard() {
-  if (curTone === "original") return;
-  const today = new Date().toDateString();
-  const d = getToneCounts();
-  if (d.date !== today) { d.date = today; d.counts = {}; }
-  d.counts[curTone] = (d.counts[curTone] || 0) + 1;
-  localStorage.setItem("wsToneCounts", JSON.stringify(d));
 }
 
 function trackCardUsage() {
@@ -775,11 +770,42 @@ function showRewritePreview(originalText, rewrittenText, tone) {
     '<button class="rewrite-preview-btn rewrite-preview-cancel" id="rewriteCancel"><i class="fas fa-xmark"></i> Keep original</button>';
   bar.classList.add("show");
 
-  document.getElementById("rewriteAccept").addEventListener("click", () => {
+  document.getElementById("rewriteAccept").addEventListener("click", async () => {
+    const acceptBtn = document.getElementById("rewriteAccept");
+    if (acceptBtn.disabled) return; // Prevent double-click while confirm is in flight
+    acceptBtn.disabled = true;
+    setTimeout(() => (acceptBtn.disabled = false), 1500);
+
+    // Confirm the rewrite server-side. This is the call that ticks the
+    // per-tone counter. If it fails (e.g. 429, network), we roll back to
+    // the original text and applyTone("original") so the user can try a
+    // different tone.
+    const result = await confirmRewrite(tone);
+    if (!result.ok) {
+      const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
+      const msg = result.status === 429
+        ? "Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone"
+        : "Rewrite failed. Showing original";
+      showToast(msg);
+      document.getElementById("sta").value = originalText;
+      window._originalText = null;
+      window._pendingRewrite = null;
+      window._rewriteConfirmed = false;
+      hideRewritePreview();
+      applyTone("original");
+      updateCard();
+      saveDraft();
+      return;
+    }
+    if (typeof result.used === "number") {
+      setToneUsed(tone, result.used);
+    }
     document.getElementById("sta").value = rewrittenText;
     window._originalText = null;
     window._pendingRewrite = null;
+    window._rewriteConfirmed = true;
     hideRewritePreview();
+    applyTone(tone);
     updateCard();
     saveDraft();
     showToast("Rewrite applied!");
@@ -788,11 +814,49 @@ function showRewritePreview(originalText, rewrittenText, tone) {
     document.getElementById("sta").value = originalText;
     window._originalText = null;
     window._pendingRewrite = null;
+    window._rewriteConfirmed = false;
     hideRewritePreview();
     applyTone("original");
     updateCard();
     saveDraft();
   });
+}
+
+// Posts to /api/rewrite-confirm. Returns { ok, used, status }.
+// The server is the source of truth for the per-tone counter; this function
+// makes that tick happen at the moment the user Accepts (or auto-accepts via
+// Create). All error paths return ok:false so callers can roll back.
+async function confirmRewrite(tone) {
+  if (tone === "original") return { ok: true, used: 0 };
+  try {
+    let sessionId = localStorage.getItem("wsSessionId");
+    if (!sessionId) {
+      sessionId = "sess_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("wsSessionId", sessionId);
+    }
+    const res = await fetch("/api/rewrite-confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tone,
+        sessionId,
+        proKey: sessionStorage.getItem("wsProKey") || null,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return {
+        ok: false,
+        status: res.status,
+        used: typeof err.used === "number" ? err.used : null,
+        error: err.error || "Confirm failed",
+      };
+    }
+    const data = await res.json();
+    return { ok: true, used: data.used, status: 200 };
+  } catch (e) {
+    return { ok: false, status: 0, error: e.message || "Network error" };
+  }
 }
 
 function hideRewritePreview() {
@@ -1785,6 +1849,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     }
     if (window._pendingRewrite) {
       window._pendingRewrite = null;
+      window._rewriteConfirmed = false;
       hideRewritePreview();
     }
     applyTone(tone);
@@ -1796,6 +1861,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   // If there's a pending rewrite from a previous tone, clear it
   if (window._pendingRewrite) {
     window._pendingRewrite = null;
+    window._rewriteConfirmed = false;
     hideRewritePreview();
   }
 
@@ -1824,6 +1890,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     updateCard(true);
     window._originalText = text;
     window._pendingRewrite = cached.text;
+    window._rewriteConfirmed = false;
     showRewritePreview(text, cached.text, tone);
     return;
   }
@@ -1876,14 +1943,15 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
     }
 
     const data = await res.json();
-    // Sync the local per-tone counter from the server response.
-    if (typeof data.used === "number") {
-      setToneUsed(data.tone || tone, data.used);
-    }
+    // Preview-only: no counter change. The actual tick happens in
+    // /api/rewrite-confirm when the user Accepts or Creates the card.
     // Store original text so we can restore it
     window._originalText = text;
     // Store the rewritten text as pending
     window._pendingRewrite = data.text;
+    // The rewrite has NOT been confirmed yet — it will be confirmed on Accept
+    // (or auto-confirmed on Create if the user skips Accept).
+    window._rewriteConfirmed = false;
     // Show rewritten text on card preview only
     cardText.textContent = data.text;
     cardText.classList.remove("mt");
@@ -1984,6 +2052,9 @@ document.getElementById("sta").addEventListener("input", (e) => {
   }
   _webmCache = null;
   _pngCache = null;
+  const ta = e.target;
+  const cleaned = stripControls(ta.value);
+  if (cleaned !== ta.value) { const pos = ta.selectionStart; ta.value = cleaned; ta.setSelectionRange(pos, pos); }
   clearTimeout(_dc);
   _dc = setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
   _stopPlaceholderCycle();
@@ -1996,7 +2067,9 @@ document.getElementById("sta").addEventListener("paste", () => {
   setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
 });
 document.getElementById("nin").addEventListener("input", function() {
-  this.value = [...this.value].slice(0, 18).join("");
+  this.value = stripControls(this.value)
+    .replace(/[^\p{L}\p{M}\p{N}\s\-'.()À-ɏ]/gu, "")
+    .slice(0, 20);
   updateCard();
   saveDraft();
 });
@@ -2121,8 +2194,8 @@ if (location.hash && location.hash.length > 1) {
   var hTone = params.get("tone");
   var hP = params.get("p");
   inputSource = "story";
-  if (hText) document.getElementById("sta").value = hText;
-  if (hName) document.getElementById("nin").value = [...hName].slice(0, 18).join("");
+  if (hText) document.getElementById("sta").value = stripControls([...hText].slice(0, 150).join(""));
+  if (hName) document.getElementById("nin").value = stripControls([...hName].slice(0, 20).join(""));
   if (hTone) applyTone(hTone);
   if (hP != null) applyPal(parseInt(hP));
   if (hText) { updateCard(); cardReady = true; document.getElementById("btnS").disabled = false; document.getElementById("wcta").classList.add("show"); document.getElementById("dlBtn").style.display = "block"; restored = true; }
@@ -2448,14 +2521,14 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
 });
 
 // Create card
-document.getElementById("btnC").addEventListener("click", () => {
+document.getElementById("btnC").addEventListener("click", async () => {
   _vibrate();
   const btn = document.getElementById("btnC");
   if (btn.disabled) return;
   btn.disabled = true;
   setTimeout(() => btn.disabled = false, 400);
   const text = document.getElementById("sta").value.trim();
-  if (!text) {
+  if (text.replace(/\s/g, "").length < 2) {
     const ta = document.getElementById("sta");
     ta.style.borderColor = "rgba(26,26,26,.3)";
     ta.focus();
@@ -2468,7 +2541,39 @@ document.getElementById("btnC").addEventListener("click", () => {
     showToast(check.msg);
     return;
   }
-  countCard();
+  // If the user picked a tone and skipped Accept, auto-commit the rewrite
+  // so the per-tone counter ticks. The rewrite is "used" the moment a
+  // card is created with it — previewing then cancelling is free.
+  if (window._pendingRewrite && !window._rewriteConfirmed && curTone !== "original") {
+    const result = await confirmRewrite(curTone);
+    if (!result.ok) {
+      const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + curTone) : curTone;
+      const msg = result.status === 429
+        ? "Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone"
+        : "Couldn't apply rewrite. Showing original";
+      showToast(msg);
+      if (window._originalText) {
+        document.getElementById("sta").value = window._originalText;
+      }
+      window._pendingRewrite = null;
+      window._rewriteConfirmed = false;
+      window._originalText = null;
+      hideRewritePreview();
+      applyTone("original");
+      updateCard();
+      saveDraft();
+      btn.disabled = false;
+      return;
+    }
+    if (typeof result.used === "number") {
+      setToneUsed(curTone, result.used);
+    }
+    window._rewriteConfirmed = true;
+  }
+  // The per-tone counter is now authoritative on the server (via confirm
+  // above for non-original tones, or unchanged for original). Mirror the
+  // current state in localStorage so the UI reflects the same count.
+  applyTone(curTone);
   trackCardUsage();
   updateCard();
   const card = document.getElementById("card");
@@ -2691,7 +2796,12 @@ document.getElementById("shareNative").addEventListener("click", async function 
     // into the clipboard — the user taps Instagram's Link sticker and pastes
     // it in one step. Fire-and-forget so it never blocks the share gesture.
     try { if (navigator.clipboard) navigator.clipboard.writeText(shareUrl); } catch (ce) {}
-    var blobToShare = _shareSocialBlob || _shareBlob;
+    // Share the native 1:1 card, not the 9:16 social variant. The user-reported
+    // bug was the 9:16 padded image being visibly wrong — they want the
+    // shared image to match the card they created. The 9:16 social blob is
+    // still generated (for future Instagram Story integration) but no longer
+    // used in the default share path.
+    var blobToShare = _shareBlob;
     var shareFile = new File([blobToShare], "wispr-story.png", { type: "image/png" });
     // Put the link in `text`, not `url`. When sharing an image file, WhatsApp
     // (and Telegram) attach the image and use `text` as the caption — and they

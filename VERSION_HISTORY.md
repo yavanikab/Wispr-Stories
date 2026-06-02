@@ -1,20 +1,19 @@
 # Version History
 
-## [Unreleased] — About Page Polish Follow-up
+## [Unreleased] — Tone Counter & WhatsApp Fixes + Recording Flow Spec
 
 ### Added
-- "About Wispr Stories" eyebrow label above hero heading + intro sentence framing the page as an About page
-- Hero CTA button ("Create your first card →") below hero tagline
-- Feature icon color changes to lavender on hover
-
-### Changed
-- Feature & HIW icons enlarged (20-24px → 26-32px)
-- Mobile mosaic card text: 9px → 10px
+- **`api/rewrite-confirm.js`** — new commit endpoint for tone rewrites
+- **Test scripts**: `scripts/stress-test-99-cap.mjs`, `scripts/verify-cron-cleanup.mjs` + markdown explainers in `docs/test-plans/`
+- **Recording flow redesign spec** at `docs/superpowers/specs/2026-06-01-recording-ui-redesign-design.md` (Stage 1–4)
 
 ### Fixed
-- Smooth scroll enabled on html element
-- **Recording→STT pipeline**: WebM Opus → 16kHz WAV conversion with `_audioBufferToWav()`; `api/stt.js` rewritten to accept raw binary; `runtime: 'edge'` restored
-- **CSP service worker font blocking**: added Google Fonts domains to `connect-src` in `vercel.json`
+- **Tone rewrite counter** — preview-then-commit refactor (counter ticks on Accept/Create, not on tone pick). Server is source of truth
+- **Tone counter live UI** — `applyTone(curTone)` after counter change in btnC handler
+- **WhatsApp share preview** — OG image is now 1200×1200 native 1:1 (was 1200×630 padded). Meta tags updated. Share-apps uses `_shareBlob` (1:1) not `_shareSocialBlob` (9:16)
+
+### Removed
+- Dead `countCard()` function in `wisprstories.js` (server is now source of truth)
 
 ## v0.10.4 — About Page UI/UX Polish (2026-05-29)
 ### Added

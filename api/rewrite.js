@@ -1,6 +1,6 @@
 export const config = { runtime: 'edge' };
 
-import { getRedis, KEYS, secondsUntilMidnightUTC } from '../lib/redis.js';
+import { getRedis, KEYS } from '../lib/redis.js';
 
 // Free-tier quota is enforced per tone, per day.
 // Each tone has its own 5-rewrite daily budget (5 x 6 tones = 30 max/day).
@@ -152,10 +152,11 @@ export default async function handler(req) {
       console.warn('[Rewrite] Cache check failed, proceeding:', cacheErr.message);
     }
 
-    // Check per-tone rewrite limit for free users.
-    // Each tone has its own daily quota (FREE_MAX_PER_TONE).
+    // Check per-tone rewrite limit for free users (PREVIEW ONLY — no increment).
+    // The actual counter tick happens in /api/rewrite-confirm when the user
+    // accepts the rewrite or creates a card with it. This way, picking a
+    // tone and cancelling the preview doesn't burn quota.
     let redisFailed = false;
-    let newUsedCount = null; // populated after successful increment for free users
     if (!isPro && sessionId) {
       try {
         const redis = getRedis();
@@ -175,14 +176,8 @@ export default async function handler(req) {
             headers: { 'Content-Type': 'application/json' },
           });
         }
-
-        // Increment per-tone counter
-        const ttl = secondsUntilMidnightUTC();
-        const incremented = await redis.incr(key);
-        await redis.expire(key, ttl);
-        newUsedCount = typeof incremented === 'number' ? incremented : count + 1;
       } catch (redisErr) {
-        console.warn('[Rewrite] Redis unavailable, allowing rewrite:', redisErr.message);
+        console.warn('[Rewrite] Redis unavailable, allowing preview:', redisErr.message);
         redisFailed = true;
       }
     }
@@ -293,8 +288,9 @@ export default async function handler(req) {
       console.warn('[Rewrite] Cache write failed, continuing:', cacheErr.message);
     }
 
-    // Compute remaining count for frontend UI sync.
-    // For Pro users, send isPro signal. For free users, send per-tone used/remaining.
+    // Response payload. The per-tone counter is NOT incremented here — see
+    // /api/rewrite-confirm. We only return the rewritten text and the tone
+    // signal. The client uses isPro to skip limit UI for Pro users.
     const responsePayload = {
       text: rewritten,
       original: text,
@@ -302,10 +298,6 @@ export default async function handler(req) {
     };
     if (isPro) {
       responsePayload.isPro = true;
-    } else if (newUsedCount !== null) {
-      responsePayload.used = newUsedCount;
-      responsePayload.max = FREE_MAX_PER_TONE;
-      responsePayload.remaining = Math.max(0, FREE_MAX_PER_TONE - newUsedCount);
     }
 
     return new Response(JSON.stringify(responsePayload), {

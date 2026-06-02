@@ -3,18 +3,20 @@
 ## [Unreleased]
 
 ### Added
-- **About-page framing** — "About Wispr Stories" eyebrow label above hero heading, plus intro sentence between tagline and CTA explaining what the app is
-- **Hero CTA button** — "Create your first card →" below hero tagline, light bg with dark text, scale-up hover with shadow
-- **Feature icon hover accent** — icon color changes to lavender when hovering a feature card, with `transition: color 0.2s`
-
-### Changed
-- **Feature & HIW icons**: enlarged from `clamp(20px, 1.8vw, 24px)` to `clamp(26px, 2.4vw, 32px)` to match stat number scale
-- **Mobile mosaic card text**: `font-size` bumped from 9px to 10px for non-Latin script readability
+- **`api/rewrite-confirm.js`** — new tone rewrite commit endpoint. The per-tone Redis counter is incremented here, not in `api/rewrite.js`. Called by the client when the user Accepts a rewrite preview, or auto-called when the user clicks Create without Accepting.
+- **`scripts/stress-test-99-cap.mjs`** — Node.js verification script (built-in `fetch`, no deps). Fires 120 unique sessions at `/api/usage` and asserts 5 conditions: zero errors, cap == 99, allowed + blocked == count, allowed ≤ 99, grandfather re-hit allowed.
+- **`scripts/verify-cron-cleanup.mjs`** — Node.js verification script. Asserts `/api/cleanup` returns 401 for no/wrong auth and 200 + valid body for correct `CRON_SECRET`. Reads secret from `--secret=` flag or env var.
+- **`docs/test-plans/stress-test-99-cap.md`** + **`docs/test-plans/verify-cron-cleanup.md`** — markdown explainers for the test scripts.
+- **`docs/superpowers/specs/2026-06-01-recording-ui-redesign-design.md`** — 9-section recording flow redesign spec (Stage 1–4). Stage 1 = 7 bug fixes, Stage 2 = VAD + pre-warm + caps, Stage 3 = streaming STT, Stage 4 = Wispr Flow learnings with honest "proud implementation" answer.
 
 ### Fixed
-- **Smooth scroll**: added `scroll-behavior: smooth` on `html` element for anchor navigation
-- **Recording→STT pipeline**: WebM Opus audio now converted to 16kHz WAV client-side before Deepgram submission (WebM Opus returned empty transcripts). `_audioBufferToWav()` resamples to 16kHz keeping payload ~470KB. `api/stt.js` rewritten to accept raw binary via `req.arrayBuffer()` with parameters as headers. `runtime: 'edge'` restored.
-- **CSP service worker font blocking**: added `https://fonts.googleapis.com` and `https://fonts.gstatic.com` to `connect-src` in `vercel.json` — service worker `fetch()` calls for Google Fonts were blocked, flooding console with CSP errors
+- **Tone rewrite counter — preview-then-commit refactor**: Counter no longer ticks on tone pick. `api/rewrite.js` is now preview-only (checks per-tone limit but doesn't increment; response no longer carries `used`/`max`/`remaining`). New `api/rewrite-confirm.js` performs the atomic INCR on Accept or auto-Create. Client uses `_rewriteConfirmed` flag to prevent double-increment. Server is now the source of truth; localStorage mirrors via `setToneUsed(tone, serverReturnedUsed)`.
+- **Tone counter — live UI refresh on Create (Bug A)**: `btnC` handler now calls `applyTone(curTone)` after the counter change so the tone pill + per-tone badges re-render immediately, not on page reload.
+- **WhatsApp share preview — wrong aspect ratio**: Share-link OG image is now a 1200×1200 native 1:1 JPEG (was 1200×630 padded, which contradicted the card's square aspect). `api/upload.js` produces 1:1 with `fit: 'cover'`; `api/c/[id].js` meta tags updated to `og:image:width=1200 og:image:height=1200`.
+- **WhatsApp Web Share API — 9:16 image in 1:1 app**: `shareNative` handler now uses `_shareBlob` (1:1) instead of `_shareSocialBlob` (9:16). The 9:16 social variant is still generated for future Instagram Story integration but no longer used in the default share path.
+
+### Removed
+- **`countCard()` function in `wisprstories.js`**: Server is now the source of truth for the per-tone counter; the local `countCard()` increment was duplicating the server-side INCR and over-counting by 1–2 per session. Replaced by `setToneUsed(tone, serverReturnedUsed)`.
 
 ## [v0.10.4] — 2026-05-29
 

@@ -87,18 +87,21 @@ export default async function handler(req, res) {
       cacheControlMaxAge: 60 * 60 * 24 * 5, // 5 days
     });
 
-    // Re-encode the original card as a 1200×630 JPEG for the OG image.
-    // Padding to 1.91:1 landscape is required for WhatsApp, Instagram, and
-    // Twitter to show the large full-width preview (the Spotify-style card).
-    // A square image triggers only a small thumbnail on these platforms.
-    // mozjpeg + quality 82 typically lands ~30–60 KB.
+    // Re-encode the original card as a 1200×1200 JPEG for the OG image.
+    // NATIVE ASPECT (1:1) matches the card, so the link preview shows the
+    // card as the user created it — not a 16:9 padded version with cream
+    // bars on top/bottom. A 1:1 OG triggers a smaller preview on some
+    // platforms (WhatsApp/Twitter), but the user's reported bug was the
+    // 16:9 image being visibly wrong. The native aspect is the correct
+    // trade-off for Wispr Stories' card-shaped content.
+    // mozjpeg + quality 82 typically lands ~50–100 KB.
     const ogBuffer = await sharp(pngBuffer)
       .flatten({ background: '#ffffff' }) // strip alpha so JPEG bg is predictable
       .resize({
         width: 1200,
-        height: 630,
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 235, alpha: 1 } // #ffffeb warm cream
+        height: 1200,
+        fit: 'cover', // crop to exact 1:1 (card is already 1:1, this is a safety)
+        position: 'center',
       })
       .jpeg({ quality: 82, mozjpeg: true, chromaSubsampling: '4:2:0' })
       .toBuffer();

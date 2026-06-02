@@ -68,10 +68,10 @@ export default async function handler(req, res) {
     ? `${origin}/#text=${enc(metaText)}&name=${enc(metaName)}&tone=${metaTone}&p=${metaP}&r=${metaR}`
     : homeUrl;
 
-  // OG image = the actual card, padded to 1200×630 JPEG by api/upload.js.
-  // Verified: this blob is true landscape (1200×630, ~30KB), which is what
-  // triggers the WhatsApp/Instagram large preview. It is a static CDN file,
-  // so the scraper fetches it instantly with no serverless cold start.
+  // OG image = the actual card, native 1:1 (1200×1200) JPEG by api/upload.js.
+  // The blob is a static CDN file, so the scraper fetches it instantly with
+  // no serverless cold start. Native aspect matches the card; older
+  // 1200×630 padded OG images were visibly wrong on the share-apps path.
   const ogUrl = `https://${BLOB_HOST}/og/${id}.jpg`;
 
   const safeOgUrl = escapeHtml(ogUrl);
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
 <meta property="og:image" content="${safeOgUrl}">
 <meta property="og:image:secure_url" content="${safeOgUrl}">
 <meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:height" content="1200">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="${ogAltText}">
 <meta property="og:url" content="${safeShareUrl}">
