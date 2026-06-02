@@ -120,6 +120,12 @@ const RECOG_MAX_RESTARTS = 5;
 const FREE_MAX_RECORDING_SEC = 15;
 const PRO_MAX_RECORDING_SEC = 30;
 let recStartTime = null,
+_recTimerMaxSec = 0,
+_recTimerExpire = null,
+_recTimerStartTime = null,
+_recTimerPausedAt = null,
+_recTimerPausedRemaining = null,
+_isRecPaused = false,
   recMaxDuration = FREE_MAX_RECORDING_SEC,
   recDurationTimer = null,
   recGraceTimer = null;
@@ -1421,11 +1427,17 @@ function startRec() {
           }
           if (ok) {
             isRec = true;
+            _isRecPaused = false;
+            var liveBox2 = document.getElementById("liveBox");
+            liveBox2.textContent = "";
+            var listeningMsg2 = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
+            var listeningSpan2 = document.createElement("span");
+            listeningSpan2.textContent = listeningMsg2;
+            liveBox2.appendChild(listeningSpan2);
+            liveBox2.classList.add("show");
+            liveBox2.classList.remove("paused", "processing", "retry");
             document.getElementById("recBtn").classList.add("on");
-            document.getElementById("recSt").textContent = "Recording\u2026";
-            document.getElementById("recSub").textContent = "Tap again to stop and transcribe";
-            document.getElementById("recSub").classList.add("live");
-            document.getElementById("liveBox").textContent = "Recording\u2026";
+            _showDoneButton(true);
           } else {
             if (stream) stream.getTracks().forEach(function(t) { t.stop(); });
             usingDeepgram = false;
@@ -1464,18 +1476,26 @@ function startWebSpeechAPI() {
   }
   recog.onstart = () => {
     isRec = true;
+    _isRecPaused = false;
     if (recStartTime === null) recStartTime = Date.now();
     recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     document.getElementById("recBtn").classList.add("on");
-    document.getElementById("recSt").textContent = "Listening\u2026";
-    document.getElementById("recSub").textContent = recMaxDuration + "s remaining";
+    var liveBox3 = document.getElementById("liveBox");
+    liveBox3.textContent = "";
+    var listeningMsg3 = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
+    var listeningSpan3 = document.createElement("span");
+    listeningSpan3.textContent = listeningMsg3;
+    liveBox3.appendChild(listeningSpan3);
+    liveBox3.classList.add("show");
+    liveBox3.classList.remove("paused", "processing", "retry");
+    document.getElementById("recSt").textContent = listeningMsg3;
     document.getElementById("recSub").classList.add("live");
-    document.getElementById("liveBox").classList.add("show");
+    _showDoneButton(true);
     console.log("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
     _startRecTimer(recMaxDuration, function() {
       showToast("Max recording time reached (" + recMaxDuration + "s)");
       isRec = false;
-      recog.stop();
+      if (recog) recog.stop();
     });
     recogTimeout = setTimeout(() => {
       console.warn("[Speech] Timeout \u2014 no results after 8s");
@@ -1582,18 +1602,16 @@ function finishRec() {
     clearInterval(recDurationTimer);
     recDurationTimer = null;
   }
+  _stopRecTimer();
+  _showDoneButton(false);
+  _isRecPaused = false;
   const actualDuration = recStartTime ? Math.floor((Date.now() - recStartTime) / 1000) : 0;
   recStartTime = null;
   usingDeepgram = false;
   _sttRetrying = false;
   var recBtnFin = document.getElementById("recBtn");
-  recBtnFin.classList.remove("on");
+  recBtnFin.classList.remove("on", "paused");
   recBtnFin.disabled = false;
-  document.getElementById("recSt").textContent =
-    (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
-  document.getElementById("recSub").textContent =
-    (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
-  document.getElementById("recSub").classList.remove("live");
   if (fullTx.trim()) {
     document.getElementById("sta").value = fullTx.trim().slice(0, 150);
     inputSource = "voice";
@@ -1621,38 +1639,159 @@ function finishRec() {
   return actualDuration;
 }
 
-// Recording timer with drift correction. Renders MM:SS in the recSub element
-// starting at the cap (e.g. "00:15") and counting down to "00:00". Uses a
+// Recording timer with drift correction. Renders "Ns" in the recSub element
+// starting at the cap (e.g. "15s") and counting down to "0s". Uses a
 // setTimeout chain (not setInterval) and performance.now() so each tick
 // re-anchors to the start time, eliminating drift across long recordings.
 // When remaining hits 0, onExpire is invoked and recDurationTimer is cleared.
+// Supports pause/resume via _pauseRecTimer / _resumeRecTimer.
 function _startRecTimer(maxSec, onExpire) {
+  _recTimerMaxSec = maxSec;
+  _recTimerExpire = onExpire;
+  _recTimerStartTime = performance.now();
+  _recTimerPausedAt = null;
+  _recTimerPausedRemaining = null;
   var recSub = document.getElementById("recSub");
-  function formatMMSS(s) {
-    s = Math.max(0, Math.ceil(s));
-    var mm = Math.floor(s / 60);
-    var ss = s % 60;
-    return (mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss;
-  }
-  var startTime = performance.now();
-  recSub.textContent = formatMMSS(maxSec);
+  recSub.textContent = _formatRecTimer(maxSec);
   function tick() {
-    var elapsed = (performance.now() - startTime) / 1000;
-    var remaining = maxSec - elapsed;
+    if (_recTimerPausedAt !== null) return;
+    var elapsed = (performance.now() - _recTimerStartTime) / 1000;
+    var remaining = _recTimerMaxSec - elapsed;
     if (remaining <= 0) {
-      recSub.textContent = "00:00";
+      recSub.textContent = "0s";
       recDurationTimer = null;
       recDurationTimer = setTimeout(function() {
         recDurationTimer = null;
-        if (onExpire) onExpire();
+        if (_recTimerExpire) _recTimerExpire();
       }, 1000);
       return;
     }
-    recSub.textContent = formatMMSS(remaining);
-    var drift = (performance.now() - startTime) % 1000;
+    recSub.textContent = _formatRecTimer(remaining);
+    var drift = (performance.now() - _recTimerStartTime) % 1000;
     recDurationTimer = setTimeout(tick, 1000 - drift);
   }
   recDurationTimer = setTimeout(tick, 1000);
+}
+function _formatRecTimer(s) {
+  s = Math.max(0, Math.ceil(s));
+  return s + "s";
+}
+function _pauseRecTimer() {
+  if (_recTimerStartTime === null) return;
+  if (_recTimerPausedAt !== null) return;
+  _recTimerPausedAt = performance.now();
+  if (recDurationTimer) { clearTimeout(recDurationTimer); recDurationTimer = null; }
+  var elapsed = (_recTimerPausedAt - _recTimerStartTime) / 1000;
+  _recTimerPausedRemaining = Math.max(0, _recTimerMaxSec - elapsed);
+  var recSub = document.getElementById("recSub");
+  if (recSub) recSub.textContent = _formatRecTimer(_recTimerPausedRemaining);
+}
+function _resumeRecTimer() {
+  if (_recTimerPausedAt === null || _recTimerPausedRemaining === null) return;
+  if (_recTimerPausedRemaining <= 0) {
+    var recSub = document.getElementById("recSub");
+    if (recSub) recSub.textContent = "0s";
+    recDurationTimer = setTimeout(function() {
+      recDurationTimer = null;
+      if (_recTimerExpire) _recTimerExpire();
+    }, 1000);
+    _recTimerStartTime = null;
+    _recTimerPausedAt = null;
+    _recTimerPausedRemaining = null;
+    return;
+  }
+  _recTimerStartTime = performance.now() - (_recTimerMaxSec - _recTimerPausedRemaining) * 1000;
+  _recTimerPausedAt = null;
+  _recTimerPausedRemaining = null;
+  function tick() {
+    if (_recTimerPausedAt !== null) return;
+    var elapsed = (performance.now() - _recTimerStartTime) / 1000;
+    var remaining = _recTimerMaxSec - elapsed;
+    var recSub = document.getElementById("recSub");
+    if (remaining <= 0) {
+      recSub.textContent = "0s";
+      recDurationTimer = null;
+      recDurationTimer = setTimeout(function() {
+        recDurationTimer = null;
+        if (_recTimerExpire) _recTimerExpire();
+      }, 1000);
+      return;
+    }
+    recSub.textContent = _formatRecTimer(remaining);
+    var drift = (performance.now() - _recTimerStartTime) % 1000;
+    recDurationTimer = setTimeout(tick, 1000 - drift);
+  }
+  recDurationTimer = setTimeout(tick, 1000 - ((performance.now() - _recTimerStartTime) % 1000));
+}
+function _stopRecTimer() {
+  if (recDurationTimer) { clearTimeout(recDurationTimer); recDurationTimer = null; }
+  _recTimerStartTime = null;
+  _recTimerPausedAt = null;
+  _recTimerPausedRemaining = null;
+  _recTimerMaxSec = 0;
+  _recTimerExpire = null;
+}
+
+function _setPausedUI(paused) {
+  var liveBoxEl = document.getElementById("liveBox");
+  var recStEl = document.getElementById("recSt");
+  var recBtnEl = document.getElementById("recBtn");
+  var doneBtnEl = document.getElementById("recDoneBtn");
+  if (paused) {
+    if (recStEl) recStEl.textContent = (typeof getI18nSync === "function" && getI18nSync("record.paused")) || "Paused \u2014 tap the mic to resume";
+    if (liveBoxEl) {
+      liveBoxEl.textContent = "";
+      var span = document.createElement("span");
+      span.className = "paused-hint";
+      span.textContent = (typeof getI18nSync === "function" && getI18nSync("record.pausedHint")) || "Tap Done to transcribe";
+      liveBoxEl.appendChild(span);
+      liveBoxEl.classList.add("show", "paused");
+      liveBoxEl.classList.remove("processing", "retry");
+    }
+    if (recBtnEl) recBtnEl.classList.add("paused");
+    if (doneBtnEl) doneBtnEl.disabled = false;
+  } else {
+    if (liveBoxEl) liveBoxEl.classList.remove("paused");
+    if (recBtnEl) recBtnEl.classList.remove("paused");
+  }
+}
+
+function _pauseRecording() {
+  if (!isRec || _isRecPaused) return;
+  _isRecPaused = true;
+  if (usingDeepgram && mediaRec && mediaRec.state === "recording") {
+    try { mediaRec.pause(); } catch (e) { console.warn("[Rec] MediaRecorder.pause() failed:", e); }
+  }
+  _pauseRecTimer();
+  _setPausedUI(true);
+}
+
+function _resumeRecording() {
+  if (!isRec || !_isRecPaused) return;
+  _isRecPaused = false;
+  if (usingDeepgram && mediaRec && mediaRec.state === "paused") {
+    try { mediaRec.resume(); } catch (e) { console.warn("[Rec] MediaRecorder.resume() failed:", e); }
+  }
+  var liveBoxEl = document.getElementById("liveBox");
+  if (liveBoxEl) {
+    liveBoxEl.textContent = "";
+    var listeningMsg = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
+    var span = document.createElement("span");
+    span.textContent = listeningMsg;
+    liveBoxEl.appendChild(span);
+    liveBoxEl.classList.add("show");
+    liveBoxEl.classList.remove("paused", "processing", "retry");
+  }
+  document.getElementById("recSt").textContent = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
+  _setPausedUI(false);
+  _resumeRecTimer();
+}
+
+function _showDoneButton(show) {
+  var doneBtnEl = document.getElementById("recDoneBtn");
+  var resetBtnEl = document.getElementById("resetBtn");
+  if (doneBtnEl) doneBtnEl.style.display = show ? "inline-flex" : "none";
+  if (resetBtnEl) resetBtnEl.style.display = show ? "none" : "inline-flex";
 }
 
 // Haptic feedback helper
@@ -1660,50 +1799,76 @@ function _vibrate(duration) {
   if (typeof navigator.vibrate === 'function') navigator.vibrate(duration || 12);
 }
 
+document.getElementById("recDoneBtn").addEventListener("click", async function() {
+  if (!isRec) return;
+  _vibrate();
+  if (_isRecPaused) _resumeRecording();
+  await _stopAndTranscribe();
+});
+
+async function _stopAndTranscribe() {
+  if (!isRec) return;
+  isRec = false;
+  _isRecPaused = false;
+  if (recDurationTimer) {
+    clearTimeout(recDurationTimer);
+    recDurationTimer = null;
+  }
+  if (recGraceTimer) {
+    clearTimeout(recGraceTimer);
+    recGraceTimer = null;
+  }
+  _stopRecTimer();
+  _showDoneButton(false);
+  var recBtnFin = document.getElementById("recBtn");
+  recBtnFin.classList.remove("on", "paused");
+  var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
+  var liveBoxEl = document.getElementById("liveBox");
+  liveBoxEl.textContent = processingMsg;
+  liveBoxEl.classList.add("show", "processing");
+  liveBoxEl.classList.remove("paused", "retry");
+  if (usingDeepgram) {
+    const result = await stopDeepgramRecording();
+    liveBoxEl.classList.remove("processing");
+    fullTx = result.text ? result.text.trim().slice(0, 150) : "";
+    if (audioBlob) {
+      _computeWaveform(audioBlob).then(function(h) {
+        _cardWaveform = h;
+        if (document.getElementById("sta").value.trim()) {
+          wave(document.getElementById("sta").value);
+        }
+      }).catch(function() { _cardWaveform = null; });
+    }
+    if (!fullTx && _lastSttWav) {
+      _showSttRetryState();
+      return;
+    }
+    if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
+    const actualDuration = finishRec();
+    await reportRecordingDuration(actualDuration || result.duration);
+    return;
+  }
+  if (recogTimeout) {
+    clearTimeout(recogTimeout);
+    recogTimeout = null;
+  }
+  if (recog) recog.stop();
+  const actualDuration = finishRec();
+  await reportRecordingDuration(actualDuration);
+}
+
 document.getElementById("recBtn").addEventListener("click", async () => {
   _vibrate();
   if (isRec) {
-    isRec = false;
-    if (recDurationTimer) {
-      clearTimeout(recDurationTimer);
-      recDurationTimer = null;
-    }
-    if (recGraceTimer) {
-      clearTimeout(recGraceTimer);
-      recGraceTimer = null;
-    }
-    var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
-    var liveBoxEl = document.getElementById("liveBox");
-    liveBoxEl.textContent = processingMsg;
-    liveBoxEl.classList.add("show", "processing");
     if (usingDeepgram) {
-      const result = await stopDeepgramRecording();
-      liveBoxEl.classList.remove("processing");
-      fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-      if (audioBlob) {
-        _computeWaveform(audioBlob).then(function(h) {
-          _cardWaveform = h;
-          if (document.getElementById("sta").value.trim()) {
-            wave(document.getElementById("sta").value);
-          }
-        }).catch(function() { _cardWaveform = null; });
+      if (_isRecPaused) {
+        _resumeRecording();
+      } else {
+        _pauseRecording();
       }
-      if (!fullTx && _lastSttWav) {
-        _showSttRetryState();
-        return;
-      }
-      if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
-      const actualDuration = finishRec();
-      await reportRecordingDuration(actualDuration || result.duration);
       return;
     }
-    if (recogTimeout) {
-      clearTimeout(recogTimeout);
-      recogTimeout = null;
-    }
-    if (recog) recog.stop();
-    const actualDuration = finishRec();
-    await reportRecordingDuration(actualDuration);
+    await _stopAndTranscribe();
     return;
   }
 
@@ -1825,14 +1990,13 @@ document.getElementById("recBtn").addEventListener("click", async () => {
 
 async function reportRecordingDuration(actualDuration) {
   if (_skipDurationReport) { _skipDurationReport = false; return; }
-  if (!actualDuration || actualDuration <= 0) return;
   const sessionId = localStorage.getItem("wsSessionId");
   const isPro = isSupporter();
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
       headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
-      body: JSON.stringify({ sessionId, isPro, audioDuration: actualDuration, checkOnly: false }),
+      body: JSON.stringify({ sessionId, isPro, audioDuration: actualDuration || 0, checkOnly: false }),
     });
     const data = await res.json();
     if (data.allowed) {

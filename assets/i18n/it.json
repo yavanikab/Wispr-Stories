@@ -18,7 +18,11 @@
     "generating": "Generazione…",
     "processing": "Elaborazione del tuo audio…",
     "cancel": "Annulla",
-    "couldntRetry": "Impossibile trascrivere. Tocca per riprovare"
+    "couldntRetry": "Impossibile trascrivere. Tocca per riprovare",
+    "listening": "Sto ascoltando e trascrivendo le tue parole",
+    "paused": "In pausa — tocca il mic per riprendere",
+    "pausedHint": "Tocca Fatto per trascrivere",
+    "done": "Fatto"
   },
   "speechLang": {
     "title": "Seleziona lingua vocale",

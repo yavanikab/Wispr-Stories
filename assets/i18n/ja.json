@@ -18,7 +18,11 @@
     "generating": "生成中…",
     "processing": "オーディオを処理中…",
     "cancel": "キャンセル",
-    "couldntRetry": "文字起こしできませんでした。タップして再試行"
+    "couldntRetry": "文字起こしできませんでした。タップして再試行",
+    "listening": "話してください、テキストに変換します",
+    "paused": "一時停止 — 再開はマイクをタップ",
+    "pausedHint": "テキスト化は完了をタップ",
+    "done": "完了"
   },
   "speechLang": {
     "title": "音声言語を選択",

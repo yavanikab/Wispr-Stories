@@ -29,6 +29,13 @@ Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel 
 - **Onboarding modal visual polish**: emoji tiles (🎙️ 🎨 🚀) on the 3 steps, full-ink + bold labels in Quick Reference with dimmer body text, 28px gap before CTA, hint rewritten to point at the real "How to Use" footer link in all 11 locales
 - **Voice attach bar hides when tone is not "original"**: `updateVoiceBar()` checks `curTone === "original"`; non-original tones auto-detach voice (preserve audioBlob) and hide the toggle. `applyTone()` now calls `updateVoiceBar()`.
 - **Tone counter UI sync from server** (`api/rewrite-status.js`): New read-only GET endpoint returns authoritative per-tone counts for a sessionId. Client fetches on page load and replaces the localStorage mirror, so clearing localStorage no longer makes the UI lie about remaining rewrites. Server still enforces the cap; this fix is display-only.
+- **v0.10.4.4 — Recording UX fixes + Pause/Resume**:
+  - Recordings counter now decrements even for sub-1-second recordings (removed 0-duration early return in `reportRecordingDuration`).
+  - Timer format changed from MM:SS ("00:15") to plain seconds ("15s").
+  - LiveBox shows "Listening and processing your words" during recording.
+  - **Pause/Resume (Deepgram)**: mic click while recording pauses (timer freezes, MediaRecorder pauses); mic click again resumes. New Done button next to mic stops + transcribes. Hides "Start over" while recording. WSA path falls back to mic-click-stops (SpeechRecognition has no native pause).
+  - 4 new i18n keys: `record.listening`, `record.paused`, `record.pausedHint`, `record.done` — all 11 locales.
+  - Double-call guard in `_stopAndTranscribe` prevents counter double-increment on WSA timer-expire race.
 
 ### Removed
 - **`global/styles/tooltips.css`** (orphaned after 2.5) + its import in `main.css`

@@ -18,7 +18,11 @@
     "generating": "생성 중…",
     "processing": "오디오 처리 중…",
     "cancel": "취소",
-    "couldntRetry": "텍스트 변환에 실패했습니다. 탭하여 다시 시도"
+    "couldntRetry": "텍스트 변환에 실패했습니다. 탭하여 다시 시도",
+    "listening": "말을 쓰고 처리하고 있어요",
+    "paused": "일시정지 \u2014 리줌마는 마이크를 누르세요",
+    "pausedHint": "트랜스크립트는 완료를 누르세요",
+    "done": "완료"
   },
   "speechLang": {
     "title": "음성 언어 선택",

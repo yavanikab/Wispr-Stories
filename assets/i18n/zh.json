@@ -18,7 +18,11 @@
     "generating": "正在生成…",
     "processing": "正在处理你的音频…",
     "cancel": "取消",
-    "couldntRetry": "转录失败，点击重试"
+    "couldntRetry": "转录失败，点击重试",
+    "listening": "正在听你说话并转为文字",
+    "paused": "已暂停 \u2014 点击麦克风继续",
+    "pausedHint": "点击“完成”转为文字",
+    "done": "完成"
   },
   "speechLang": {
     "title": "选择语音语言",

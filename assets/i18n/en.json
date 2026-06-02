@@ -18,7 +18,11 @@
     "generating": "Generating…",
     "processing": "Processing your audio…",
     "cancel": "Cancel",
-    "couldntRetry": "Couldn't transcribe. Tap to retry"
+    "couldntRetry": "Couldn't transcribe. Tap to retry",
+    "listening": "Listening and processing your words",
+    "paused": "Paused \u2014 tap the mic to resume",
+    "pausedHint": "Tap Done to transcribe",
+    "done": "Done"
   },
   "speechLang": {
     "title": "Select speech language",

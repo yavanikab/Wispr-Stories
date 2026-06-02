@@ -18,7 +18,11 @@
     "generating": "Generando…",
     "processing": "Procesando tu audio…",
     "cancel": "Cancelar",
-    "couldntRetry": "No se pudo transcribir. Toca para reintentar"
+    "couldntRetry": "No se pudo transcribir. Toca para reintentar",
+    "listening": "Escuchando y procesando tus palabras",
+    "paused": "En pausa — toca el mic para continuar",
+    "pausedHint": "Toca Listo para transcribir",
+    "done": "Listo"
   },
   "speechLang": {
     "title": "Seleccionar idioma de voz",
