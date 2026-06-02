@@ -724,6 +724,7 @@ function applyTone(tone) {
   updateMobileBar();
   updateSourceLabel();
   updateStyleChipSummary();
+  updateVoiceBar();
 }
 
 function updateSourceLabel() {
@@ -750,12 +751,20 @@ function updateVoiceBar() {
   var info = document.getElementById("voiceToggleInfo");
   var durLabel = document.getElementById("voiceDurationLabel");
   if (!bar || !toggle) return;
-  if (inputSource === "voice" && audioBlob && webmCodecString) {
+  // Voice can only be attached when tone is "original" — any other tone
+  // rewrites the text, so the recorded voice no longer matches the words
+  // on the card. Hide the bar and detach without losing the audioBlob.
+  var toneAllowsVoice = curTone === "original";
+  if (!toneAllowsVoice && voiceAttached) {
+    voiceAttached = false;
+    toggle.checked = false;
+  }
+  if (inputSource === "voice" && audioBlob && webmCodecString && toneAllowsVoice) {
     bar.style.display = "flex";
     toggle.disabled = false;
     info.style.display = audioDurationSec > 0 ? "flex" : "none";
     if (audioDurationSec > 0) durLabel.textContent = formatDuration(audioDurationSec);
-  } else if (inputSource === "voice" && !audioBlob) {
+  } else if (inputSource === "voice" && !audioBlob && toneAllowsVoice) {
     bar.style.display = "flex";
     toggle.disabled = true;
     toggle.checked = false;
@@ -2431,6 +2440,27 @@ if (!restored) {
   }
 }
 updateSupporterBadge();
+// Sync per-tone rewrite counts from the server on page load. Without this,
+// a user who clears localStorage would see "5 left" for every tone even
+// after actually using all 5. The server is the source of truth; this call
+// just refreshes the localStorage mirror to match.
+syncToneCountsFromServer();
+function syncToneCountsFromServer() {
+  var sessionId = localStorage.getItem("wsSessionId");
+  if (!sessionId) return;
+  var proKey = sessionStorage.getItem("wsProKey") || "";
+  var url = "/api/rewrite-status?sessionId=" + encodeURIComponent(sessionId);
+  if (proKey) url += "&proKey=" + encodeURIComponent(proKey);
+  fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+    if (!data || !data.counts) return;
+    for (var tone in data.counts) {
+      if (Object.prototype.hasOwnProperty.call(data.counts, tone)) {
+        setToneUsed(tone, data.counts[tone]);
+      }
+    }
+    if (typeof curTone === "string" && curTone) applyTone(curTone);
+  }).catch(function() { /* ignore — fallback to localStorage mirror */ });
+}
 // Warm the full card-bg WebP cache during idle time so ratio/corner switches
 // later in the session are instant. Falls back to setTimeout where requestIdleCallback
 // isn't supported (e.g. older Safari).

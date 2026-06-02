@@ -27,6 +27,8 @@ Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel 
 - **Info tooltips removed from form** (2.5): 5 inline `?` icons gone, ~55 lines of JS removed, `tooltips.css` deleted
 - **Duplicate `record` i18n key in 10 non-English locales** — merged into single object
 - **Onboarding modal visual polish**: emoji tiles (🎙️ 🎨 🚀) on the 3 steps, full-ink + bold labels in Quick Reference with dimmer body text, 28px gap before CTA, hint rewritten to point at the real "How to Use" footer link in all 11 locales
+- **Voice attach bar hides when tone is not "original"**: `updateVoiceBar()` checks `curTone === "original"`; non-original tones auto-detach voice (preserve audioBlob) and hide the toggle. `applyTone()` now calls `updateVoiceBar()`.
+- **Tone counter UI sync from server** (`api/rewrite-status.js`): New read-only GET endpoint returns authoritative per-tone counts for a sessionId. Client fetches on page load and replaces the localStorage mirror, so clearing localStorage no longer makes the UI lie about remaining rewrites. Server still enforces the cap; this fix is display-only.
 
 ### Removed
 - **`global/styles/tooltips.css`** (orphaned after 2.5) + its import in `main.css`
