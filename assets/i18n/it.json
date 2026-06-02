@@ -22,7 +22,9 @@
     "listening": "Sto ascoltando e trascrivendo le tue parole",
     "paused": "In pausa — tocca il mic per riprendere",
     "pausedHint": "Tocca Fatto per trascrivere",
-    "done": "Fatto"
+    "done": "Fatto",
+    "softHint": "Ancora qualcuna oggi 💛",
+    "softHintDone": "Domani ancora 💛"
   },
   "speechLang": {
     "title": "Seleziona lingua vocale",
@@ -152,7 +154,7 @@
     "hint": "Hai bisogno di aiuto dopo? Apri <em>Come usare</em> nel menu del footer.",
     "refTitle": "Riferimento rapido",
     "refToggle": "<strong>Cambia modalità</strong>: tocca l'icona del microfono per passare tra modalità registrazione e testo.",
-    "refVoice": "<strong>Lingue vocali</strong>: 29 lingue + rilevamento automatico. Scegli dal pulsante della lingua.",
+    "refVoice": "<strong>Lingue vocali</strong>: 44 lingue + rilevamento automatico. Scegli dal pulsante della lingua.",
     "refText": "<strong>Modifica testo</strong>: l'area di testo accetta fino a 150 caratteri. Modifica liberamente.",
     "refTone": "<strong>Riscrittura tono</strong>: 6 toni. Gli utenti gratuiti ottengono 5 per tono al giorno. Gli utenti Pro ottengono illimitato.",
     "refColor": "<strong>Colore</strong>: scegli una palette per impostare lo sfondo della card.",

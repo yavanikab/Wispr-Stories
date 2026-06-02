@@ -70,16 +70,31 @@
   font-weight: 500;
 }
 .rec-counter {
-  font-size: clamp(11px, 0.3vw + 10px, 12px);
-  color: var(--ink3);
-  margin-top: 4px;
-  font-weight: 500;
-}
-.rec-counter.warn {
+  display: none;
+  font-size: clamp(13px, 0.5vw + 11px, 15px);
   color: #d97706;
+  background: rgba(217, 119, 6, 0.08);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 12px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.rec-counter.warn,
+.rec-counter.exhausted {
+  display: block;
 }
 .rec-counter.exhausted {
-  color: #dc2626;
+  color: #b91c1c;
+  background: rgba(185, 28, 28, 0.06);
+}
+@media (max-width: 480px) {
+  .rec-counter.warn,
+  .rec-counter.exhausted {
+    font-size: 15px;
+    padding: 10px 14px;
+  }
 }
 .mic-select-row {
   display: flex;

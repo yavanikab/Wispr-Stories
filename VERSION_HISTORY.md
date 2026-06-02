@@ -1,5 +1,40 @@
 # Version History
 
+## v0.10.4.5 — Friction Reduction Pass (2026-06-03)
+
+This pass hides technical jargon from the user, fixes the counter so it self-heals against the server, and warms the card-creation moment. Goal: zero new UI for grandparents; everything fades in only when needed.
+
+### Changed
+- **Recording counter hidden by default** — `.rec-counter { display: none; }` in `global/styles/inputs.css`. Counter only appears at 3+ recordings ("A few more today 💛") or at the limit ("More tomorrow 💛"). No more "5/5 recordings · 75s audio left" jargon. CSS uses warm amber + soft chip background; mobile (≤480px) bumps to 15px.
+- **Soft hint copy in 11 locales** — new `record.softHint` and `record.softHintDone` i18n keys. All 11 locales (en, es, hi, it, ja, kn, ko, ta, te, th, zh) translated.
+- **Toasts moved to top-center** — `global/styles/overlays.css:118-142` changed `bottom: 24px` → `top: 16px`; entrance animation `translateY(10px)` → `translateY(-10px)` (slides down from top instead of up from bottom). `global/styles/responsive.css:417-419` changed to clear iOS safe-area top inset. Reason: user reported eyes are on the mic (middle of screen) — toasts at the bottom were not in their eye line.
+- **Start Over button — Smart Show** — new `_updateResetBtnVisibility()` in `wisprstories.js`. Hides `#resetBtn` on blank load and after the reset action; reveals it when there's content in the textarea, name field, or a recorded audio blob. Also fires after URL-hash restore from shared links. Reason: a "Start over" CTA on first-time visits is awkward — there's nothing to start over from.
+- **Card creation moment warmed** — clicking Create now changes the button to "💛 Beautiful!" with a green background (`#10b981`) for 1.5s, then reverts to "Create". New `.btn-c.created` CSS in `actions.css` for both light and dark modes. Replaces the old "✨ Created!" yellow-emoji-on-gold (low contrast) and the redundant "Card ready — tap Share to download" toast.
+- **Limit toasts warmed** — `toasts.freeLimit`, `toasts.proLimit`, `toasts.cumulativeLimit`, `toasts.tooLong` rewritten as warm short copy with 💛. JS now uses `getI18nSync("toasts.*")` with English fallback.
+- **Footer version display fix** — `global/footer-menu.js:235-244` regex changed from `/^## v(\d+\.\d+\.\d+)/m` to `/^## (v\d+(?:\.\d+)+)/m` so it matches 4-part (and N-part) versions. Cache buster `?v=20260603` added to the `VERSION_HISTORY.md` fetch to bypass stale browser cache. The "vv" double-prefix bug (regex captured `v` then code prepended another `v`) is fixed.
+
+### Added
+- **Permanent build banner in DevTools console** — `console.log("%c[Build] Wispr Stories v0.10.4.5 ...", "color:#ec4899;font-weight:bold;font-size:14px")` at the top of `wisprstories.js`. Pink color matches brand; updates per release. Solves the "which version is deployed?" question permanently without adding any user-facing UI.
+- **Auto-heal counter** — new `_refreshLimitsFromServer()` in `wisprstories.js` does a silent `checkOnly: true` fetch against `/api/limits` to reconcile the local counter with the authoritative server state. Called on page load (after draft/URL restore) and after any cap-returning report. Invisible to the user — the counter is hidden by default anyway, so any drift is corrected before the user can see wrong values.
+- **Pro-unlock counter refresh** — `updateSupporterBadge()` now calls `_refreshLimitsFromServer()` so the counter immediately reflects Pro tier limits (50/day vs 5/day, 900s vs 75s) after key unlock, not on the next mic click.
+
+### Diagnostic (temporary, to be removed in v0.10.4.6)
+- **4× `console.debug("[Limits] ...")` lines** added to `wisprstories.js` for diagnosing the "counter stuck at 5/5" bug. Use Chrome DevTools → Console → set "Verbose" log level to see them. Capture and share with the dev to find the root cause.
+  - `[Limits] precheck:` + `[Limits] precheck response:`
+  - `[Limits] report:` + `[Limits] report response:`
+  - `[Limits] updateRecCounter:`
+  - `[Limits] refresh:` + `[Limits] refresh response:`
+
+### Files touched
+- `wisprstories.js` (build banner, 4× console.debug, soft hint logic, Smart Show, top-center toast CSS-aware, Beautiful button, auto-heal, warm limit toasts)
+- `wisprstories.html` (reset button initial `style="display: none"`)
+- `global/footer-menu.js` (regex fix, cache buster)
+- `global/styles/inputs.css` (rec-counter hidden + warm chip + mobile media query)
+- `global/styles/overlays.css` (toast position + entrance animation)
+- `global/styles/responsive.css` (toast top-center with iOS safe-area)
+- `global/styles/actions.css` (`.btn-c.created` for light + dark mode)
+- `assets/i18n/en.json` + 10 other locales (softHint, softHintDone keys; warm limit toasts)
+
 ## v0.10.4.2 — Stage 1 Recording Flow Bug Fixes (2026-06-02)
 
 Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel button, 2.2 one-tick 00:00, 2.3 retry state). Stages 2–4 (VAD, streaming STT, Wispr Flow learnings) are data-gated and not in this milestone. Design doc was deleted after Stage 1 reached 100% completion.
@@ -41,6 +76,19 @@ Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel 
 - **`global/styles/tooltips.css`** (orphaned after 2.5) + its import in `main.css`
 
 ---
+
+## [Unreleased] — 2026-06-03 Design Inconsistency Audit
+
+### Added
+- **`audit.md`** — design inconsistency audit (9 issues documented)
+- **`docs/every-design-decision-explained.md`** — architecture Q&A
+
+### Fixed
+- **Locale "29 languages" → "44 languages"** in all 11 locales
+- **btnS dead code removed** in `wisprstories.js`
+
+### Changed
+- **Creation Celebration**: "✨ Created!" flash on Create button (1.2s) + enhanced card pop animation (amber glow, 0.28s transition)
 
 ## v0.10.4.1 — Tone Counter & WhatsApp Share Fixes (2026-06-02)
 

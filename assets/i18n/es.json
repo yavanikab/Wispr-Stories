@@ -22,7 +22,9 @@
     "listening": "Escuchando y procesando tus palabras",
     "paused": "En pausa — toca el mic para continuar",
     "pausedHint": "Toca Listo para transcribir",
-    "done": "Listo"
+    "done": "Listo",
+    "softHint": "Unas más hoy 💛",
+    "softHintDone": "Mañana más 💛"
   },
   "speechLang": {
     "title": "Seleccionar idioma de voz",
@@ -152,7 +154,7 @@
     "hint": "¿Necesitas ayuda después? Abre <em>Cómo usar</em> en el menú del pie.",
     "refTitle": "Referencia rápida",
     "refToggle": "<strong>Cambiar modos</strong>: toca el ícono del micrófono para alternar entre modo de grabación y texto.",
-    "refVoice": "<strong>Idiomas de voz</strong>: 29 idiomas + detección automática. Elige desde el botón de idioma.",
+    "refVoice": "<strong>Idiomas de voz</strong>: 44 idiomas + detección automática. Elige desde el botón de idioma.",
     "refText": "<strong>Edición de texto</strong>: el área de texto acepta hasta 150 caracteres. Edita libremente.",
     "refTone": "<strong>Reescritura de tono</strong>: 6 tonos. Los usuarios gratuitos obtienen 5 por tono al día. Los usuarios Pro obtienen ilimitado.",
     "refColor": "<strong>Color</strong>: elige una paleta para establecer el fondo de la tarjeta.",

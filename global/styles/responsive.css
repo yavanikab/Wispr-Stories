@@ -413,9 +413,9 @@
     width: auto;
     margin: 10px auto 40px;
   }
-  /* Toast: lift above mobile bar */
+  /* Toast: top-center, clear of iOS/Android status bar */
   .toast {
-    bottom: max(80px, env(safe-area-inset-bottom) + 70px);
+    top: max(16px, env(safe-area-inset-top) + 16px);
   }
 
   /* Share modal: hide redundant buttons on mobile */

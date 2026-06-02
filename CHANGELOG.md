@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.10.4.5] — Friction Reduction Pass (2026-06-03)
+
+Friction-reduction pass: hides technical jargon (counter), warms the card-creation moment, moves toasts to top-center (eye line with the mic), and adds self-healing for the recording counter. Zero new UI for grandparents — every change fades in only when needed.
+
+### Changed
+- **Counter hidden by default** — only appears at 3+ recordings or at the limit. New soft warm copy ("A few more today 💛" / "More tomorrow 💛") in 11 locales.
+- **Toasts moved from bottom to top-center** — slides down from top with iOS safe-area clearance. User reported eyes stay on the mic; bottom toasts were out of eye line.
+- **Start Over button — Smart Show** — hidden on blank load and after reset; shown when there's content (textarea, name, or audio). Re-evaluates after URL-hash restore.
+- **Card creation moment** — button flashes green + "💛 Beautiful!" for 1.5s. Replaces old yellow ✨ on gold (low contrast) and redundant "Card ready" toast.
+- **Limit toasts warmed** — freeLimit / proLimit / cumulativeLimit / tooLong rewritten as short warm copy with 💛. No more "Free limit reached (5/day). Upgrade for more."
+- **Footer version display** — regex now matches 4-part versions (`v0.10.4.5` not `vv0.10.4.5`). Cache buster `?v=20260603` added to the `VERSION_HISTORY.md` fetch.
+- **Recording counter auto-heals** — new `_refreshLimitsFromServer()` does a silent `checkOnly: true` against the server on page load and after cap-returning reports. UI always matches the server's true state.
+
+### Added
+- **Permanent build banner in DevTools Console** — `[Build] Wispr Stories v0.10.4.5` in pink. Updates per release. Answers "which version is deployed?" permanently.
+- **Pro-unlock counter refresh** — `updateSupporterBadge()` now re-fetches limits so the counter shows Pro tier immediately (50/day vs 5/day).
+- **Diagnostic `console.debug("[Limits] ...")` lines (4 places, temporary)** — for diagnosing the "counter stuck at 5/5" bug. Use Chrome DevTools → Console → Verbose level.
+
+### Files touched
+`wisprstories.js`, `wisprstories.html`, `global/footer-menu.js`, `global/styles/inputs.css`, `global/styles/overlays.css`, `global/styles/responsive.css`, `global/styles/actions.css`, `assets/i18n/*.json` (11 locales).
+
 ## [v0.10.4.2] — Stage 1 Recording Flow Bug Fixes (2026-06-02)
 
 Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel button, 2.2 one-tick 00:00, 2.3 retry state). Stages 2–4 (VAD, streaming STT, Wispr Flow learnings) are data-gated and not in this milestone. Design doc was deleted after Stage 1 reached 100% completion.
@@ -40,6 +61,19 @@ Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel 
 
 ### Removed
 - **`global/styles/tooltips.css`**: Orphaned after the 2.5 tooltip removal. Was only imported from `global/styles/main.css`; that import is now also gone. No other file referenced it.
+
+## [Unreleased] — 2026-06-03 Design Inconsistency Audit
+
+### Added
+- **`audit.md`** — design inconsistency audit document capturing 9 UI/UX issues across the app
+- **`docs/every-design-decision-explained.md`** — architecture Q&A reference explaining key design decisions
+
+### Fixed
+- **Locale onboarding: "29 languages" → "44 languages"** — All 11 locale files had the old `refVoice` string claiming 29 STT languages; updated to 44 language count in lockstep (`onboarding.refVoice` key)
+- **btnS dead code removed** — In `wisprstories.js`, the `if (!cardReady) { document.getElementById("btnC").click(); return; }` guard at the top of the btnS click handler was removed. `cardReady` is always `true` by the time btnS is enabled, so this was unreachable dead code.
+
+### Changed
+- **Creation Celebration animation** — Card creation now shows a "✨ Created!" flash on the Create button (1.2s) plus an enhanced card pop animation: longer transition (0.28s), bigger scale (1.025), amber glow box-shadow (`rgba(245,158,11,0.35)`), with 720ms duration before reset.
 
 ## [v0.10.4.1] — Tone Counter & WhatsApp Share Fixes (2026-06-02)
 

@@ -65,6 +65,16 @@
 .btn-c:active {
   transform: scale(0.95);
 }
+.btn-c.created {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+.btn-c.created:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+}
 @keyframes wave-text {
   0%,
   100% {
@@ -106,6 +116,18 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+}
+
+/* Dark mode overrides for .btn-c.created — keep green readable on dark bg */
+:root.dark .btn-c.created {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+:root.dark .btn-c.created:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
 }
 
 /* EXAMPLES */

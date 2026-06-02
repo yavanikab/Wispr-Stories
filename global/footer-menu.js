@@ -232,12 +232,12 @@
   const versionDiv = wrapper.querySelector("#fmenu-version");
   const versionSpan = wrapper.querySelector("#fmenu-version-number");
 
-  fetch("VERSION_HISTORY.md")
+  fetch("VERSION_HISTORY.md?v=20260603")
     .then(r => r.ok ? r.text() : Promise.reject())
     .then(text => {
-      const match = text.match(/^## v(\d+\.\d+\.\d+)/m);
+      const match = text.match(/^## (v\d+(?:\.\d+)+)/m);
       if (match) {
-        versionSpan.textContent = "v" + match[1];
+        versionSpan.textContent = match[1];
         versionDiv.classList.add("loaded");
       }
     })

@@ -1,3 +1,4 @@
+console.log("%c[Build] Wispr Stories v0.10.4.5 (2026-06-03)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",
@@ -543,6 +544,10 @@ function updateSupporterBadge() {
   const badge = document.getElementById("proBadge");
   if (badge) badge.style.display = isSupporter() ? "" : "none";
   if (curTone) applyTone(curTone);
+  // When Pro status changes, the counter's max bounds (50 vs 5, 900s vs 75s)
+  // also change. Force a re-fetch so the UI matches the new tier immediately,
+  // not just on the next click of the mic.
+  if (typeof _refreshLimitsFromServer === "function") _refreshLimitsFromServer();
 }
 
 function openUpgradeModal() {
@@ -1794,6 +1799,22 @@ function _showDoneButton(show) {
   if (resetBtnEl) resetBtnEl.style.display = show ? "none" : "inline-flex";
 }
 
+// Smart Show: only show the Start Over button when there's something to clear.
+// Inputs: textarea, name field, recorded audio. On blank load it's hidden —
+// eliminates the "Start over" CTA on first-time visits (per friction principle).
+function _updateResetBtnVisibility() {
+  var resetBtnEl = document.getElementById("resetBtn");
+  if (!resetBtnEl) return;
+  // Don't fight the recording-flow override: while recording, the Done button
+  // is shown instead and the reset button is hidden via _showDoneButton(true).
+  if (isRec) return;
+  var sta = document.getElementById("sta");
+  var nin = document.getElementById("nin");
+  var hasText = (sta && sta.value && sta.value.length > 0) || (nin && nin.value && nin.value.length > 0);
+  var hasAudio = !!audioBlob;
+  resetBtnEl.style.display = (hasText || hasAudio) ? "inline-flex" : "none";
+}
+
 // Haptic feedback helper
 function _vibrate(duration) {
   if (typeof navigator.vibrate === 'function') navigator.vibrate(duration || 12);
@@ -1945,6 +1966,7 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   const isPro = isSupporter();
   const maxDuration = isPro ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
 
+  console.debug("[Limits] precheck:", JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: maxDuration }));
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
@@ -1952,6 +1974,7 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       body: JSON.stringify({ sessionId: localStorage.getItem("wsSessionId"), isPro, audioDuration: maxDuration, checkOnly: true }),
     });
     const data = await res.json();
+    console.debug("[Limits] precheck response:", JSON.stringify(data));
 
     if (!data.allowed) {
       clearTimeout(readyTimer);
@@ -1964,12 +1987,12 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       document.getElementById("recSub").classList.remove("live");
       if (data.reason === "too_many") {
         showToast(isPro
-          ? `Pro limit reached (${data.max}/day). Come back tomorrow!`
-          : `Free limit reached (${data.max}/day). Upgrade for more.`);
+          ? (typeof getI18nSync === "function" && getI18nSync("toasts.proLimit")) || "More tomorrow 💛"
+          : (typeof getI18nSync === "function" && getI18nSync("toasts.freeLimit")) || "Free limit hit 💛");
       } else if (data.reason === "cumulative_exceeded") {
-        showToast("Daily audio time limit reached. Come back tomorrow!");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.cumulativeLimit")) || "More tomorrow 💛");
       } else if (data.reason === "too_long") {
-        showToast(`Recording too long (max ${data.maxSeconds}s).`);
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.tooLong")) || `Max ${data.maxSeconds}s. Tap Done`);
       }
       return;
     }
@@ -1992,6 +2015,7 @@ async function reportRecordingDuration(actualDuration) {
   if (_skipDurationReport) { _skipDurationReport = false; return; }
   const sessionId = localStorage.getItem("wsSessionId");
   const isPro = isSupporter();
+  console.debug("[Limits] report:", JSON.stringify({ sessionId, actualDuration, isPro }));
   try {
     const res = await fetch("/api/limits", {
       method: "POST",
@@ -1999,27 +2023,60 @@ async function reportRecordingDuration(actualDuration) {
       body: JSON.stringify({ sessionId, isPro, audioDuration: actualDuration || 0, checkOnly: false }),
     });
     const data = await res.json();
+    console.debug("[Limits] report response:", JSON.stringify(data));
     if (data.allowed) {
       updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
+    } else if (data.reason === "too_many" || data.reason === "cumulative_exceeded") {
+      // Server says we're capped. Do a silent verify so the UI reflects
+      // the true authoritative count (in case the report succeeded but
+      // returned a different reason than expected).
+      console.debug("[Limits] report returned cap, verifying:", data.reason);
+      _refreshLimitsFromServer();
     }
   } catch (e) {
     console.warn("[Limits] Report failed:", e.message);
   }
 }
 
+// Auto-heal: silent checkOnly against the server. Used on page load to
+// reconcile any drift between localStorage mirror and the authoritative
+// server state, and after any cap-returning report to recover the true
+// counts. Never shows a toast or user-facing state change.
+async function _refreshLimitsFromServer() {
+  const sessionId = localStorage.getItem("wsSessionId");
+  if (!sessionId) return;
+  const isPro = isSupporter();
+  console.debug("[Limits] refresh:", JSON.stringify({ sessionId, isPro }));
+  try {
+    const res = await fetch("/api/limits", {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, getAdminHeaders()),
+      body: JSON.stringify({ sessionId, isPro, audioDuration: 0, checkOnly: true }),
+    });
+    const data = await res.json();
+    console.debug("[Limits] refresh response:", JSON.stringify(data));
+    if (data && data.recordingsMax) {
+      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
+    }
+  } catch (e) {
+    console.warn("[Limits] Refresh failed:", e.message);
+  }
+}
+
 function updateRecCounter(used, max, cumulativeUsed, cumulativeMax) {
   const el = document.getElementById("recCounter");
   if (!el) return;
+  console.debug("[Limits] updateRecCounter:", JSON.stringify({ used, max, cumulativeUsed, cumulativeMax }));
   const remaining = max - used;
   const cumRemaining = Math.max(0, cumulativeMax - cumulativeUsed);
   if (remaining <= 0) {
-    el.textContent = "No recordings left today";
+    el.textContent = (typeof getI18nSync === "function" && getI18nSync("record.softHintDone")) || "More tomorrow 💛";
     el.className = "rec-counter exhausted";
   } else if (remaining <= 2) {
-    el.textContent = remaining + " recording" + (remaining === 1 ? "" : "s") + " left · " + cumRemaining + "s audio";
+    el.textContent = (typeof getI18nSync === "function" && getI18nSync("record.softHint")) || "A few more today 💛";
     el.className = "rec-counter warn";
   } else {
-    el.textContent = remaining + "/" + max + " recordings · " + cumRemaining + "s audio left";
+    el.textContent = "";
     el.className = "rec-counter";
   }
 }
@@ -2450,8 +2507,23 @@ document.getElementById("sta").addEventListener("input", (e) => {
   const cleaned = stripControls(ta.value);
   if (cleaned !== ta.value) { const pos = ta.selectionStart; ta.value = cleaned; ta.setSelectionRange(pos, pos); }
   clearTimeout(_dc);
-  _dc = setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); }, 50);
+  _dc = setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); _updateResetBtnVisibility(); }, 50);
   _stopPlaceholderCycle();
+  _updateResetBtnVisibility();
+});
+document.getElementById("sta").addEventListener("paste", () => {
+  rewriteCache = {};
+  _webmCache = null;
+  _pngCache = null;
+  inputSource = "story";
+  setTimeout(function() { updateCard(); saveDraft(); updateSlNudge(); updateMicState(); _updateResetBtnVisibility(); }, 50);
+});
+document.getElementById("nin").addEventListener("input", function() {
+  this.value = stripControls(this.value)
+    .replace(/[^\p{L}\p{M}\p{N}\s\-'.()À-ɏ]/gu, "")
+    .slice(0, 20);
+  saveDraft();
+  _updateResetBtnVisibility();
 });
 document.getElementById("sta").addEventListener("paste", () => {
   rewriteCache = {};
@@ -2527,6 +2599,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   updateMicState();
   updateMobileBar();
   updateVoiceBar();
+  _updateResetBtnVisibility();
 });
 // Voice toggle
 document.getElementById("voiceToggle").addEventListener("change", function() {
@@ -2603,6 +2676,11 @@ if (!restored) {
     updateCard();
   }
 }
+// After all draft/URL restoration completes, sync Start Over visibility to
+// whatever content is now in the form (Smart Show), and auto-heal the
+// recording counter from the server so the UI matches the source of truth.
+if (typeof _updateResetBtnVisibility === "function") _updateResetBtnVisibility();
+if (typeof _refreshLimitsFromServer === "function") _refreshLimitsFromServer();
 updateSupporterBadge();
 // Sync per-tone rewrite counts from the server on page load. Without this,
 // a user who clears localStorage would see "5 left" for every tone even
@@ -2647,6 +2725,8 @@ try {
     }
   }
 } catch(e) {}
+// Smart Show: after page load, reveal Start Over only if a draft has content.
+if (typeof _updateResetBtnVisibility === "function") _updateResetBtnVisibility();
 
 // Unified mobile sticky bar: Create+Share left, Rewrites+Upgrade right
 function updateMobileBar() {
@@ -2993,13 +3073,13 @@ document.getElementById("btnC").addEventListener("click", async () => {
   updateCard();
   const card = document.getElementById("card");
   card.style.transition =
-    "transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s";
-  card.style.transform = "scale(1.018)";
-  card.style.boxShadow = "0 32px 80px rgba(0,0,0,.22)";
+    "transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .7s";
+  card.style.transform = "scale(1.025)";
+  card.style.boxShadow = "0 32px 80px rgba(0,0,0,.22), 0 0 60px rgba(245,158,11,0.35)";
   setTimeout(() => {
     card.style.transform = "";
     card.style.boxShadow = "";
-  }, 400);
+  }, 720);
   cardReady = true;
   document.getElementById("btnS").disabled = false;
   document.getElementById("wcta").classList.add("show");
@@ -3013,7 +3093,15 @@ document.getElementById("btnC").addEventListener("click", async () => {
       card.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, 120);
-  showToast("Card ready \u2014 tap Share to download");
+  const btnCTxt = document.getElementById("btnCTxt");
+  const origText = btnCTxt.textContent;
+  const btnCEl = document.getElementById("btnC");
+  btnCEl.classList.add("created");
+  btnCTxt.textContent = "\ud83d\udc9b Beautiful!";
+  setTimeout(() => {
+    btnCEl.classList.remove("created");
+    btnCTxt.textContent = origText;
+  }, 1500);
 });
 
 // Download helpers -- PNG only
@@ -3163,7 +3251,6 @@ async function _makeSocialBlob(srcBlob) {
 
 document.getElementById("btnS").addEventListener("click", async () => {
   _vibrate();
-  if (!cardReady) { document.getElementById("btnC").click(); return; }
   const btn = document.getElementById("btnS");
   const generatingLabel = typeof getI18nSync === "function" ? getI18nSync("record.generating") : "Generating\u2026";
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + generatingLabel;

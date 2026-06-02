@@ -20,9 +20,11 @@
     "cancel": "취소",
     "couldntRetry": "텍스트 변환에 실패했습니다. 탭하여 다시 시도",
     "listening": "말을 쓰고 처리하고 있어요",
-    "paused": "일시정지 \u2014 리줌마는 마이크를 누르세요",
+    "paused": "일시정지 — 리줌마는 마이크를 누르세요",
     "pausedHint": "트랜스크립트는 완료를 누르세요",
-    "done": "완료"
+    "done": "완료",
+    "softHint": "오늘 조금 더 💛",
+    "softHintDone": "내일 또 💛"
   },
   "speechLang": {
     "title": "음성 언어 선택",
@@ -152,7 +154,7 @@
     "hint": "나중에 도움이 필요하신가요? 푸터 메뉴에서 <em>사용 방법</em>을 여세요.",
     "refTitle": "빠른 참조",
     "refToggle": "<strong>모드 전환</strong>: 마이크 아이콘을 탭하여 녹음 모드와 텍스트 모드 사이를 전환합니다.",
-    "refVoice": "<strong>음성 언어</strong>: 29개 언어 + 자동 감지. 언어 버튼에서 선택하세요.",
+    "refVoice": "<strong>음성 언어</strong>: 44개 언어 + 자동 감지. 언어 버튼에서 선택하세요.",
     "refText": "<strong>텍스트 편집</strong>: 텍스트 영역은 최대 150자까지 허용합니다. 자유롭게 편집하세요.",
     "refTone": "<strong>톤 다시 쓰기</strong>: 6가지 톤. 무료 사용자는 톤당 하루 5회. Pro 사용자는 무제한.",
     "refColor": "<strong>색상</strong>: 팔레트를 선택하여 카드 배경을 설정하세요.",

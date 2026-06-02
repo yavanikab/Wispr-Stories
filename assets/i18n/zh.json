@@ -20,9 +20,11 @@
     "cancel": "取消",
     "couldntRetry": "转录失败，点击重试",
     "listening": "正在听你说话并转为文字",
-    "paused": "已暂停 \u2014 点击麦克风继续",
+    "paused": "已暂停 — 点击麦克风继续",
     "pausedHint": "点击“完成”转为文字",
-    "done": "完成"
+    "done": "完成",
+    "softHint": "今天还有几次 💛",
+    "softHintDone": "明天再来 💛"
   },
   "speechLang": {
     "title": "选择语音语言",
@@ -152,7 +154,7 @@
     "hint": "稍后需要帮助？在页脚菜单中打开<em>使用说明</em>。",
     "refTitle": "快速参考",
     "refToggle": "<strong>切换模式</strong>: 点击麦克风图标在录音模式和文字模式之间切换。",
-    "refVoice": "<strong>语音语言</strong>: 29 种语言 + 自动检测。从语言按钮选择。",
+    "refVoice": "<strong>语音语言</strong>: 44 种语言 + 自动检测。从语言按钮选择。",
     "refText": "<strong>文字编辑</strong>: 文本区域最多接受 150 个字符。可自由编辑。",
     "refTone": "<strong>语气改写</strong>: 6 种语气。免费用户每个语气每天 5 次。Pro 用户无限次。",
     "refColor": "<strong>颜色</strong>: 选择调色板以设置卡片背景。",
