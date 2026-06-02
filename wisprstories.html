@@ -7,14 +7,18 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>
-      Wispr Stories &mdash; Turn your voice into shareable cards, in your language, in seconds
+      Wispr Stories &mdash; Turn your voice into shareable cards, in your
+      language, in seconds
     </title>
     <meta
       name="description"
       content="Turn your voice into shareable cards, in your language, in seconds. No install, no account needed."
     />
     <meta name="robots" content="index, follow" />
-    <meta name="google-site-verification" content="ISQu91mAcH9X70ViTg6fYuZSAP3x0Y8AIDEU8pn5v34" />
+    <meta
+      name="google-site-verification"
+      content="Cxrj2sG3e_A59R4z25QSBUsuFVzVevyHBymTvs8O-y8"
+    />
     <link rel="canonical" href="https://wisprstories.vercel.app" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://wisprstories.vercel.app" />
@@ -78,7 +82,7 @@
         document.documentElement.classList.add("dark");
         document.documentElement.classList.add("theme-init-dark");
       }
-      document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener("DOMContentLoaded", function () {
         var tt = document.getElementById("themeToggle");
         if (tt && document.documentElement.classList.contains("dark")) {
           tt.setAttribute("aria-pressed", "true");
@@ -95,11 +99,16 @@
       /* Service worker — registered on production hosts only. localhost and
          the Vercel preview branches skip registration so a stale SW doesn't
          shadow live edits during development. */
-      if ("serviceWorker" in navigator && location.hostname === "wisprstories.vercel.app") {
+      if (
+        "serviceWorker" in navigator &&
+        location.hostname === "wisprstories.vercel.app"
+      ) {
         window.addEventListener("load", function () {
           navigator.serviceWorker
             .register("/sw.js", { scope: "/" })
-            .catch(function () { /* SW registration failed — app still works */ });
+            .catch(function () {
+              /* SW registration failed — app still works */
+            });
         });
       }
     </script>
@@ -133,10 +142,7 @@
     <link rel="stylesheet" href="assets/fontawesome/css/fontawesome.min.css" />
     <link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
     <link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
-    <link
-      rel="stylesheet"
-      href="global/styles/main.css"
-    />
+    <link rel="stylesheet" href="global/styles/main.css" />
     <link rel="stylesheet" href="global/occasions/occasions.css" />
     <link rel="stylesheet" href="assets/flag-icons/css/flag-icons.min.css" />
     <link rel="stylesheet" href="assets/languages/languages.css" />
@@ -179,7 +185,12 @@
       </a>
       <div class="nav-right">
         <div class="lang-wrap-sel" id="langWrapSel">
-          <button class="lang-btn" id="langBtn" type="button" aria-label="Select language">
+          <button
+            class="lang-btn"
+            id="langBtn"
+            type="button"
+            aria-label="Select language"
+          >
             <span id="langBtnText"></span>
             <span class="lang-arr"></span>
           </button>
@@ -201,8 +212,19 @@
       <!-- LEFT -->
       <div class="left">
         <div>
-          <h1 class="hl-h1" data-i18n="hero.title">Say it once, share it forever</h1>
-          <p class="hl-h2" data-i18n="hero.subtitle">Record with the mic or dictate with <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener" class="wispr-flow-link"><strong><em>Wispr Flow</em></strong></a>. Style and share with love.</p>
+          <h1 class="hl-h1" data-i18n="hero.title">
+            Say it once, share it forever
+          </h1>
+          <p class="hl-h2" data-i18n="hero.subtitle">
+            Record with the mic or dictate with
+            <a
+              href="https://wisprflow.ai?ref=wispr-stories"
+              target="_blank"
+              rel="noopener"
+              class="wispr-flow-link"
+              ><strong><em>Wispr Flow</em></strong></a
+            >. Style and share with love.
+          </p>
         </div>
 
         <!-- Unified notice slot. Shows at most one message at a time
@@ -211,7 +233,14 @@
              type so the user doesn't see it again. -->
         <div class="notice" id="notice" hidden role="status" aria-live="polite">
           <span class="notice-text" id="noticeText"></span>
-          <button class="notice-dismiss" id="noticeDismiss" aria-label="Dismiss notice" type="button">&times;</button>
+          <button
+            class="notice-dismiss"
+            id="noticeDismiss"
+            aria-label="Dismiss notice"
+            type="button"
+          >
+            &times;
+          </button>
         </div>
 
         <!-- HERO INPUT ZONE: Record + OR + Textarea -->
@@ -221,8 +250,13 @@
             <div class="lbl">
               <span data-i18n="record.label">Your voice</span>
             </div>
-            <div class="speech-lang-trigger" id="speechLangTrigger"><i class="fi fi-us"></i> <span>English</span> <span class="sl-arr"></span></div>
-            <p class="lang-reminder" id="langReminder">Select a language for an accurate card label</p>
+            <div class="speech-lang-trigger" id="speechLangTrigger">
+              <i class="fi fi-us"></i> <span>English</span>
+              <span class="sl-arr"></span>
+            </div>
+            <p class="lang-reminder" id="langReminder">
+              Select a language for an accurate card label
+            </p>
             <div class="rec-row">
               <button class="rec-btn" id="recBtn" aria-label="Record">
                 <svg viewBox="0 0 20 20" fill="none">
@@ -262,15 +296,28 @@
                 </svg>
               </button>
               <div>
-                <div class="rec-st" id="recSt" data-i18n="record.status" aria-live="polite" aria-atomic="true">Tap to speak</div>
+                <div
+                  class="rec-st"
+                  id="recSt"
+                  data-i18n="record.status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  Tap to speak
+                </div>
                 <div class="rec-sub" id="recSub" data-i18n="record.sub"></div>
                 <div class="rec-counter" id="recCounter"></div>
               </div>
-              <button class="reset-btn" id="resetBtn" aria-label="Start over, clear the form">
-                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> <span data-i18n="resetBtn">Start over</span>
+              <button
+                class="reset-btn"
+                id="resetBtn"
+                aria-label="Start over, clear the form"
+              >
+                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                <span data-i18n="resetBtn">Start over</span>
               </button>
             </div>
-            <div class="mic-select-row" id="micSelectRow" style="display:none;">
+            <div class="mic-select-row" id="micSelectRow" style="display: none">
               <i class="fa-solid fa-microphone" aria-hidden="true"></i>
               <select id="micSelect" aria-label="Choose microphone"></select>
             </div>
@@ -288,9 +335,9 @@
             <label class="lbl" for="sta"
               ><span data-i18n="textarea.label">Your words</span>
               <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
+                ><button type="button" class="ii" aria-label="More info">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
                 <span class="tip" data-i18n="textarea.tip"
                   >Speak first using Record above &mdash; words land here
                   automatically. Or type directly. Or dictate with Wispr Flow.
@@ -330,23 +377,37 @@
 
         <!-- EXAMPLES (safety net after input + name) -->
         <div class="ex-section-wrap">
-          <div class="ex-lbl" data-i18n="examples.label">Need inspiration? Click an example</div>
+          <div class="ex-lbl" data-i18n="examples.label">
+            Need inspiration? Click an example
+          </div>
           <div class="ex-grid" id="exGrid"></div>
         </div>
 
         <!-- MAKE IT YOURS (collapsible, open by default) -->
         <details class="customize" open>
           <summary class="customize-summary">
-            <span class="customize-summary-label" data-i18n="customize.summary">Style</span>
-            <span class="customize-summary-hint" id="customizeSummaryHint" aria-live="polite">
+            <span class="customize-summary-label" data-i18n="customize.summary"
+              >Style</span
+            >
+            <span
+              class="customize-summary-hint"
+              id="customizeSummaryHint"
+              aria-live="polite"
+            >
               <span class="cz-chip cz-chip-tone" id="czChipTone">Original</span>
               <span class="cz-chip-sep" aria-hidden="true">&middot;</span>
               <span class="cz-chip cz-chip-color" id="czChipColor">
-                <span class="cz-swatch" id="czChipSwatch" style="background:#7c3aed"></span>
+                <span
+                  class="cz-swatch"
+                  id="czChipSwatch"
+                  style="background: #7c3aed"
+                ></span>
                 <span id="czChipColorName">Violet</span>
               </span>
               <span class="cz-chip-sep" aria-hidden="true">&middot;</span>
-              <span class="cz-chip cz-chip-shape" id="czChipShape">Rounded</span>
+              <span class="cz-chip cz-chip-shape" id="czChipShape"
+                >Rounded</span
+              >
             </span>
             <i
               class="fa-solid fa-chevron-right customize-chevron"
@@ -359,9 +420,9 @@
             <div class="lbl">
               <span data-i18n="tone.label">Tone</span>
               <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
+                ><button type="button" class="ii" aria-label="More info">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
                 <span class="tip" data-i18n="tone.tip"
                   >Changes how your words feel on the card. Warm is gentle. Bold
                   is direct. Poetic flows with rhythm. Playful is light.
@@ -381,30 +442,39 @@
                 data-tone="original"
                 aria-label="Tone: Original (unlimited)"
               >
-                <i class="fas fa-pen" aria-hidden="true"></i> <span data-i18n="tone.original">Original</span>
-                <span class="tone-badge tone-badge-unlimited" aria-hidden="true">∞</span>
+                <i class="fas fa-pen" aria-hidden="true"></i>
+                <span data-i18n="tone.original">Original</span>
+                <span class="tone-badge tone-badge-unlimited" aria-hidden="true"
+                  >∞</span
+                >
               </button>
               <button class="tc" data-tone="warm" aria-label="Tone: Warm">
-                <i class="fas fa-heart" aria-hidden="true"></i> <span data-i18n="tone.warm">Warm</span>
+                <i class="fas fa-heart" aria-hidden="true"></i>
+                <span data-i18n="tone.warm">Warm</span>
               </button>
               <button class="tc" data-tone="bold" aria-label="Tone: Bold">
-                <i class="fas fa-bolt" aria-hidden="true"></i> <span data-i18n="tone.bold">Bold</span>
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                <span data-i18n="tone.bold">Bold</span>
               </button>
               <button class="tc" data-tone="poetic" aria-label="Tone: Poetic">
-                <i class="fas fa-feather" aria-hidden="true"></i> <span data-i18n="tone.poetic">Poetic</span>
+                <i class="fas fa-feather" aria-hidden="true"></i>
+                <span data-i18n="tone.poetic">Poetic</span>
               </button>
               <button class="tc" data-tone="playful" aria-label="Tone: Playful">
-                <i class="fas fa-face-smile" aria-hidden="true"></i> <span data-i18n="tone.playful">Playful</span>
+                <i class="fas fa-face-smile" aria-hidden="true"></i>
+                <span data-i18n="tone.playful">Playful</span>
               </button>
               <button
                 class="tc"
                 data-tone="reflective"
                 aria-label="Tone: Reflective"
               >
-                <i class="fas fa-moon" aria-hidden="true"></i> <span data-i18n="tone.reflective">Reflective</span>
+                <i class="fas fa-moon" aria-hidden="true"></i>
+                <span data-i18n="tone.reflective">Reflective</span>
               </button>
               <button class="tc" data-tone="honest" aria-label="Tone: Honest">
-                <i class="fas fa-handshake" aria-hidden="true"></i> <span data-i18n="tone.honest">Honest</span>
+                <i class="fas fa-handshake" aria-hidden="true"></i>
+                <span data-i18n="tone.honest">Honest</span>
               </button>
             </div>
           </div>
@@ -417,9 +487,9 @@
             <div class="lbl">
               <span data-i18n="color.label">Card color</span>
               <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
+                ><button type="button" class="ii" aria-label="More info">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
                 <span class="tip" data-i18n="color.tip"
                   >Sets the card background. The live preview updates
                   instantly.</span
@@ -530,9 +600,9 @@
             <div class="lbl">
               <span data-i18n="shape.label">Shape</span>
               <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
+                ><button type="button" class="ii" aria-label="More info">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
                 <span class="tip" data-i18n="shape.tip"
                   >Sharp edges work best for WhatsApp. Rounded corners suit
                   galleries and web.</span
@@ -545,7 +615,12 @@
               role="radiogroup"
               aria-label="Shape"
             >
-              <button class="sz" data-rounded="false" aria-label="Sharp corners" data-i18n="shape.sharp">
+              <button
+                class="sz"
+                data-rounded="false"
+                aria-label="Sharp corners"
+                data-i18n="shape.sharp"
+              >
                 Sharp corners
               </button>
               <button
@@ -564,9 +639,9 @@
             <div class="lbl">
               <span data-i18n="fontSize.label">Font size</span>
               <span class="iw"
-                ><button type="button" class="ii" aria-label="More info"
-                  ><i class="fa-solid fa-circle-info"></i
-                ></button>
+                ><button type="button" class="ii" aria-label="More info">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
                 <span class="tip" data-i18n="fontSize.tip"
                   >Make short card text larger so it fills the card nicely. Only
                   available while your card text is short.</span
@@ -574,10 +649,33 @@
               >
             </div>
             <div class="font-size-row" id="fontSizeRow">
-              <button type="button" class="font-step" id="fontMinus" aria-label="Decrease font size">&minus;</button>
-              <span class="font-size-val" id="fontSizeVal" aria-live="polite"></span>
-              <button type="button" class="font-step" id="fontPlus" aria-label="Increase font size">+</button>
-              <span class="font-size-info" id="fontSizeInfo" data-i18n="fontSize.info">Available only when your card text is under 85 characters</span>
+              <button
+                type="button"
+                class="font-step"
+                id="fontMinus"
+                aria-label="Decrease font size"
+              >
+                &minus;
+              </button>
+              <span
+                class="font-size-val"
+                id="fontSizeVal"
+                aria-live="polite"
+              ></span>
+              <button
+                type="button"
+                class="font-step"
+                id="fontPlus"
+                aria-label="Increase font size"
+              >
+                +
+              </button>
+              <span
+                class="font-size-info"
+                id="fontSizeInfo"
+                data-i18n="fontSize.info"
+                >Available only when your card text is under 85 characters</span
+              >
             </div>
           </div>
         </details>
@@ -586,15 +684,23 @@
         <div class="actions">
           <button class="btn-c" id="btnC">
             <i class="fas fa-wand-sparkles"></i
-            ><span class="btn-c-text" id="btnCTxt" data-i18n="actions.create">Create&nbsp;card</span>
+            ><span class="btn-c-text" id="btnCTxt" data-i18n="actions.create"
+              >Create&nbsp;card</span
+            >
           </button>
           <button class="btn-s" id="btnS" disabled>
-            <i class="fas fa-share-nodes"></i> <span data-i18n="actions.share">Share card</span>
+            <i class="fas fa-share-nodes"></i>
+            <span data-i18n="actions.share">Share card</span>
           </button>
         </div>
 
         <div class="left-closing">
-          <span class="left-closing-text wave-on-hover" tabindex="0" data-i18n="closing">Your voice, beautifully shared</span>
+          <span
+            class="left-closing-text wave-on-hover"
+            tabindex="0"
+            data-i18n="closing"
+            >Your voice, beautifully shared</span
+          >
         </div>
       </div>
       <!-- /left -->
@@ -604,33 +710,65 @@
         <div class="pvw-lbl" data-i18n="preview.label">Live preview</div>
         <div id="tonePillWrap" class="tone-pill-wrap" style="display: none">
           <span id="tonePill" class="tone-pill"></span>
-          <button id="upgradeBtn" class="tone-upgrade-link" data-i18n="upgrade">Upgrade</button>
+          <button id="upgradeBtn" class="tone-upgrade-link" data-i18n="upgrade">
+            Upgrade
+          </button>
         </div>
         <div class="card-wrap">
           <button class="dl-btn" id="dlBtn" style="display: none">
-            <i class="fas fa-download"></i> <span data-i18n="download">Download card</span>
+            <i class="fas fa-download"></i>
+            <span data-i18n="download">Download card</span>
           </button>
-          <div class="voice-bar" id="voiceBar" style="display:none">
+          <div class="voice-bar" id="voiceBar" style="display: none">
             <label class="voice-toggle-label">
               <span class="voice-toggle-icon">&#127908;</span>
-              <span class="voice-toggle-text" id="voiceToggleText" data-i18n="voice.attach">Attach voice</span>
+              <span
+                class="voice-toggle-text"
+                id="voiceToggleText"
+                data-i18n="voice.attach"
+                >Attach voice</span
+              >
               <span class="voice-toggle-switch">
                 <input type="checkbox" id="voiceToggle" />
                 <span class="voice-toggle-slider"></span>
               </span>
             </label>
-            <span class="voice-toggle-info" id="voiceToggleInfo" style="display:none">
-              <span class="voice-toggle-duration" id="voiceDurationLabel"></span>
-              <button class="voice-play-btn" id="voicePlayBtn" title="Preview voice">&#9654;</button>
-              <button class="voice-rerecord-btn" id="voiceReRecordBtn" title="Re-record voice">&#8635;</button>
+            <span
+              class="voice-toggle-info"
+              id="voiceToggleInfo"
+              style="display: none"
+            >
+              <span
+                class="voice-toggle-duration"
+                id="voiceDurationLabel"
+              ></span>
+              <button
+                class="voice-play-btn"
+                id="voicePlayBtn"
+                title="Preview voice"
+              >
+                &#9654;
+              </button>
+              <button
+                class="voice-rerecord-btn"
+                id="voiceReRecordBtn"
+                title="Re-record voice"
+              >
+                &#8635;
+              </button>
             </span>
           </div>
           <div class="card card-empty" id="card">
             <div class="card-bg" id="cardBg"></div>
             <div class="card-ghost" id="cardGhost">“</div>
             <div class="card-empty-state">
-              <span class="card-empty-prompt" data-i18n="cardEmpty">Fill the details &mdash;<br />your card appears here</span>
-              <span class="card-empty-quote" data-i18n="hero.quote">&ldquo;Hold onto memories; they will hold onto you.&rdquo;</span>
+              <span class="card-empty-prompt" data-i18n="cardEmpty"
+                >Fill the details &mdash;<br />your card appears here</span
+              >
+              <span class="card-empty-quote" data-i18n="hero.quote"
+                >&ldquo;Hold onto memories; they will hold onto
+                you.&rdquo;</span
+              >
             </div>
             <div class="card-content">
               <div class="card-label" id="cardLabel"></div>
@@ -700,9 +838,13 @@
             >Wispr Flow</a
           >
         </p>
-        <span data-i18n="footer.independent">Independent project &middot; Not affiliated with Wispr Flow</span>
-        <span class="footer-copyright">&copy; 2026 <span class="footer-sep" aria-hidden="true">|</span><script src="global/footer-menu.js"></script></span>
-        
+        <span data-i18n="footer.independent"
+          >Independent project &middot; Not affiliated with Wispr Flow</span
+        >
+        <span class="footer-copyright"
+          >&copy; 2026 <span class="footer-sep" aria-hidden="true">|</span>
+          <script src="global/footer-menu.js"></script
+        ></span>
       </footer>
     </div>
     <!-- /shell -->
@@ -711,7 +853,9 @@
       <div class="share-modal-backdrop" id="shareBackdrop"></div>
       <div class="share-modal-content">
         <button class="share-modal-close" id="shareClose">&times;</button>
-        <div class="share-modal-title" data-i18n="shareModal.title">Share your card</div>
+        <div class="share-modal-title" data-i18n="shareModal.title">
+          Share your card
+        </div>
         <p class="share-modal-sub" data-i18n="shareModal.sub">
           Post the image directly, or share the app link so others can make
           their own cards.
@@ -723,16 +867,20 @@
             id="shareNative"
             style="display: none"
           >
-            <i class="fas fa-share-nodes"></i> <span data-i18n="shareModal.native">Share to apps</span>
+            <i class="fas fa-share-nodes"></i>
+            <span data-i18n="shareModal.native">Share to apps</span>
           </button>
           <button class="share-modal-btn" id="shareDownload">
-            <i class="fas fa-download"></i> <span data-i18n="shareModal.download">Download card image</span>
+            <i class="fas fa-download"></i>
+            <span data-i18n="shareModal.download">Download card image</span>
           </button>
           <button class="share-modal-btn" id="shareCopyLink">
-            <i class="fas fa-link"></i> <span data-i18n="shareModal.copyLink">Copy image link</span>
+            <i class="fas fa-link"></i>
+            <span data-i18n="shareModal.copyLink">Copy image link</span>
           </button>
           <button class="share-modal-btn" id="shareCopyImage">
-            <i class="fas fa-copy"></i> <span data-i18n="shareModal.copyImage">Copy image</span>
+            <i class="fas fa-copy"></i>
+            <span data-i18n="shareModal.copyImage">Copy image</span>
           </button>
         </div>
       </div>
@@ -743,7 +891,9 @@
       <div class="upgrade-modal-content">
         <button class="upgrade-modal-close" id="upgradeClose">&#10005;</button>
         <div class="upgrade-modal-icon">&#10024;</div>
-        <div class="upgrade-modal-title" data-i18n="upgradeModal.title">Upgrade to Pro</div>
+        <div class="upgrade-modal-title" data-i18n="upgradeModal.title">
+          Upgrade to Pro
+        </div>
         <p class="upgrade-modal-sub" data-i18n="upgradeModal.sub">
           Unlimited tone rewrites. No more daily limits.
         </p>
@@ -755,8 +905,12 @@
           data-i18n="upgradeModal.buyCoffee"
           >&#9749; Buy me a coffee</a
         >
-        <div class="upgrade-modal-divider" data-i18n="upgradeModal.or">&#8212; or &#8212;</div>
-        <p class="upgrade-modal-label" data-i18n="upgradeModal.haveKey">Already have a supporter key?</p>
+        <div class="upgrade-modal-divider" data-i18n="upgradeModal.or">
+          &#8212; or &#8212;
+        </div>
+        <p class="upgrade-modal-label" data-i18n="upgradeModal.haveKey">
+          Already have a supporter key?
+        </p>
         <div class="upgrade-modal-row">
           <input
             class="upgrade-modal-input"
@@ -765,10 +919,21 @@
             data-i18n-placeholder="upgradeModal.keyPlaceholder"
             placeholder="Paste your key..."
           />
-          <button class="upgrade-modal-btn" id="upgradeKeyGo" data-i18n="upgradeModal.continue">Continue</button>
+          <button
+            class="upgrade-modal-btn"
+            id="upgradeKeyGo"
+            data-i18n="upgradeModal.continue"
+          >
+            Continue
+          </button>
         </div>
         <div id="upgradeKeyMsg" class="upgrade-modal-msg"></div>
-        <p class="upgrade-modal-label lost-key" data-i18n="upgradeModal.lostKey">Lost your key?</p>
+        <p
+          class="upgrade-modal-label lost-key"
+          data-i18n="upgradeModal.lostKey"
+        >
+          Lost your key?
+        </p>
         <div class="upgrade-modal-row">
           <input
             class="upgrade-modal-input"
@@ -788,7 +953,9 @@
           </button>
         </div>
         <div id="upgradeEmailMsg" class="upgrade-modal-msg"></div>
-        <p class="upgrade-modal-disclaimer" data-i18n="upgradeModal.disclaimer">Wispr Stories &mdash; made for Wispr Flow</p>
+        <p class="upgrade-modal-disclaimer" data-i18n="upgradeModal.disclaimer">
+          Wispr Stories &mdash; made for Wispr Flow
+        </p>
       </div>
     </div>
 
@@ -797,9 +964,19 @@
       <div class="sl-modal-backdrop" id="slBackdrop"></div>
       <div class="sl-modal-content">
         <button class="sl-modal-close" id="slClose">&times;</button>
-        <div class="sl-modal-title" data-i18n="speechLang.title">Select speech language</div>
-        <p class="sl-modal-sub" data-i18n="speechLang.sub">Choose your speaking language: 44 options</p>
-        <input type="text" class="sl-modal-filter" id="slFilter" placeholder="Search languages\u2026" data-i18n-placeholder="speechLang.filter">
+        <div class="sl-modal-title" data-i18n="speechLang.title">
+          Select speech language
+        </div>
+        <p class="sl-modal-sub" data-i18n="speechLang.sub">
+          Choose your speaking language: 44 options
+        </p>
+        <input
+          type="text"
+          class="sl-modal-filter"
+          id="slFilter"
+          placeholder="Search languages\u2026"
+          data-i18n-placeholder="speechLang.filter"
+        />
         <div class="sl-modal-grid" id="slGrid"></div>
       </div>
     </div>
@@ -807,37 +984,53 @@
     <!-- ONBOARDING BANNER -->
     <div class="onboarding-overlay" id="onboardingOverlay">
       <div class="onboarding-banner" id="onboardingBanner">
-        <button class="onboarding-close" id="onboardingClose" aria-label="Dismiss">&#10005;</button>
+        <button
+          class="onboarding-close"
+          id="onboardingClose"
+          aria-label="Dismiss"
+        >
+          &#10005;
+        </button>
         <div class="onboarding-header">
           <div class="onboarding-icon">&#127908;</div>
-          <h2 class="onboarding-title" data-i18n="onboarding.title">Welcome to Wispr Stories</h2>
+          <h2 class="onboarding-title" data-i18n="onboarding.title">
+            Welcome to Wispr Stories
+          </h2>
         </div>
         <div class="onboarding-steps">
           <div class="onboarding-step">
             <span class="onboarding-step-num">1</span>
             <div class="onboarding-step-text" data-i18n="onboarding.step1">
-              <strong>Speak or type</strong> your message. Tap the microphone or paste text.
+              <strong>Speak or type</strong> your message. Tap the microphone or
+              paste text.
             </div>
           </div>
           <div class="onboarding-step">
             <span class="onboarding-step-num">2</span>
             <div class="onboarding-step-text" data-i18n="onboarding.step2">
-              <strong>Customize</strong> your card: choose a tone, color, and corner style.
+              <strong>Customize</strong> your card: choose a tone, color, and
+              corner style.
             </div>
           </div>
           <div class="onboarding-step">
             <span class="onboarding-step-num">3</span>
             <div class="onboarding-step-text" data-i18n="onboarding.step3">
-              <strong>Create &amp; share</strong>: download as PNG or share directly on social platforms.
+              <strong>Create &amp; share</strong>: download as PNG or share
+              directly on social platforms.
             </div>
           </div>
         </div>
         <div class="onboarding-footer">
-          <button class="onboarding-btn onboarding-btn-primary" id="onboardingGotIt" data-i18n="onboarding.gotIt">
+          <button
+            class="onboarding-btn onboarding-btn-primary"
+            id="onboardingGotIt"
+            data-i18n="onboarding.gotIt"
+          >
             Got it, let's go!
           </button>
           <p class="onboarding-hint" data-i18n="onboarding.hint">
-            Need help later? Tap the <i class="fa-solid fa-circle-question"></i> icon in the top bar.
+            Need help later? Tap the
+            <i class="fa-solid fa-circle-question"></i> icon in the top bar.
           </p>
         </div>
       </div>
@@ -846,25 +1039,40 @@
     <div class="toast" id="toast"></div>
     <div class="export-progress" id="exportProgress">
       <div class="export-progress-bar"></div>
-      <span class="export-progress-text" data-i18n="exportProgress.generating">Generating card&hellip;</span>
+      <span class="export-progress-text" data-i18n="exportProgress.generating"
+        >Generating card&hellip;</span
+      >
     </div>
 
     <div class="mobile-bar" id="mobileBar" aria-label="Card actions">
       <div class="mobile-bar-left">
         <button class="mobile-bar-btn mobile-bar-btn-create" id="mobileBtnC">
           <i class="fas fa-wand-sparkles"></i>
-          <span class="mobile-bar-btn-label" data-i18n="mobileBar.create">Create</span>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.create"
+            >Create</span
+          >
         </button>
-        <button class="mobile-bar-btn mobile-bar-btn-share" id="mobileBtnS" disabled>
+        <button
+          class="mobile-bar-btn mobile-bar-btn-share"
+          id="mobileBtnS"
+          disabled
+        >
           <i class="fas fa-share-nodes"></i>
-          <span class="mobile-bar-btn-label" data-i18n="mobileBar.share">Share</span>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.share"
+            >Share</span
+          >
         </button>
       </div>
       <div class="mobile-bar-right" id="mobileBarRight" style="display: none">
         <span class="mobile-bar-rewrite-text" id="mobileRewriteText"></span>
-        <button class="mobile-bar-btn mobile-bar-btn-upgrade" id="mobileBtnUpgrade">
+        <button
+          class="mobile-bar-btn mobile-bar-btn-upgrade"
+          id="mobileBtnUpgrade"
+        >
           <i class="fas fa-mug-hot"></i>
-          <span class="mobile-bar-btn-label" data-i18n="mobileBar.upgrade">Upgrade</span>
+          <span class="mobile-bar-btn-label" data-i18n="mobileBar.upgrade"
+            >Upgrade</span
+          >
         </button>
       </div>
     </div>
@@ -874,10 +1082,24 @@
       <div class="dl-choice-backdrop" id="dlChoiceBackdrop"></div>
       <div class="dl-choice-content">
         <button class="dl-choice-close" id="dlChoiceClose">&times;</button>
-        <div class="dl-choice-title" data-i18n="dlChoice.title">Download your card</div>
+        <div class="dl-choice-title" data-i18n="dlChoice.title">
+          Download your card
+        </div>
         <div class="dl-choice-actions">
-          <button class="dl-choice-btn" id="dlChoicePng" data-i18n="dlChoice.png"><i class="fa-solid fa-file-image"></i> Download PNG</button>
-          <button class="dl-choice-btn dl-choice-btn-secondary" id="dlChoiceWebm" data-i18n="dlChoice.webm"><i class="fa-solid fa-video"></i> Download WebM</button>
+          <button
+            class="dl-choice-btn"
+            id="dlChoicePng"
+            data-i18n="dlChoice.png"
+          >
+            <i class="fa-solid fa-file-image"></i> Download PNG
+          </button>
+          <button
+            class="dl-choice-btn dl-choice-btn-secondary"
+            id="dlChoiceWebm"
+            data-i18n="dlChoice.webm"
+          >
+            <i class="fa-solid fa-video"></i> Download WebM
+          </button>
         </div>
       </div>
     </div>
