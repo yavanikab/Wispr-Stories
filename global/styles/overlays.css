@@ -754,23 +754,24 @@ body.modal-open .rewrite-bar {
   align-items: flex-start;
   gap: 14px;
 }
-.onboarding-step-num {
+.onboarding-step-icon {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--cream);
-  font-size: clamp(13px, 0.3vw + 12px, 14px);
-  font-weight: 700;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--cream2);
+  font-size: 20px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--rule);
 }
 .onboarding-step-text {
   font-size: clamp(14px, 0.3vw + 13px, 15px);
   color: var(--ink2);
   line-height: 1.5;
+  padding-top: 8px;
 }
 .onboarding-step-text strong {
   color: var(--ink);
@@ -788,6 +789,7 @@ body.modal-open .rewrite-bar {
   cursor: pointer;
   transition: all 0.2s;
   touch-action: manipulation;
+  margin-top: 8px;
 }
 .onboarding-btn-primary {
   background: var(--ink);
@@ -800,8 +802,13 @@ body.modal-open .rewrite-bar {
 .onboarding-hint {
   font-size: clamp(12px, 0.3vw + 11px, 13px);
   color: var(--ink3);
-  margin-top: 14px;
+  margin-top: 18px;
   line-height: 1.5;
+}
+.onboarding-hint em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink2);
 }
 .onboarding-hint i {
   font-size: clamp(12px, 0.3vw + 11px, 13px);
@@ -809,7 +816,7 @@ body.modal-open .rewrite-bar {
 }
 .onboarding-quick-ref {
   text-align: left;
-  margin: 0 0 16px;
+  margin: 0 0 28px;
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 12px;
   padding: 0;
@@ -817,10 +824,10 @@ body.modal-open .rewrite-bar {
 }
 .onboarding-quick-ref > summary {
   cursor: pointer;
-  padding: 10px 16px;
+  padding: 12px 16px;
   font-size: clamp(13px, 0.3vw + 12px, 14px);
   font-weight: 600;
-  color: var(--ink2);
+  color: var(--ink);
   list-style: none;
   user-select: none;
 }
@@ -833,6 +840,7 @@ body.modal-open .rewrite-bar {
   margin-right: 8px;
   font-size: 11px;
   transition: transform 0.2s;
+  color: var(--ink3);
 }
 .onboarding-quick-ref[open] > summary::before {
   transform: rotate(90deg);
@@ -840,7 +848,7 @@ body.modal-open .rewrite-bar {
 .onboarding-quick-ref-list {
   list-style: none;
   margin: 0;
-  padding: 0 16px 12px;
+  padding: 4px 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -850,38 +858,49 @@ body.modal-open .rewrite-bar {
   font-size: clamp(12px, 0.3vw + 11px, 13px);
   line-height: 1.5;
   color: var(--ink3);
+  opacity: 0.72;
 }
 .onboarding-quick-ref-list dd strong {
-  color: var(--ink2);
-  font-weight: 600;
+  color: var(--ink);
+  font-weight: 700;
+  opacity: 1;
 }
 :root.dark .onboarding-banner {
   background: #2a2a2a;
 }
-:root.dark .onboarding-title {
-  color: #ffffeb;
+:root.dark .onboarding-step-icon {
+  background: rgba(255,255,235,0.06);
+  border-color: rgba(255,255,235,0.12);
 }
 :root.dark .onboarding-step-text {
-  color: rgba(255,255,235,0.7);
+  color: rgba(255,255,235,0.78);
 }
 :root.dark .onboarding-step-text strong {
   color: #ffffeb;
 }
 :root.dark .onboarding-hint {
-  color: rgba(255,255,235,0.4);
+  color: rgba(255,255,235,0.45);
+}
+:root.dark .onboarding-hint em {
+  color: rgba(255,255,235,0.8);
 }
 :root.dark .onboarding-quick-ref {
   border-color: rgba(255,255,235,0.08);
   background: rgba(255,255,235,0.02);
 }
 :root.dark .onboarding-quick-ref > summary {
-  color: rgba(255,255,235,0.7);
+  color: #ffffeb;
 }
-:root.dark .onboarding-quick-ref-list dd {
+:root.dark .onboarding-quick-ref > summary::before {
   color: rgba(255,255,235,0.5);
 }
+:root.dark .onboarding-quick-ref-list dd {
+  color: rgba(255,255,235,0.55);
+  opacity: 1;
+}
 :root.dark .onboarding-quick-ref-list dd strong {
-  color: rgba(255,255,235,0.8);
+  color: #ffffeb;
+  opacity: 1;
 }
 
 /* DOWNLOAD CHOICE MODAL */
