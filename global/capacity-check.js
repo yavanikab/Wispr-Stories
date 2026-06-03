@@ -77,7 +77,7 @@
         '<div class="capacity-page-actions">' +
           '<button class="capacity-page-btn" onclick="window.location.reload()">Check if we\u2019re back</button>' +
         '</div>' +
-        '<p class="capacity-page-footer">Wispr Stories &mdash; made for <a href="https://wisprflow.ai?ref=wispr-stories" target="_blank" rel="noopener"><strong><em>Wispr Flow</em></strong></a></p>' +
+        '<p class="capacity-page-footer">Wispr Stories &mdash; made for <a href="https://wisprflow.ai/r?BEST76" target="_blank" rel="noopener"><strong><em>Wispr Flow</em></strong></a></p>' +
       '</div>';
 
     document.documentElement.appendChild(el);

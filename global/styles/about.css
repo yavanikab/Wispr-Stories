@@ -352,122 +352,6 @@ h2 {
   color: var(--ink);
   margin-bottom: 4px;
 }
-.how-step-desc {
-  font-size: clamp(11px, 0.3vw + 10px, 12px);
-  color: var(--ink3);
-  line-height: 1.4;
-}
-.how-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  top: 39px;
-  right: -14px;
-  width: 12px;
-  height: 2px;
-  background: var(--ws-lavender);
-  opacity: 0.6;
-}
-.how-step:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  top: 35px;
-  right: -18px;
-  border: 5px solid transparent;
-  border-left: 6px solid var(--ws-lavender);
-  opacity: 0.6;
-}
-
-/* === Use-case examples === */
-.examples-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin: 32px 0 8px;
-}
-.example-card {
-  padding: 16px 14px;
-  background: var(--cream2);
-  border-radius: 10px;
-  border: 1px solid var(--rule);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.example-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  border-color: var(--ws-lavender);
-  background: var(--ws-card-hover);
-}
-.example-emoji {
-  font-size: 20px;
-  margin-bottom: 6px;
-}
-.example-title {
-  font-size: clamp(12px, 0.3vw + 11px, 13px);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 2px;
-}
-.example-desc {
-  font-size: clamp(11px, 0.2vw + 10px, 12px);
-  color: var(--ink3);
-  line-height: 1.35;
-}
-.examples-note {
-  font-size: clamp(11px, 0.2vw + 10px, 12px);
-  color: var(--ink3);
-  text-align: center;
-  font-style: italic;
-  margin-bottom: 40px;
-}
-
-/* === Tone grid === */
-.tone-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 32px 0 8px;
-}
-.tone-card {
-  flex: 0 1 calc(25% - 8px);
-  min-width: 130px;
-  padding: 16px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--rule);
-  border-top: 3px solid var(--tone-color, #7c3aed);
-  background: var(--cream2);
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.tone-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  background: var(--ws-card-hover);
-  border-color: var(--tone-color, #7c3aed);
-}
-.tone-card-icon {
-  font-size: 20px;
-  color: var(--tone-color, #7c3aed);
-  margin-bottom: 6px;
-}
-.tone-card-name {
-  font-size: clamp(12px, 0.3vw + 11px, 13px);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 2px;
-}
-.tone-card-desc {
-  font-size: clamp(10px, 0.2vw + 9px, 11px);
-  color: var(--ink3);
-  line-height: 1.35;
-}
-.tone-grid-note {
-  font-size: clamp(11px, 0.2vw + 10px, 12px);
-  color: var(--ink3);
-  text-align: center;
-  font-style: italic;
-  margin-bottom: 40px;
-}
 
 /* === Section eyebrow label (used above stats grid) === */
 .section-eyebrow {
@@ -476,45 +360,6 @@ h2 {
 }
 .section-eyebrow + .features {
   margin-top: 8px;
-}
-
-/* === Modes grid === */
-.modes-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 24px 0 8px;
-}
-.mode-card {
-  padding: 22px 18px;
-  background: var(--cream2);
-  border-radius: 12px;
-  border: 1px solid var(--rule);
-  border-top: 3px solid var(--mode-color, var(--ws-lavender));
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.mode-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  background: var(--ws-card-hover);
-  border-color: var(--mode-color, var(--ws-lavender));
-}
-.mode-icon {
-  font-size: clamp(22px, 2vw, 28px);
-  color: var(--mode-color, var(--ws-lavender));
-  margin-bottom: 10px;
-}
-.mode-title {
-  font-size: clamp(13px, 1.1vw, 14px);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-.mode-desc {
-  font-size: clamp(11px, 0.3vw + 10px, 12px);
-  color: var(--ink3);
-  line-height: 1.5;
-  margin-bottom: 10px;
 }
 
 /* === Body links === */
@@ -756,7 +601,6 @@ button:focus-visible {
 @media (max-width: 640px) {
   .main { padding: 0 16px 32px; }
   .hero-dark { padding: clamp(48px, 8vw, 80px) 16px clamp(36px, 6vw, 60px); }
-  .modes-grid { grid-template-columns: 1fr; }
   .hero-mosaic { height: 160px; max-width: 340px; }
   .mosaic-card { width: 90px; padding: 10px 8px; }
   .mc-text { font-size: 10px; }
@@ -770,14 +614,12 @@ button:focus-visible {
   .features { grid-template-columns: repeat(2, 1fr); }
   .how-steps { grid-template-columns: 1fr; gap: 12px; }
   .how-step::after, .how-step::before { display: none; }
-  .examples-grid { grid-template-columns: 1fr 1fr; }
   .tone-card { flex: 0 1 calc(50% - 6px); }
   .back-to-top { bottom: 20px; right: 20px; width: 36px; height: 36px; }
   h2 { margin-top: 40px; }
 }
 @media (max-width: 380px) {
   .features { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .examples-grid { grid-template-columns: 1fr; }
 }
 
 /* === Text selection === */

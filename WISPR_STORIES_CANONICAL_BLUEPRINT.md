@@ -440,7 +440,7 @@ When a new user feels inspired to create their own card, they should be sent to 
 **Deploy method:** Run `vercel --prod` from project root (applies `vercel.json` config, security headers, and cron schedule). Drag-and-drop to Vercel dashboard works for static files but doesn't apply `vercel.json` headers.
 
 The referral link on the card should include a tracking parameter:
-`https://wisprflow.ai?ref=wispr-stories`
+`https://wisprflow.ai/r?BEST76`
 
 This lets Wispr Flow's team see exactly how many visits and downloads originated from shared cards — direct evidence of the app's growth impact. Simple to implement, costs nothing, valuable for the interview conversation.
 
@@ -579,7 +579,7 @@ That is exactly the risk I would want to solve before treating this as a finishe
 
 The card itself carries the Wispr Flow brand, but the stronger behavior is to share the image together with a short message and a tappable Wispr Stories link. The recipient should not have to guess where the card came from. They should receive the image and a clear "make your own" link in the same share.
 
-The in-app CTA to Wispr Flow should use `https://wisprflow.ai?ref=wispr-stories` so visits from the prototype can be attributed.
+The in-app CTA to Wispr Flow should use `https://wisprflow.ai/r?BEST76` so visits from the prototype can be attributed.
 
 ---
 
@@ -703,7 +703,7 @@ After that, I would improve mobile preview navigation. On small screens the card
 **"How would you measure whether this is actually driving Wispr Flow adoption?"**
 At minimum, I would track the funnel in three layers.
 
-First: Wispr Stories usage — visits, card creation rate, share/download clicks, recording attempts, and completion rate. Second: referral behavior — clicks on `wisprflow.ai?ref=wispr-stories` from the in-app CTA. Third: Wispr Flow conversion — installs, signups, or activation from that referral source, if Wispr Flow can share that data.
+First: Wispr Stories usage — visits, card creation rate, share/download clicks, recording attempts, and completion rate. Second: referral behavior — clicks on `wisprflow.ai/r?BEST76` from the in-app CTA. Third: Wispr Flow conversion — installs, signups, or activation from that referral source, if Wispr Flow can share that data.
 
 The prototype can prove engagement and CTA intent on its own. Proving actual Wispr Flow adoption requires referral conversion data from Wispr Flow.
 

@@ -178,8 +178,14 @@ export default async function handler(req) {
 
   const redis = getRedis();
 
-  // ── Support Created ──────────────────────────────────────────────────────────
-  const isSupportCreated = ['coffee_purchase', 'support_created', 'Support created'].includes(eventType);
+  // ── One-time coffee purchase — no Pro key, intentional no-op ────────────────
+  if (eventType === 'coffee_purchase') {
+    console.log('[BMAC] One-time coffee purchase — no Pro key issued (membership required)');
+    return new Response('OK', { status: 200 });
+  }
+
+  // ── Support Created (membership only) ────────────────────────────────────────
+  const isSupportCreated = ['support_created', 'Support created'].includes(eventType);
 
   if (isSupportCreated) {
     // Idempotency: SET NX on a fingerprint of this event (atomic — handles race conditions)

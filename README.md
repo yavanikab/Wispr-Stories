@@ -38,7 +38,7 @@ Wispr Stories is a browser-based tool that turns voice into a shareable card. An
 
 **The core insight:** Wispr Flow is powerful but invisible. People dictate emails, recipes, and memories every day — but none of it is shareable. Wispr Stories is the social layer that was missing.
 
-Wispr Stories is an independent fan project — not affiliated, not sponsored. [Wispr Flow](https://wisprflow.ai?ref=wispr-stories) is credited in the page footer and shared-link previews; the cards themselves carry only the user's words and a small Wispr Stories mark.
+Wispr Stories is an independent fan project — not affiliated, not sponsored. [Wispr Flow](https://wisprflow.ai/r?BEST76) is credited in the page footer and shared-link previews; the cards themselves carry only the user's words and a small Wispr Stories mark.
 
 ## The Grandparent Test
 

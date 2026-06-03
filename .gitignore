@@ -26,3 +26,5 @@ mockup-og-option-c.html
 .env
 .env*.local
 .vercel
+
+.vercel

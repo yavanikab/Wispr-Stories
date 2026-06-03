@@ -153,7 +153,7 @@
         <i class="fa-solid fa-chart-simple"></i> Lang Stats
       </a>
       <div class="fmenu-divider"></div>
-      <a href="https://buymeacoffee.com/yg_labs" class="fmenu-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.support">
+      <a href="https://buymeacoffee.com/yg_labs/membership" class="fmenu-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.support">
         <i class="fa-solid fa-hand-holding-heart"></i> Support Here
       </a>
       <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank" data-i18n="footer.articles">
