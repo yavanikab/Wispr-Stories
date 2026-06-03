@@ -1,4 +1,4 @@
-console.log("%c[Build] Wispr Stories v0.10.4.5 (2026-06-03)", "color:#ec4899;font-weight:bold;font-size:14px");
+console.log("%c[Build] Wispr Stories v0.10.4.6 (2026-06-03)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",
@@ -591,7 +591,7 @@ async function handleUpgradeKey() {
       msg.className = "upgrade-modal-msg ok";
       setTimeout(() => {
         closeUpgradeModal();
-        showToast("Welcome to Pro!");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.welcomePro")) || "Welcome to Pro 💛");
       }, 1500);
     } else {
       msg.textContent = "Invalid key. Try again or buy a coffee.";
@@ -813,8 +813,8 @@ function showRewritePreview(originalText, rewrittenText, tone) {
     if (!result.ok) {
       const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
       const msg = result.status === 429
-        ? "Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone"
-        : "Rewrite failed. Showing original";
+        ? ((typeof getI18nSync === "function" && getI18nSync("toasts.dailyRewritesUsed").replace("{tone}", toneLabel.toLowerCase())) || "Out of " + toneLabel.toLowerCase() + " today")
+        : ((typeof getI18nSync === "function" && getI18nSync("toasts.rewriteFailed")) || "Rewrite failed");
       showToast(msg);
       document.getElementById("sta").value = originalText;
       window._originalText = null;
@@ -837,7 +837,6 @@ function showRewritePreview(originalText, rewrittenText, tone) {
     applyTone(tone);
     updateCard();
     saveDraft();
-    showToast("Rewrite applied!");
   });
   document.getElementById("rewriteCancel").addEventListener("click", () => {
     document.getElementById("sta").value = originalText;
@@ -1054,7 +1053,7 @@ async function refreshMicList() {
     if (!sel || !row) return;
     var devices = await navigator.mediaDevices.enumerateDevices();
     var mics = devices.filter(function (d) { return d.kind === "audioinput"; });
-    console.log("[Mic] Available inputs: " + mics.map(function (m) { return m.label || "(unlabeled)"; }).join(" | "));
+    console.debug("[Mic] Available inputs: " + mics.map(function (m) { return m.label || "(unlabeled)"; }).join(" | "));
     // Labels are empty until permission is granted — without them the picker is useless.
     var labeled = mics.filter(function (m) { return m.label; });
     if (labeled.length === 0) { row.style.display = "none"; return; }
@@ -1088,7 +1087,6 @@ async function refreshMicList() {
       } else {
         localStorage.removeItem("wsMicDevice");
       }
-      showToast("Microphone set. Tap record to use it");
     });
   }
   if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
@@ -1110,7 +1108,7 @@ async function startDeepgramRecording(stream) {
     if (audioTrack) {
       var settings = {};
       try { settings = audioTrack.getSettings(); } catch(e) {}
-      console.log("[Mic] Device label=" + audioTrack.label + " enabled=" + audioTrack.enabled + " settings=" + JSON.stringify(settings));
+      console.debug("[Mic] Device label=" + audioTrack.label + " enabled=" + audioTrack.enabled + " settings=" + JSON.stringify(settings));
     } else {
       console.error("[Mic] No audio tracks in stream!");
     }
@@ -1130,22 +1128,22 @@ async function startDeepgramRecording(stream) {
     mediaRec.onerror = (e) => {
       console.error("[Rec] MediaRecorder error:", e.error && e.error.message ? e.error.message : e);
       isRec = false;
-      if (recDurationTimer) { clearInterval(recDurationTimer); recDurationTimer = null; }
+      if (recDurationTimer) { clearTimeout(recDurationTimer); recDurationTimer = null; }
       stream.getTracks().forEach((t) => t.stop());
-      showToast("Recording stopped. Check your mic connection");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.recordingStopped")) || "Recording stopped");
       finishRec();
     };
 
     _startRecTimer(recMaxDuration, function() {
       isRec = false;
-      showToast("Max recording time reached (" + recMaxDuration + "s)");
-      console.log("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || "Max " + recMaxDuration + "s");
+      console.debug("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
       if (mediaRec && mediaRec.state !== "inactive") {
         stopDeepgramRecording().then(function(result) {
           fullTx = result.text ? result.text.trim().slice(0, 150) : "";
           var preview = (result.text || "").slice(0, 30) + ((result.text || "").length > 30 ? "..." : "");
-          console.log("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
-          if (!fullTx) showToast("We didn\u2019t catch that \u2014 check your mic and try again");
+          console.debug("[Rec] STT result: text='" + preview + "', duration=" + result.duration + ", fullTx='" + fullTx + "'");
+          if (!fullTx) showToast((typeof getI18nSync === "function" && getI18nSync("toasts.silence")) || "Didn't catch that");
           if (audioBlob) {
             _computeWaveform(audioBlob).then(function(h) {
               _cardWaveform = h;
@@ -1173,7 +1171,7 @@ function stopDeepgramRecording() {
   return new Promise((resolve) => {
     if (!mediaRec || mediaRec.state === "inactive") {
       if (recDurationTimer) {
-        clearInterval(recDurationTimer);
+        clearTimeout(recDurationTimer);
         recDurationTimer = null;
       }
       const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
@@ -1184,13 +1182,13 @@ function stopDeepgramRecording() {
       mediaRec.onstop = async () => {
         mediaRec.stream.getTracks().forEach((t) => t.stop());
         if (recDurationTimer) {
-          clearInterval(recDurationTimer);
+          clearTimeout(recDurationTimer);
           recDurationTimer = null;
         }
         const duration = deepgramStartTime ? Math.floor((Date.now() - deepgramStartTime) / 1000) : 0;
         deepgramStartTime = null;
         const blob = new Blob(audioChunks, { type: mediaRec.mimeType });
-        console.log("[Rec] Onstop: chunks=" + audioChunks.length + ", blobSize=" + blob.size + ", duration=" + duration);
+        console.debug("[Rec] Onstop: chunks=" + audioChunks.length + ", blobSize=" + blob.size + ", duration=" + duration);
         audioChunks = [];
         audioBlob = blob;
         audioDurationSec = duration;
@@ -1211,7 +1209,7 @@ function stopDeepgramRecording() {
             _lvlSum += _lvlAbs;
           }
           _lvlCtx.close();
-          console.log("[Mic] Captured audio level: peak=" + _lvlPeak.toFixed(4) + " avg=" + (_lvlSum / (_lvlCh.length || 1)).toFixed(6) + " samples=" + _lvlCh.length);
+          console.debug("[Mic] Captured audio level: peak=" + _lvlPeak.toFixed(4) + " avg=" + (_lvlSum / (_lvlCh.length || 1)).toFixed(6) + " samples=" + _lvlCh.length);
         } catch (_lvlErr) {
           console.warn("[Mic] Level check failed:", _lvlErr && _lvlErr.message);
         }
@@ -1229,7 +1227,7 @@ function stopDeepgramRecording() {
         _lastSttWav = fetchBlob;
         _lastSttLang = speechLang;
         _lastSttSessionId = localStorage.getItem("wsSessionId") || "";
-        console.log("[STT] Sending WAV: size=" + fetchBlob.size);
+        console.debug("[STT] Sending WAV: size=" + fetchBlob.size);
         var controller = new AbortController();
         var sttTimeout = setTimeout(function() { controller.abort(); }, 15000);
         try {
@@ -1244,7 +1242,7 @@ function stopDeepgramRecording() {
             signal: controller.signal,
           });
           clearTimeout(sttTimeout);
-          console.log("[STT] Response status=" + res.status);
+          console.debug("[STT] Response status=" + res.status);
           if (!res.ok) {
             const err = await res.text();
             console.error("[STT] API error:", err);
@@ -1314,7 +1312,7 @@ async function _retryLastStt() {
       liveBoxEl.classList.add("show", "retry");
       var retryMsg = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
       liveBoxEl.textContent = retryMsg;
-      showToast("Still couldn't transcribe. Tap to re-record");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
       return;
     }
     const data = await res.json();
@@ -1334,7 +1332,7 @@ async function _retryLastStt() {
       liveBoxEl.classList.add("show", "retry");
       var retryMsg2 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
       liveBoxEl.textContent = retryMsg2;
-      showToast("Still couldn't transcribe. Tap to re-record");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
     }
   } catch (e) {
     clearTimeout(sttTimeout);
@@ -1345,7 +1343,7 @@ async function _retryLastStt() {
     liveBoxEl.classList.add("show", "retry");
     var retryMsg3 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
     liveBoxEl.textContent = retryMsg3;
-    showToast("Still couldn't transcribe. Tap to re-record");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
   }
 }
 
@@ -1363,11 +1361,42 @@ function _getMicStream() {
   });
 }
 
+// Fallback to Web Speech API when Deepgram is unavailable or fails to start.
+// Attempts to use the browser's built-in speech recognition. If that also fails,
+// shows a toast and resets the UI.
+function trySpeechFallback() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceUnavailable")) || "Voice off \u2014 type instead");
+    var recBtnEl = document.getElementById("recBtn");
+    recBtnEl.disabled = false;
+    recBtnEl.classList.remove("on");
+    document.getElementById("recSt").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+    document.getElementById("recSub").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+    document.getElementById("recSub").classList.remove("live");
+    return;
+  }
+  try {
+    usingDeepgram = false;
+    startWebSpeechAPI();
+  } catch (e) {
+    console.error("[Speech] Fallback failed:", e);
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceUnavailable")) || "Voice off \u2014 type instead");
+    var recBtnEl2 = document.getElementById("recBtn");
+    recBtnEl2.disabled = false;
+    recBtnEl2.classList.remove("on");
+    document.getElementById("recSt").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+    document.getElementById("recSub").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+    document.getElementById("recSub").classList.remove("live");
+  }
+}
+
 function startRec() {
   if (location.protocol === "file:") {
-    showToast(
-      "Voice recording requires HTTPS \u2014 open via localhost or deploy to use"
-    );
     return;
   }
 
@@ -1409,11 +1438,11 @@ function startRec() {
       if (streamOrErr && streamOrErr.__micError) {
         var name = streamOrErr.__micError && streamOrErr.__micError.name;
         if (name === "NotAllowedError" || name === "SecurityError") {
-          showToast("Mic permission denied. Allow mic access and try again.");
+          showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micDenied")) || "Allow mic to record");
         } else if (name === "NotFoundError") {
-          showToast("No microphone found. Plug one in and try again.");
+          showToast((typeof getI18nSync === "function" && getI18nSync("toasts.noMicFound")) || "No mic found");
         } else {
-          showToast("Couldn't access mic. Try again.");
+          showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micUnavailable")) || "Mic unavailable");
         }
         var recBtnEl = document.getElementById("recBtn");
         recBtnEl.disabled = false;
@@ -1463,7 +1492,7 @@ function startWebSpeechAPI() {
   }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    showToast("Voice recording unavailable \u2014 try typing instead");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceUnavailable")) || "Voice off — type instead");
     finishRec();
     return;
   }
@@ -1474,11 +1503,6 @@ function startWebSpeechAPI() {
   recog.interimResults = true;
   var _wsLocales = { ca:'ca-ES', cs:'cs-CZ', de:'de-DE', el:'el-GR', es:'es-ES', fr:'fr-FR', gu:'gu-IN', hi:'hi-IN', id:'id-ID', it:'it-IT', ja:'ja-JP', jw:'jv-ID', kn:'kn-IN', ko:'ko-KR', ml:'ml-IN', my:'my-MM', ne:'ne-NP', pa:'pa-IN', pt:'pt-BR', ru:'ru-RU', si:'si-LK', sv:'sv-SE', ta:'ta-IN', te:'te-IN', th:'th-TH', tr:'tr-TR', uz:'uz-UZ', zh:'zh-CN', ar:'ar-SA', bn:'bn-BD', da:'da-DK', fa:'fa-IR', fi:'fi-FI', he:'he-IL', hu:'hu-HU', mr:'mr-IN', ms:'ms-MY', nl:'nl-NL', pl:'pl-PL', tl:'tl-PH', uk:'uk-UA', ur:'ur-PK', vi:'vi-VN' };
   recog.lang = _wsLocales[speechLang] || _wsLocales[curLang] || 'en-US';
-  if (isSafari && curLang !== "en-US") {
-    showToast(
-      "Safari may only support English (US) for voice recognition"
-    );
-  }
   recog.onstart = () => {
     isRec = true;
     _isRecPaused = false;
@@ -1496,17 +1520,15 @@ function startWebSpeechAPI() {
     document.getElementById("recSt").textContent = listeningMsg3;
     document.getElementById("recSub").classList.add("live");
     _showDoneButton(true);
-    console.log("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
+    console.debug("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
     _startRecTimer(recMaxDuration, function() {
-      showToast("Max recording time reached (" + recMaxDuration + "s)");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || "Max " + recMaxDuration + "s");
       isRec = false;
       if (recog) recog.stop();
     });
     recogTimeout = setTimeout(() => {
       console.warn("[Speech] Timeout \u2014 no results after 8s");
-      showToast(
-        "Speech service not responding \u2014 try again or type instead"
-      );
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.speechNotResponding")) || "Speech off \u2014 type instead");
       isRec = false;
       recog.stop();
     }, 8000);
@@ -1521,7 +1543,7 @@ function startWebSpeechAPI() {
     }
     if (fi) {
       fullTx += fi + " ";
-      console.log('[Speech] Final result: "' + fi.trim() + '"');
+      console.debug('[Speech] Final result: "' + fi.trim() + '"');
     }
     document.getElementById("liveBox").textContent = (fullTx + it).trim();
     if (recogTimeout) {
@@ -1531,7 +1553,7 @@ function startWebSpeechAPI() {
   };
   recog.onend = () => {
     if (usingDeepgram) return;
-    console.log("[Speech] Ended, isRec=" + isRec);
+    console.debug("[Speech] Ended, isRec=" + isRec);
     if (recogTimeout) {
       clearTimeout(recogTimeout);
       recogTimeout = null;
@@ -1541,9 +1563,7 @@ _vibrate();
       recogRestartCount++;
       if (recogRestartCount > RECOG_MAX_RESTARTS) {
         console.warn("[Speech] Max restarts reached");
-        showToast(
-          "Speech service unavailable \u2014 try again later or type instead"
-        );
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.speechUnavailable")) || "Speech off \u2014 try later");
         isRec = false;
         finishRec();
         return;
@@ -1553,7 +1573,7 @@ _vibrate();
         try {
           recog.lang = _wsLocales[speechLang] || _wsLocales[curLang] || 'en-US';
           recog.start();
-          console.log(
+          console.debug(
             "[Speech] Restarted (attempt " + recogRestartCount + ")"
           );
         } catch (e) {
@@ -1574,37 +1594,37 @@ _vibrate();
     }
     if (e.error === "aborted") return;
     if (e.error === "not-allowed") {
-      showToast("Microphone access denied \u2014 check browser settings");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micAccessDenied")) || "Allow mic in browser");
       isRec = false;
       return;
     }
     if (e.error === "network") {
-      showToast("Speech service unavailable \u2014 try again");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.speechUnavailable")) || "Speech off — try later");
       isRec = false;
       return;
     }
     if (e.error === "no-speech")
-      showToast("No speech detected \u2014 try speaking louder");
-    else showToast("Speech error \u2014 try again");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.noSpeech")) || "Speak louder");
+    else showToast((typeof getI18nSync === "function" && getI18nSync("toasts.speechError")) || "Speech error");
     isRec = false;
   };
   recog.onnomatch = () => {
     console.warn("[Speech] No match");
     showToast(
-      "Couldn\u2019t match speech \u2014 try speaking more clearly"
+      (typeof getI18nSync === "function" && getI18nSync("toasts.noMatch")) || "Speak more clearly"
     );
   };
   try {
     recog.start();
   } catch (e) {
-    showToast("Could not start microphone");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.couldNotStartMic")) || "Mic failed");
   }
 }
 
 function finishRec() {
   console.warn("[Rec] finishRec() called, fullTx='" + (fullTx || "").slice(0, 40) + "', recStartTime=" + recStartTime + ", usingDeepgram=" + usingDeepgram);
   if (recDurationTimer) {
-    clearInterval(recDurationTimer);
+    clearTimeout(recDurationTimer);
     recDurationTimer = null;
   }
   _stopRecTimer();
@@ -1631,7 +1651,6 @@ function finishRec() {
     );
     updateCard();
     saveDraft();
-    showToast("Done \u2014 review your words then tap Create");
     fullTx = "";
   } else {
     var lb2 = document.getElementById("liveBox");
@@ -1864,7 +1883,7 @@ async function _stopAndTranscribe() {
       _showSttRetryState();
       return;
     }
-    if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
+    if (!fullTx) showToast((typeof getI18nSync === "function" && getI18nSync("toasts.silence")) || "Didn't catch that");
     const actualDuration = finishRec();
     await reportRecordingDuration(actualDuration || result.duration);
     return;
@@ -1895,11 +1914,9 @@ document.getElementById("recBtn").addEventListener("click", async () => {
 
   // Speech language guard — don't record when no valid speech language
   if (!speechLang) {
-    showToast("Select a language first");
     return;
   }
   if (speechLang === "__native__") {
-    showToast("This language isn't supported for speech yet. Type your words below.");
     return;
   }
 
@@ -1941,21 +1958,38 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     liveBoxEl.classList.remove("show", "processing");
   });
 
-  var readyTimer = setTimeout(function() {
-    if (_micStartCancelled) return;
-    if (!isRec) {
-      recBtnEl.disabled = false;
-      recBtnEl.classList.remove("on");
-      document.getElementById("recSt").textContent =
-        (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
-      document.getElementById("recSub").textContent =
-        (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
-      document.getElementById("recSub").classList.remove("live");
-      liveBoxEl.textContent = "";
-      liveBoxEl.classList.remove("show", "processing");
-      showToast("Mic taking longer than expected. Try again");
+  var readyTimer;
+
+  // Pre-flight: request mic permission and populate the mic picker before
+  // the recording flow starts. This avoids the browser permission prompt
+  // eating into the recording timer on first visit.
+  try {
+    var preflightStream = await _getMicStream();
+    if (_micStartCancelled) {
+      if (preflightStream) preflightStream.getTracks().forEach(function(t) { t.stop(); });
+      return;
     }
-  }, 2000);
+    refreshMicList();
+  } catch (micErr) {
+    recBtnEl.disabled = false;
+    recBtnEl.classList.remove("on");
+    document.getElementById("recSt").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+    document.getElementById("recSub").textContent =
+      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+    document.getElementById("recSub").classList.remove("live");
+    liveBoxEl.textContent = "";
+    liveBoxEl.classList.remove("show", "processing");
+    var errName = micErr && micErr.name;
+    if (errName === "NotAllowedError" || errName === "SecurityError") {
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micDenied")) || "Allow mic to record");
+    } else if (errName === "NotFoundError") {
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.noMicFound")) || "No mic found");
+    } else {
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micUnavailable")) || "Mic unavailable");
+    }
+    return;
+  }
 
   // Server-side limit check before starting recording (check only, don't increment)
   const sessionId = localStorage.getItem("wsSessionId");
@@ -2001,6 +2035,25 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   } catch (e) {
     console.warn("[Limits] Check failed, allowing:", e.message);
   }
+
+  // Clear the old readyTimer — it may have fired during the server check.
+  // Restart it so it guards the mic setup phase (getUserMedia + startRec).
+  clearTimeout(readyTimer);
+  readyTimer = setTimeout(function() {
+    if (_micStartCancelled) return;
+    if (!isRec) {
+      recBtnEl.disabled = false;
+      recBtnEl.classList.remove("on");
+      document.getElementById("recSt").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
+      document.getElementById("recSub").textContent =
+        (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
+      document.getElementById("recSub").classList.remove("live");
+      liveBoxEl.textContent = "";
+      liveBoxEl.classList.remove("show", "processing");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micSlow")) || "Mic slow \u2014 try again");
+    }
+  }, 2000);
 
   startRec();
   // startRec() sets isRec=true synchronously on its first synchronous
@@ -2325,7 +2378,7 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   const isPro = isSupporter();
   if (!isPro && getRewritesLeftForTone(tone) <= 0) {
     const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
-    showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.dailyRewritesUsed").replace("{tone}", toneLabel.toLowerCase())) || "Out of " + toneLabel.toLowerCase() + " today");
     applyTone("original");
     updateCard();
     saveDraft();
@@ -2380,10 +2433,10 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
           setToneUsed(errTone, err.used);
         }
         const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + errTone) : errTone;
-        showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.dailyRewritesUsed").replace("{tone}", toneLabel.toLowerCase())) || "Out of " + toneLabel.toLowerCase() + " today");
         applyTone("original");
       } else {
-        showToast("Rewrite failed. Showing original");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.rewriteFailed")) || "Rewrite failed");
         applyTone(tone);
       }
       cardText.textContent = prevText;
@@ -2416,9 +2469,9 @@ document.getElementById("toneRow").addEventListener("click", async (e) => {
   } catch (err) {
     console.error("[Rewrite] Error:", err);
     if (err.name === "AbortError") {
-      showToast("Rewrite timed out. Showing original");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.rewriteTimedOut")) || "Rewrite timed out");
     } else {
-      showToast("Rewrite failed. Showing original");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.rewriteFailed")) || "Rewrite failed");
     }
     cardText.textContent = prevText;
     cardText.classList.remove("mt");
@@ -2498,7 +2551,7 @@ document.getElementById("sta").addEventListener("input", (e) => {
     voiceAttached = false;
     var vt = document.getElementById("voiceToggle");
     if (vt) vt.checked = false;
-    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.textChanged") : "Text changed \u2014 voice detached. Re-record to attach.");
+    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.textChanged") : "Voice removed");
     updateVoiceBar();
   }
   _webmCache = null;
@@ -2548,7 +2601,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-        if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
+        if (!fullTx) showToast((typeof getI18nSync === "function" && getI18nSync("toasts.silence")) || "Didn't catch that");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
@@ -2606,7 +2659,7 @@ document.getElementById("voiceToggle").addEventListener("change", function() {
   voiceAttached = this.checked;
   updateCard();
   saveDraft();
-  showToast(voiceAttached ? (typeof getI18nSync === "function" ? getI18nSync("voice.attached") : "Voice will be attached") : (typeof getI18nSync === "function" ? getI18nSync("voice.detached") : "Voice removed from card"));
+  showToast(voiceAttached ? (typeof getI18nSync === "function" ? getI18nSync("voice.attached") : "Voice added") : (typeof getI18nSync === "function" ? getI18nSync("voice.detached") : "Voice removed"));
 });
 // Voice play button
 document.getElementById("voicePlayBtn").addEventListener("click", function() {
@@ -2629,13 +2682,12 @@ document.getElementById("voicePlayBtn").addEventListener("click", function() {
   audio.onerror = function() {
     this.classList.remove("playing");
     this.textContent = "\u25B6";
-    showToast("Playback failed");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.playbackFailed")) || "Can't play");
   }.bind(this);
   audio.play().then(function() {
     this.classList.add("playing");
     this.textContent = "\u23F8";
   }.bind(this)).catch(function() {
-    showToast("Tap again to play");
     this.classList.remove("playing");
     this.textContent = "\u25B6";
   }.bind(this));
@@ -2988,7 +3040,7 @@ document.getElementById("exGrid").addEventListener("click", (e) => {
     if (tone !== "original" && !isSupporter() && getRewritesLeftForTone(tone) === 0) {
       applyTone("original");
       const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + tone) : tone;
-      showToast("Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.dailyRewritesUsed").replace("{tone}", toneLabel.toLowerCase())) || "Out of " + toneLabel.toLowerCase() + " today");
     } else {
       applyTone(tone);
     }
@@ -3028,7 +3080,7 @@ document.getElementById("btnC").addEventListener("click", async () => {
     ta.style.borderColor = "rgba(26,26,26,.3)";
     ta.focus();
     setTimeout(() => (ta.style.borderColor = ""), 1400);
-    showToast("Speak or write your story first");
+    /* removed: speak first toast */
     return;
   }
   const check = canCreateCard();
@@ -3044,8 +3096,8 @@ document.getElementById("btnC").addEventListener("click", async () => {
     if (!result.ok) {
       const toneLabel = typeof getI18nSync === "function" ? getI18nSync("tone." + curTone) : curTone;
       const msg = result.status === 429
-        ? "Daily " + toneLabel.toLowerCase() + " rewrites used. Try another tone"
-        : "Couldn't apply rewrite. Showing original";
+        ? ((typeof getI18nSync === "function" && getI18nSync("toasts.dailyRewritesUsed").replace("{tone}", toneLabel.toLowerCase())) || "Out of " + toneLabel.toLowerCase() + " today")
+        : ((typeof getI18nSync === "function" && getI18nSync("toasts.rewriteFailed")) || "Rewrite failed");
       showToast(msg);
       if (window._originalText) {
         document.getElementById("sta").value = window._originalText;
@@ -3114,7 +3166,7 @@ async function _downloadPngOnly() {
   a.href = URL.createObjectURL(pngBlob);
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast("Downloaded!");
+  showToast((typeof getI18nSync === "function" && getI18nSync("toasts.downloaded")) || "Saved ✓");
 }
 // Download helpers -- WebM only (no PNG)
 async function _downloadWebmWithAudio() {
@@ -3125,7 +3177,7 @@ async function _downloadWebmWithAudio() {
     _setExportStage("Rendering card…");
     var webmBlob = await generateWebm();
     if (!webmBlob || !webmBlob.size) {
-      showToast("Voice didn't capture. Try again");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceEmpty")) || "Voice empty");
       return;
     }
     var v = document.createElement("a");
@@ -3133,13 +3185,13 @@ async function _downloadWebmWithAudio() {
     v.href = URL.createObjectURL(webmBlob);
     v.click();
     URL.revokeObjectURL(v.href);
-    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
+    showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "Voice saved ✓");
   } catch (webmErr) {
     console.error("[WebM]", webmErr);
     if (webmErr && /0 bytes/.test(webmErr.message || "")) {
-      showToast("Voice didn't capture. Try again");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceEmpty")) || "Voice empty");
     } else {
-      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "WebM export failed");
+      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmFailed") : "Voice export failed");
     }
   } finally {
     hideExportProgress();
@@ -3277,7 +3329,7 @@ document.getElementById("btnS").addEventListener("click", async () => {
   } catch (e) {
     btn.innerHTML = '<i class="fas fa-share-nodes"></i> Share card';
     btn.disabled = false;
-    showToast("Export failed \u2014 try again");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.exportFailed")) || "Export failed");
   }
 });
 document.getElementById("shareClose").addEventListener("click", function () { _deactivateModal(); document.getElementById("shareModal").classList.remove("open"); document.body.classList.remove("modal-open"); });
@@ -3325,9 +3377,9 @@ document.getElementById("shareNative").addEventListener("click", async function 
     } else {
       navigator.share({ text: shareCaption }).catch(function () {});
     }
-    showToast("Shared — image with your link attached");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.shared")) || "Shared ✓");
   } catch (e) {
-    showToast("Upload failed. Try again");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.uploadFailed")) || "Upload failed");
   }
   btn.innerHTML = origHTML;
   btn.disabled = false;
@@ -3338,12 +3390,12 @@ document.getElementById("shareDownload").addEventListener("click", async functio
   a.download = "wispr-story.png";
   a.href = URL.createObjectURL(_shareBlob);
   a.click();
-  showToast("Downloaded!");
+  showToast((typeof getI18nSync === "function" && getI18nSync("toasts.downloaded")) || "Saved ✓");
   if (voiceAttached && audioBlob && webmCodecString) {
     try {
       var webmBlob = await generateWebm();
       if (!webmBlob || !webmBlob.size) {
-        showToast("Voice didn't capture. Try again");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceEmpty")) || "Voice empty");
         return;
       }
       var v = document.createElement("a");
@@ -3351,11 +3403,11 @@ document.getElementById("shareDownload").addEventListener("click", async functio
       v.href = URL.createObjectURL(webmBlob);
       v.click();
       URL.revokeObjectURL(v.href);
-      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "WebM with voice downloaded");
+      showToast(typeof getI18nSync === "function" ? getI18nSync("voice.webmDone") : "Voice saved ✓");
     } catch (e) {
       console.error("[WebM] Share download failed:", e);
       if (e && /0 bytes/.test(e.message || "")) {
-        showToast("Voice didn't capture. Try again");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.voiceEmpty")) || "Voice empty");
       }
     }
   }
@@ -3377,9 +3429,9 @@ document.getElementById("shareCopyLink").addEventListener("click", async functio
       }
     }
     var url = "https://wisprstories.vercel.app/c/" + _shortId;
-    navigator.clipboard.writeText(url).then(function () { showToast("Link copied!"); }).catch(function () { showToast("Could not copy link"); });
+    navigator.clipboard.writeText(url).then(function () { showToast((typeof getI18nSync === "function" && getI18nSync("toasts.linkCopied")) || "Copied ✓"); }).catch(function () { showToast((typeof getI18nSync === "function" && getI18nSync("toasts.copyFailed")) || "Copy failed"); });
   } catch (e) {
-    showToast("Upload failed. Try again");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.uploadFailed")) || "Upload failed");
   }
   btn.innerHTML = origHTML;
   btn.disabled = false;
@@ -3402,9 +3454,9 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
       a.download = "wispr-story.png";
       a.href = URL.createObjectURL(_shareBlob);
       a.click();
-      showToast("Image saved. Open Photos to paste");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.imageSaved")) || "Saved to Photos");
     } catch (e) {
-      showToast("Download failed. Try Share instead");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.downloadFailed")) || "Save failed");
     }
     btn.innerHTML = origHTML;
     btn.disabled = false;
@@ -3415,7 +3467,7 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
     // Copy image to clipboard using Clipboard API
     var item = new ClipboardItem({ "image/png": _shareBlob });
     await navigator.clipboard.write([item]);
-    showToast("Image copied!");
+    showToast((typeof getI18nSync === "function" && getI18nSync("toasts.imageCopied")) || "Copied ✓");
   } catch (e) {
     // Android fallback: download to device
     if (isAndroid) {
@@ -3424,12 +3476,12 @@ document.getElementById("shareCopyImage").addEventListener("click", async functi
         a.download = "wispr-story.png";
         a.href = URL.createObjectURL(_shareBlob);
         a.click();
-        showToast("Image saved to downloads");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.imageSavedDownloads")) || "Saved ✓");
       } catch (e2) {
-        showToast("Download failed. Try Share instead");
+        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.downloadFailed")) || "Save failed");
       }
     } else {
-      showToast("Copy not supported. Try Download instead");
+      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.copyNotSupported")) || "Copy unavailable");
     }
   }
   btn.innerHTML = origHTML;
@@ -3797,7 +3849,7 @@ document.addEventListener("keydown", (e) => {
     if (usingDeepgram) {
       stopDeepgramRecording().then((result) => {
         fullTx = result.text ? result.text.trim().slice(0, 150) : "";
-        if (!fullTx) showToast("We didn't catch that. Check your mic and try again");
+        if (!fullTx) showToast((typeof getI18nSync === "function" && getI18nSync("toasts.silence")) || "Didn't catch that");
         const actualDuration = finishRec();
         reportRecordingDuration(actualDuration || result.duration);
       });
@@ -3924,13 +3976,17 @@ async function _loadFfmpeg() {
   if (!SR) {
     diag.push("[Diagnostic] Web Speech API not supported — Deepgram only");
   }
-  console.log(diag.join("\n"));
+  console.debug(diag.join("\n"));
 })();
 
 // Re-localize the Style accordion's chip summary after i18n is ready, so
 // the initial "Original · Violet · Rounded" chips show in the user's
 // language on first paint. Reversible: remove this listener.
 document.addEventListener('languagesReady', function () {
+  if (typeof updateStyleChipSummary === 'function') updateStyleChipSummary();
+});
+// Also re-localize when the UI language changes at runtime.
+window.addEventListener('i18nApplied', function () {
   if (typeof updateStyleChipSummary === 'function') updateStyleChipSummary();
 });
 

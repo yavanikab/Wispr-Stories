@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.10.4.6] — Toast Shortening + Recording Fixes (2026-06-03)
+
+Toast shortening, recording flow bug fixes, and i18n cleanup. Biggest change is the toast pass: 23 toasts kept and shortened, 17 removed.
+
+### Changed
+- **Toast shortening** — 23 unique toasts kept and shortened to ≤4-6 words with warm emoji where appropriate. 17 toasts removed: 5 with visual replacements (highlight picker, highlight textarea, button text, rewrite preview, Beautiful! flash), 5 dev-only, 3 already shown as fallback, 4 others.
+- **Footer menu reorder** — About + Lang Stats links moved first; divider added between navigation and support sections. All footer links i18n'd with `data-i18n` attributes.
+- **13 console.log → console.debug** — Only the build banner uses `console.log`; all other logging uses `console.debug`.
+- **2 hardcoded English toasts → i18n** — Replaced inline strings with i18n key lookups.
+
+### Fixed
+- **Pre-flight mic setup** — `_getMicStream()` called before the 2s readiness timer and server check, so mic permission is resolved before recording starts.
+- **readyTimer race fix** — Old timer cleared after server check passes; new 2s timer restarted before `startRec()`.
+- **`trySpeechFallback()` defined** — Was called but never defined, causing ReferenceError on that code path.
+- **`clearInterval` → `clearTimeout` bugs** — `finishRec()` and `mediaRec.onerror` both changed from `clearInterval(recDurationTimer)` to `clearTimeout(recDurationTimer)`.
+- **Style section i18n** — `i18nApplied` event listener added to call `updateStyleChipSummary()` on language change, so the style chip summary re-localizes.
+- **Duplicate JSON keys fixed** — Tone/color/shape/footer sections had duplicate keys in all 11 locale files.
+
+### Files touched
+`wisprstories.js`, `assets/i18n/en.json`, `assets/i18n/{es,hi,it,ja,kn,ko,ta,te,th,zh}.json`, `global/footer-menu.js`, `global/styles/layout.css`.
+
+## [Unreleased] — 2026-06-03
+
+### Changed
+- **Locale toast/voice sync** — Updated `toasts` and `voice` sections in all 10 non-English locale files (es, hi, it, ja, kn, ko, ta, te, th, zh) to match the English version. Ensures consistent toast messages and voice-related strings across all languages.
+
 ## [v0.10.4.5] — Friction Reduction Pass (2026-06-03)
 
 Friction-reduction pass: hides technical jargon (counter), warms the card-creation moment, moves toasts to top-center (eye line with the mic), and adds self-healing for the recording counter. Zero new UI for grandparents — every change fades in only when needed.

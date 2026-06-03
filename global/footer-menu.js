@@ -146,26 +146,26 @@
     >[ <i class="fa-solid fa-question"></i> ]</a>
 
     <div class="fmenu-panel hidden" id="fmenu-panel">
-      <a href="https://buymeacoffee.com/yg_labs" class="fmenu-link" target="_blank" rel="noopener noreferrer">
-        <i class="fa-solid fa-hand-holding-heart"></i> Support Here
-      </a>
-      <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank">
-        <i class="fa-brands fa-medium"></i> Read Articles
-      </a>
-     
-      <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link">
-        <i class="fa-solid fa-pen-clip"></i> Submit Issues
-      </a>
-      <a href="#" class="fmenu-link" id="fmenu-help">
-        <i class="fa-solid fa-circle-question"></i> How to Use
-      </a>
-      <a href="/about" class="fmenu-link">
+      <a href="/about" class="fmenu-link" data-i18n="footer.about">
         <i class="fa-solid fa-book-open"></i> About
       </a>
-      <a href="/language-stats" class="fmenu-link">
+      <a href="/language-stats" class="fmenu-link" data-i18n="footer.langStats">
         <i class="fa-solid fa-chart-simple"></i> Lang Stats
       </a>
-      <a href="#" class="fmenu-link">
+      <div class="fmenu-divider"></div>
+      <a href="https://buymeacoffee.com/yg_labs" class="fmenu-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.support">
+        <i class="fa-solid fa-hand-holding-heart"></i> Support Here
+      </a>
+      <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank" data-i18n="footer.articles">
+        <i class="fa-brands fa-medium"></i> Read Articles
+      </a>
+      <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link" data-i18n="footer.issues">
+        <i class="fa-solid fa-pen-clip"></i> Submit Issues
+      </a>
+      <a href="#" class="fmenu-link" id="fmenu-help" data-i18n="footer.help">
+        <i class="fa-solid fa-circle-question"></i> How to Use
+      </a>
+      <a href="#" class="fmenu-link" data-i18n="footer.license">
         <i class="fa-solid fa-file-shield"></i> License & Terms
       </a>
       <div class="fmenu-version" id="fmenu-version">

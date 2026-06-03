@@ -1,5 +1,9 @@
 # Version History
 
+## v0.10.4.6 — Toast Shortening + Recording Fixes (2026-06-03)
+
+Toast shortening and recording flow bug fixes. 23 toasts kept and shortened (≤4-6 words), 17 removed. Pre-flight mic setup, readyTimer race fix, trySpeechFallback() defined, clearInterval→clearTimeout fixes. Style section i18n on language change, footer menu i18n + reorder, duplicate JSON keys fixed in all 11 locales.
+
 ## v0.10.4.5 — Friction Reduction Pass (2026-06-03)
 
 This pass hides technical jargon from the user, fixes the counter so it self-heals against the server, and warms the card-creation moment. Goal: zero new UI for grandparents; everything fades in only when needed.
@@ -89,6 +93,7 @@ Stage 1 implements the 7 bug fixes + 4 deep sub-fixes (2.1 Promise.all + Cancel 
 
 ### Changed
 - **Creation Celebration**: "✨ Created!" flash on Create button (1.2s) + enhanced card pop animation (amber glow, 0.28s transition)
+- **Locale toast/voice sync**: Updated `toasts` and `voice` sections in all 10 non-English locale files (es, hi, it, ja, kn, ko, ta, te, th, zh) to match the English version.
 
 ## v0.10.4.1 — Tone Counter & WhatsApp Share Fixes (2026-06-02)
 

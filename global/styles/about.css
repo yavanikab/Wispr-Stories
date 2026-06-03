@@ -380,7 +380,7 @@ h2 {
 /* === Use-case examples === */
 .examples-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin: 32px 0 8px;
 }
@@ -444,20 +444,6 @@ h2 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   background: var(--ws-card-hover);
   border-color: var(--tone-color, #7c3aed);
-}
-.tone-card-preview {
-  width: 100%;
-  height: 48px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.12;
-  transition: opacity 0.25s ease;
-}
-.tone-card:hover .tone-card-preview {
-  opacity: 0.25;
 }
 .tone-card-icon {
   font-size: 20px;

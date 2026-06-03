@@ -143,6 +143,12 @@
   padding: 7px 14px;
   font-size: 0.8rem;
 }
+.footer .fmenu-divider {
+  height: 1px;
+  background: currentColor;
+  opacity: 0.15;
+  margin: 4px 14px;
+}
 
 /* Show on mobile (the script hides itself at <=768px). On mobile the menu
    uses full opacity. */
