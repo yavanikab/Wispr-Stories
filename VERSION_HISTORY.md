@@ -1,5 +1,57 @@
 # Version History
 
+## v0.11.0.0 — Acknowledged Logs + Internal Source-of-Truth (2026-06-04)
+
+Major release: the "Acknowledged Logs" transparency system for the Wispr Flow team. A Notion page lists 5 known issues and 7 product-decision limitations in plain language. Reachable via direct URL or via a 4-key chord (Alt+Shift+W+S) on every public page.
+
+### Added
+- **`internal-logs/ilogs-ws.md`** — source of truth for the public Notion page. 5 known issues + 7 product-decision limitations, in Q&A format. Apple-platform disclaimer leads the page. Marked with `<!-- MIRROR TO NOTION -->` / `<!-- INTERNAL ONLY -->` HTML comments.
+- **`internal-logs/secret-shortcut.js`** — IIFE keyboard handler. 4-key chord Alt+Shift+W+S (Windows: Alt+Shift; Mac: Option+Shift). Capture-phase event listeners. Opens the Notion URL in a new tab with `noopener,noreferrer`; falls back to `location.href`. Clears state on `window.blur` and after firing. Notion URL is a single editable constant at the top of the file.
+- **Script tag in 3 pages** — `wisprstories.html`, `about.html`, `language-stats.html`. Loads deferred.
+
+### Removed
+- **Dead `ffNotice` i18n key** from all 11 locale files. The only caller, `showNotice("firefox")`, was already a no-op.
+
+### Changed
+- **Build banner** (`wisprstories.js:1`) — v0.10.4.7 → v0.11.0.0.
+- **`.gitignore`** — `internal-logs/` is git-ignored; `internal-logs/secret-shortcut.js` is un-ignored so the handler ships.
+- **Public content policy** — Apple-disclaimer callout leads the public Notion page.
+
+### Files touched
+`wisprstories.js`, `wisprstories.html`, `about.html`, `language-stats.html`, `internal-logs/ilogs-ws.md` (new), `internal-logs/secret-shortcut.js` (new), `assets/i18n/{en,es,hi,it,ja,kn,ko,ta,te,th,zh}.json` (`ffNotice` removed), `.gitignore`.
+
+### Post-publish checklist
+1. Create the Notion page from the `MIRROR TO NOTION` block in `internal-logs/ilogs-ws.md`.
+2. Replace the `ACKNOWLEDGED_LOGS_URL` placeholder in `internal-logs/secret-shortcut.js` with the real Notion URL.
+3. Redeploy.
+
+## v0.10.4.7 — liveBox Removal + Counter Safety Net + 3 Bug Fixes (2026-06-04)
+
+liveBox UI element completely removed. Counter safety net added. Three verified bug fixes shipped.
+
+### Removed
+- **liveBox UI element** — `<div class="live-box" id="liveBox">` deleted from `wisprstories.html`. ~110 lines of `.live-box` CSS deleted from `global/styles/inputs.css`. 64 JS references to `liveBox` removed.
+- **Cancel button** — The "Cancel" button in the liveBox is gone. The 2s readyTimer handles cleanup if mic setup is slow.
+- **Live transcription text** — Intermediate Web Speech results no longer shown in a pill. Text appears in the textarea only after the recording finishes.
+- **`--live-glow` CSS variables** — Removed from `global/styles/base.css` (both light and dark themes).
+- **Dead `_micStartCancelled` code** — Variable, 5 checks, and the reset line deleted.
+
+### Added
+- **Counter safety net** (`wisprstories.js:reportRecordingDuration`) — Re-fetch `/api/limits` after every `reportRecordingDuration` call to auto-correct any client-server drift. 4× `console.debug` instrumentation preserved for future diagnosis.
+- **`.rec-st.retry` CSS** — Cursor pointer + dotted underline for the retry click target on the `recSt` label.
+- **`record.ended` i18n key** — Added to all 11 locales. English fallback for non-English locales.
+
+### Fixed
+- **Deepgram `recSt` text stuck on "Starting..."** — Deepgram success path now updates `recSt` to the "Listening and processing your words" message and adds `.live` class to `recSub`. Previously only the Web Speech path did this.
+- **Pre-flight mic stream leak** — After `refreshMicList()` is called with the pre-flight stream, the stream's tracks are now stopped. Previously the stream leaked.
+- **Timer font too small for older users** — `.rec-st` (status text) font 15px→17px. `.rec-sub` (the actual timer countdown "15s", "14s") 13px→17px. `.rec-counter` 15px→17px. Mobile media query (480px) bumped `.rec-counter` to 18px with larger padding, and added `.rec-sub: 18px` so the timer stays readable on phones.
+
+### Changed
+- **Retry click target moved to `recSt` label** — Dotted underline + pointer cursor. Live transcription replaced by full recSt text.
+- **Pause/resume state UI** — Simplified: just the recSt "Paused" / "Listening" text. No more liveBox hint.
+- **Cache buster** (`global/styles/main.css`) — Bumped `base.css` and `inputs.css` to `?v=20260604-no-livebox`.
+- **Build banner** (`wisprstories.js:1`) — v0.10.4.6 → v0.10.4.7.
+
 ## v0.10.4.6 — Toast Shortening + Recording Fixes (2026-06-03)
 
 Toast shortening and recording flow bug fixes. 23 toasts kept and shortened (≤4-6 words), 17 removed. Pre-flight mic setup, readyTimer race fix, trySpeechFallback() defined, clearInterval→clearTimeout fixes. Style section i18n on language change, footer menu i18n + reorder, duplicate JSON keys fixed in all 11 locales.

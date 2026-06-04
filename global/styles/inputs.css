@@ -56,12 +56,18 @@
   }
 }
 .rec-st {
-  font-size: clamp(14px, 0.3vw + 13px, 15px);
+  font-size: clamp(15px, 0.4vw + 14px, 17px);
   font-weight: 500;
   color: var(--ink);
 }
+.rec-st.retry {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
 .rec-sub {
-  font-size: clamp(12px, 0.3vw + 11px, 13px);
+  font-size: clamp(15px, 0.4vw + 14px, 17px);
   color: var(--ink3);
   margin-top: 2px;
 }
@@ -71,11 +77,11 @@
 }
 .rec-counter {
   display: none;
-  font-size: clamp(13px, 0.5vw + 11px, 15px);
+  font-size: clamp(14px, 0.5vw + 12px, 17px);
   color: #d97706;
   background: rgba(217, 119, 6, 0.08);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   margin-top: 12px;
   font-weight: 600;
   text-align: center;
@@ -92,8 +98,11 @@
 @media (max-width: 480px) {
   .rec-counter.warn,
   .rec-counter.exhausted {
-    font-size: 15px;
-    padding: 10px 14px;
+    font-size: 18px;
+    padding: 12px 16px;
+  }
+  .rec-sub {
+    font-size: 18px;
   }
 }
 .mic-select-row {
@@ -168,112 +177,6 @@
 }
 .font-size-row.disabled .font-size-val {
   opacity: 0.4;
-}
-.live-box {
-  margin-top: 10px;
-  background: var(--cream2);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  padding: 11px 13px;
-  font-size: clamp(14px, 0.3vw + 13px, 15px);
-  color: var(--ink2);
-  line-height: 1.65;
-  min-height: 40px;
-  display: none;
-  white-space: pre-wrap;
-  word-break: break-word;
-  transition: all 0.3s ease;
-}
-/* Live transcription box, active state — calm brand-color breathing glow
-   instead of a red alarm. Red is reserved for the mic button (which has
-   its own pulse). Works in both light and dark modes via --live-glow
-   variables defined in base.css. */
-.live-box.show {
-  display: block;
-  background: var(--cream3);
-  border-color: var(--ink3);
-  border-width: 1.5px;
-  box-shadow: 0 0 0 3px var(--live-glow);
-  animation: live-box-breathe 2.4s ease-in-out infinite;
-}
-.live-box.processing {
-  animation: none;
-  background: var(--cream2);
-  border-color: var(--ink3);
-  border-style: dashed;
-}
-.live-box.processing::before {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--ink3);
-  border-top-color: transparent;
-  border-radius: 50%;
-  vertical-align: -2px;
-  margin-right: 8px;
-  animation: live-box-spin 0.8s linear infinite;
-}
-@keyframes live-box-spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes live-box-breathe {
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px var(--live-glow);
-  }
-  50% {
-    box-shadow: 0 0 0 6px var(--live-glow-strong);
-  }
-}
-.live-box-cancel {
-  margin-left: 10px;
-  background: none;
-  border: 1px solid var(--ink3);
-  border-radius: 6px;
-  padding: 2px 10px;
-  font: inherit;
-  font-size: clamp(12px, 0.3vw + 11px, 13px);
-  font-weight: 600;
-  color: var(--ink2);
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-.live-box-cancel:hover {
-  background: var(--cream2);
-  border-color: var(--ink2);
-  color: var(--ink);
-}
-.live-box-cancel:focus-visible {
-  outline: 2px solid var(--ink3);
-  outline-offset: 2px;
-}
-.live-box.retry {
-  cursor: pointer;
-  background: var(--cream3);
-  border-color: var(--ink3);
-  border-style: dashed;
-  animation: none;
-}
-.live-box.retry:hover {
-  background: var(--cream2);
-}
-.live-box.retry::before {
-  content: "\21BB";
-  display: inline-block;
-  margin-right: 8px;
-  font-size: 1.1em;
-  vertical-align: -1px;
-}
-.live-box.paused {
-  border-style: dashed;
-  background: var(--cream3);
-  animation: none;
-}
-.live-box.paused .paused-hint {
-  color: var(--ink3);
-  font-weight: 600;
-  font-style: italic;
 }
 .rec-btn.paused {
   background: var(--cream2);
@@ -890,9 +793,6 @@ details.customize:not([open]) > *:not(summary.customize-summary) {
 }
 .input-hero .rec-row {
   margin-top: 8px;
-}
-.input-hero .live-box {
-  margin-top: 12px;
 }
 .input-hero .lbl {
   margin-bottom: 15px;

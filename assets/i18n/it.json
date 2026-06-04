@@ -10,7 +10,6 @@
     "quote": "\"Aggrappati ai ricordi; loro si aggrapperanno a te.\""
   },
   "sharedCta": "✨ <strong>Hai ricevuto una Wispr Story!</strong> Tocca <em>Crea la mia card</em> per fare la tua.",
-  "ffNotice": "🌐 La registrazione vocale non è supportata su Firefox. Usa Chrome o Safari, o incolla il tuo testo qui sotto.",
   "record": {
     "label": "La tua voce",
     "status": "Tocca per parlare",
@@ -22,6 +21,7 @@
     "listening": "Sto ascoltando e trascrivendo le tue parole",
     "paused": "In pausa — tocca il mic per riprendere",
     "pausedHint": "Tocca Fatto per trascrivere",
+    "ended": "Recording ended",
     "done": "Fatto",
     "softHint": "Ancora qualcuna oggi 💛",
     "softHintDone": "Domani ancora 💛"

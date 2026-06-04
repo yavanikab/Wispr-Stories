@@ -10,7 +10,6 @@
     "quote": "\"思い出を大切にしよう；思い出もあなたを大切にしてくれる。\""
   },
   "sharedCta": "✨ <strong>Wispr Storyを受け取りました！</strong> <em>カードを作成</em>をタップして自分のカードも作りましょう。",
-  "ffNotice": "🌐 Firefoxでは音声録音がサポートされていません。ChromeまたはSafariを使用してください, または下にテキストを貼り付けてください。",
   "record": {
     "label": "あなたの声",
     "status": "タップして話す",
@@ -22,6 +21,7 @@
     "listening": "話してください、テキストに変換します",
     "paused": "一時停止 — 再開はマイクをタップ",
     "pausedHint": "テキスト化は完了をタップ",
+    "ended": "Recording ended",
     "done": "完了",
     "softHint": "今日あと少し 💛",
     "softHintDone": "明日また 💛"

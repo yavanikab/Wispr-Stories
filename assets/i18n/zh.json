@@ -10,7 +10,6 @@
     "quote": "\"抓住记忆，它们也会抓住你。\""
   },
   "sharedCta": "✨ <strong>你收到了一张 Wispr Story！</strong> 点击<em>创建我的卡片</em>来制作你自己的。",
-  "ffNotice": "🌐 Firefox 不支持语音录制。请使用 Chrome 或 Safari, 或在下方粘贴你的文字。",
   "record": {
     "label": "你的声音",
     "status": "点击说话",
@@ -22,6 +21,7 @@
     "listening": "正在听你说话并转为文字",
     "paused": "已暂停 — 点击麦克风继续",
     "pausedHint": "点击“完成”转为文字",
+    "ended": "Recording ended",
     "done": "完成",
     "softHint": "今天还有几次 💛",
     "softHintDone": "明天再来 💛"

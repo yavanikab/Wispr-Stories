@@ -38,11 +38,6 @@
   --sc-thumb: rgba(0, 0, 0, 0.14);
   --sc-track: rgba(0, 0, 0, 0.12);
   --focus-border: rgba(26, 26, 26, 0.3);
-  /* Calm ink-based halo for the live-transcription box while recording.
-     Replaces the prior red "alarm" treatment. Two stops so the breathing
-     animation can fade between them. */
-  --live-glow: rgba(26, 26, 26, 0.06);
-  --live-glow-strong: rgba(26, 26, 26, 0.13);
   --card-panel-bg: #fff;
   /* Font stacks are defined in fonts.css */
 }
@@ -59,8 +54,6 @@
   --sc-thumb: rgba(255, 255, 235, 0.35);
   --sc-track: rgba(255, 255, 235, 0.15);
   --focus-border: rgba(255, 255, 235, 0.3);
-  --live-glow: rgba(255, 255, 235, 0.08);
-  --live-glow-strong: rgba(255, 255, 235, 0.16);
   --card-panel-bg: #fff;
 }
 
@@ -106,3 +99,16 @@ select {
 
 /* NAV */
 /* SHELL, LEFT, RIGHT, FOOTER — defined in layout.css */
+
+/* Visually hidden (screen-reader + SEO friendly) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

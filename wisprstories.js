@@ -1,4 +1,4 @@
-console.log("%c[Build] Wispr Stories v0.10.4.6 (2026-06-03)", "color:#ec4899;font-weight:bold;font-size:14px");
+console.log("%c[Build] Wispr Stories v0.11.0.0 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",
@@ -132,10 +132,12 @@ _isRecPaused = false,
   recGraceTimer = null;
 let _sttHealthCache = null;
 const STT_HEALTH_TTL_MS = 10 * 60 * 1000;
-let _micStartCancelled = false;
 let _lastSttWav = null;
 let _lastSttLang = "";
 let _lastSttSessionId = "";
+let _lastKnownRecordingsUsed = -1;
+let _lastKnownRecordingsDate = "";
+let _lastKnownRecordingsSessionId = "";
 let _sttRetrying = false;
 const isSafari =
   navigator.vendor === "Apple Computer, Inc." &&
@@ -1268,15 +1270,12 @@ function stopDeepgramRecording() {
   }
 
 function _showSttRetryState() {
-  var liveBoxEl = document.getElementById("liveBox");
+  var recStEl = document.getElementById("recSt");
+  if (!recStEl) return;
   var couldntMsg = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
-  liveBoxEl.textContent = "";
-  var msgSpan = document.createElement("span");
-  msgSpan.textContent = couldntMsg;
-  liveBoxEl.appendChild(msgSpan);
-  liveBoxEl.classList.remove("processing");
-  liveBoxEl.classList.add("show", "retry");
-  liveBoxEl.onclick = function() {
+  recStEl.textContent = couldntMsg;
+  recStEl.classList.add("retry");
+  recStEl.onclick = function() {
     if (_sttRetrying) return;
     _retryLastStt();
   };
@@ -1285,11 +1284,13 @@ function _showSttRetryState() {
 async function _retryLastStt() {
   if (!_lastSttWav || _sttRetrying) return;
   _sttRetrying = true;
-  var liveBoxEl = document.getElementById("liveBox");
+  var recStEl = document.getElementById("recSt");
   var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
-  liveBoxEl.textContent = processingMsg;
-  liveBoxEl.classList.remove("retry");
-  liveBoxEl.classList.add("show", "processing");
+  if (recStEl) {
+    recStEl.textContent = processingMsg;
+    recStEl.classList.remove("retry");
+    recStEl.onclick = null;
+  }
   var controller = new AbortController();
   var sttTimeout = setTimeout(function() { controller.abort(); }, 15000);
   try {
@@ -1308,10 +1309,10 @@ async function _retryLastStt() {
       console.error("[STT retry] API error, status=" + res.status);
       _lastSttWav = null;
       _sttRetrying = false;
-      liveBoxEl.classList.remove("processing");
-      liveBoxEl.classList.add("show", "retry");
-      var retryMsg = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
-      liveBoxEl.textContent = retryMsg;
+      if (recStEl) {
+        recStEl.textContent = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+        recStEl.classList.add("retry");
+      }
       showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
       return;
     }
@@ -1320,18 +1321,19 @@ async function _retryLastStt() {
     if (data.text) {
       fullTx = data.text.trim().slice(0, 150);
       _lastSttWav = null;
-      liveBoxEl.textContent = "";
-      liveBoxEl.classList.remove("show", "processing", "retry");
-      liveBoxEl.onclick = null;
+      if (recStEl) {
+        recStEl.classList.remove("retry");
+        recStEl.onclick = null;
+      }
       const actualDuration = finishRec();
       await reportRecordingDuration(actualDuration);
     } else {
       console.warn("[STT retry] Empty text");
       _lastSttWav = null;
-      liveBoxEl.classList.remove("processing");
-      liveBoxEl.classList.add("show", "retry");
-      var retryMsg2 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
-      liveBoxEl.textContent = retryMsg2;
+      if (recStEl) {
+        recStEl.textContent = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+        recStEl.classList.add("retry");
+      }
       showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
     }
   } catch (e) {
@@ -1339,10 +1341,10 @@ async function _retryLastStt() {
     console.error("[STT retry] Error:", e);
     _lastSttWav = null;
     _sttRetrying = false;
-    liveBoxEl.classList.remove("processing");
-    liveBoxEl.classList.add("show", "retry");
-    var retryMsg3 = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
-    liveBoxEl.textContent = retryMsg3;
+    if (recStEl) {
+      recStEl.textContent = (typeof getI18nSync === "function" && getI18nSync("record.couldntRetry")) || "Couldn't transcribe. Tap to retry";
+      recStEl.classList.add("retry");
+    }
     showToast((typeof getI18nSync === "function" && getI18nSync("toasts.sttFailed")) || "Couldn't transcribe");
   }
 }
@@ -1426,13 +1428,6 @@ function startRec() {
   // also wait for the health check to complete first.
   Promise.all([_runSttHealth(), _getMicStream().then(function(s) { return s; }).catch(function(e) { return { __micError: e }; })])
     .then(function(results) {
-      if (_micStartCancelled) {
-        var cancelledStream = results[1];
-        if (cancelledStream && !cancelledStream.__micError && typeof cancelledStream.getTracks === "function") {
-          cancelledStream.getTracks().forEach(function(t) { t.stop(); });
-        }
-        return;
-      }
       var data = results[0];
       var streamOrErr = results[1];
       if (streamOrErr && streamOrErr.__micError) {
@@ -1447,29 +1442,19 @@ function startRec() {
         var recBtnEl = document.getElementById("recBtn");
         recBtnEl.disabled = false;
         recBtnEl.classList.remove("on");
-        var liveBoxEl = document.getElementById("liveBox");
-        liveBoxEl.classList.remove("show", "processing");
         return;
       }
       var stream = streamOrErr;
       if (data && data.available) {
         usingDeepgram = true;
         startDeepgramRecording(stream).then(function(ok) {
-          if (_micStartCancelled) {
-            if (stream) stream.getTracks().forEach(function(t) { t.stop(); });
-            return;
-          }
           if (ok) {
             isRec = true;
             _isRecPaused = false;
-            var liveBox2 = document.getElementById("liveBox");
-            liveBox2.textContent = "";
             var listeningMsg2 = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
-            var listeningSpan2 = document.createElement("span");
-            listeningSpan2.textContent = listeningMsg2;
-            liveBox2.appendChild(listeningSpan2);
-            liveBox2.classList.add("show");
-            liveBox2.classList.remove("paused", "processing", "retry");
+            var recStEl2 = document.getElementById("recSt");
+            recStEl2.textContent = listeningMsg2;
+            document.getElementById("recSub").classList.add("live");
             document.getElementById("recBtn").classList.add("on");
             _showDoneButton(true);
           } else {
@@ -1509,14 +1494,7 @@ function startWebSpeechAPI() {
     if (recStartTime === null) recStartTime = Date.now();
     recMaxDuration = isSupporter() ? PRO_MAX_RECORDING_SEC : FREE_MAX_RECORDING_SEC;
     document.getElementById("recBtn").classList.add("on");
-    var liveBox3 = document.getElementById("liveBox");
-    liveBox3.textContent = "";
     var listeningMsg3 = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
-    var listeningSpan3 = document.createElement("span");
-    listeningSpan3.textContent = listeningMsg3;
-    liveBox3.appendChild(listeningSpan3);
-    liveBox3.classList.add("show");
-    liveBox3.classList.remove("paused", "processing", "retry");
     document.getElementById("recSt").textContent = listeningMsg3;
     document.getElementById("recSub").classList.add("live");
     _showDoneButton(true);
@@ -1535,17 +1513,14 @@ function startWebSpeechAPI() {
   };
   recog.onresult = (e) => {
     recogRestartCount = 0;
-    let fi = "",
-      it = "";
+    let fi = "";
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) fi += e.results[i][0].transcript;
-      else it += e.results[i][0].transcript;
     }
     if (fi) {
       fullTx += fi + " ";
       console.debug('[Speech] Final result: "' + fi.trim() + '"');
     }
-    document.getElementById("liveBox").textContent = (fullTx + it).trim();
     if (recogTimeout) {
       clearTimeout(recogTimeout);
       recogTimeout = null;
@@ -1637,25 +1612,19 @@ function finishRec() {
   var recBtnFin = document.getElementById("recBtn");
   recBtnFin.classList.remove("on", "paused");
   recBtnFin.disabled = false;
+  var recStElFinish = document.getElementById("recSt");
+  if (recStElFinish) {
+    recStElFinish.textContent = (typeof getI18nSync === "function" && getI18nSync("record.ended")) || "Recording ended";
+    recStElFinish.classList.remove("retry");
+    recStElFinish.onclick = null;
+  }
   if (fullTx.trim()) {
     document.getElementById("sta").value = fullTx.trim().slice(0, 150);
     inputSource = "voice";
     userOverride = false;
-    setTimeout(
-      () => {
-        var lb = document.getElementById("liveBox");
-        lb.classList.remove("show", "processing", "retry");
-        lb.onclick = null;
-      },
-      500,
-    );
     updateCard();
     saveDraft();
     fullTx = "";
-  } else {
-    var lb2 = document.getElementById("liveBox");
-    lb2.classList.remove("show", "processing", "retry");
-    lb2.onclick = null;
   }
   updateSlNudge();
   updateMicState();
@@ -1757,25 +1726,14 @@ function _stopRecTimer() {
 }
 
 function _setPausedUI(paused) {
-  var liveBoxEl = document.getElementById("liveBox");
   var recStEl = document.getElementById("recSt");
   var recBtnEl = document.getElementById("recBtn");
   var doneBtnEl = document.getElementById("recDoneBtn");
   if (paused) {
     if (recStEl) recStEl.textContent = (typeof getI18nSync === "function" && getI18nSync("record.paused")) || "Paused \u2014 tap the mic to resume";
-    if (liveBoxEl) {
-      liveBoxEl.textContent = "";
-      var span = document.createElement("span");
-      span.className = "paused-hint";
-      span.textContent = (typeof getI18nSync === "function" && getI18nSync("record.pausedHint")) || "Tap Done to transcribe";
-      liveBoxEl.appendChild(span);
-      liveBoxEl.classList.add("show", "paused");
-      liveBoxEl.classList.remove("processing", "retry");
-    }
     if (recBtnEl) recBtnEl.classList.add("paused");
     if (doneBtnEl) doneBtnEl.disabled = false;
   } else {
-    if (liveBoxEl) liveBoxEl.classList.remove("paused");
     if (recBtnEl) recBtnEl.classList.remove("paused");
   }
 }
@@ -1795,16 +1753,6 @@ function _resumeRecording() {
   _isRecPaused = false;
   if (usingDeepgram && mediaRec && mediaRec.state === "paused") {
     try { mediaRec.resume(); } catch (e) { console.warn("[Rec] MediaRecorder.resume() failed:", e); }
-  }
-  var liveBoxEl = document.getElementById("liveBox");
-  if (liveBoxEl) {
-    liveBoxEl.textContent = "";
-    var listeningMsg = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
-    var span = document.createElement("span");
-    span.textContent = listeningMsg;
-    liveBoxEl.appendChild(span);
-    liveBoxEl.classList.add("show");
-    liveBoxEl.classList.remove("paused", "processing", "retry");
   }
   document.getElementById("recSt").textContent = (typeof getI18nSync === "function" && getI18nSync("record.listening")) || "Listening and processing your words";
   _setPausedUI(false);
@@ -1863,13 +1811,13 @@ async function _stopAndTranscribe() {
   var recBtnFin = document.getElementById("recBtn");
   recBtnFin.classList.remove("on", "paused");
   var processingMsg = (typeof getI18nSync === "function" && getI18nSync("record.processing")) || "Processing your audio…";
-  var liveBoxEl = document.getElementById("liveBox");
-  liveBoxEl.textContent = processingMsg;
-  liveBoxEl.classList.add("show", "processing");
-  liveBoxEl.classList.remove("paused", "retry");
+  var recStElStop = document.getElementById("recSt");
+  if (recStElStop) {
+    recStElStop.textContent = processingMsg;
+    recStElStop.classList.remove("retry");
+  }
   if (usingDeepgram) {
     const result = await stopDeepgramRecording();
-    liveBoxEl.classList.remove("processing");
     fullTx = result.text ? result.text.trim().slice(0, 150) : "";
     if (audioBlob) {
       _computeWaveform(audioBlob).then(function(h) {
@@ -1928,35 +1876,13 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   document.getElementById("recSt").textContent = "Starting\u2026";
   document.getElementById("recSub").textContent = "Setting up mic\u2026";
   document.getElementById("recSub").classList.add("live");
-  var liveBoxEl = document.getElementById("liveBox");
-  liveBoxEl.textContent = "";
-  liveBoxEl.classList.remove("show", "processing", "retry");
-  liveBoxEl.onclick = null;
+  var recStElStart = document.getElementById("recSt");
+  if (recStElStart) {
+    recStElStart.classList.remove("retry");
+    recStElStart.onclick = null;
+  }
   _lastSttWav = null;
   _sttRetrying = false;
-  var startingText = document.createElement("span");
-  startingText.textContent = "Starting\u2026";
-  var cancelBtn = document.createElement("button");
-  cancelBtn.type = "button";
-  cancelBtn.className = "live-box-cancel";
-  cancelBtn.id = "recStartCancel";
-  cancelBtn.textContent = (typeof getI18nSync === "function" && getI18nSync("record.cancel")) || "Cancel";
-  liveBoxEl.appendChild(startingText);
-  liveBoxEl.appendChild(cancelBtn);
-  _micStartCancelled = false;
-  cancelBtn.addEventListener("click", function() {
-    _micStartCancelled = true;
-    clearTimeout(readyTimer);
-    recBtnEl.disabled = false;
-    recBtnEl.classList.remove("on");
-    document.getElementById("recSt").textContent =
-      (typeof getI18nSync === "function" && getI18nSync("record.status")) || "Tap to speak";
-    document.getElementById("recSub").textContent =
-      (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
-    document.getElementById("recSub").classList.remove("live");
-    liveBoxEl.textContent = "";
-    liveBoxEl.classList.remove("show", "processing");
-  });
 
   var readyTimer;
 
@@ -1965,11 +1891,8 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   // eating into the recording timer on first visit.
   try {
     var preflightStream = await _getMicStream();
-    if (_micStartCancelled) {
-      if (preflightStream) preflightStream.getTracks().forEach(function(t) { t.stop(); });
-      return;
-    }
     refreshMicList();
+    if (preflightStream) preflightStream.getTracks().forEach(function(t) { t.stop(); });
   } catch (micErr) {
     recBtnEl.disabled = false;
     recBtnEl.classList.remove("on");
@@ -1978,8 +1901,6 @@ document.getElementById("recBtn").addEventListener("click", async () => {
     document.getElementById("recSub").textContent =
       (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
     document.getElementById("recSub").classList.remove("live");
-    liveBoxEl.textContent = "";
-    liveBoxEl.classList.remove("show", "processing");
     var errName = micErr && micErr.name;
     if (errName === "NotAllowedError" || errName === "SecurityError") {
       showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micDenied")) || "Allow mic to record");
@@ -2040,7 +1961,6 @@ document.getElementById("recBtn").addEventListener("click", async () => {
   // Restart it so it guards the mic setup phase (getUserMedia + startRec).
   clearTimeout(readyTimer);
   readyTimer = setTimeout(function() {
-    if (_micStartCancelled) return;
     if (!isRec) {
       recBtnEl.disabled = false;
       recBtnEl.classList.remove("on");
@@ -2049,8 +1969,6 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       document.getElementById("recSub").textContent =
         (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
       document.getElementById("recSub").classList.remove("live");
-      liveBoxEl.textContent = "";
-      liveBoxEl.classList.remove("show", "processing");
       showToast((typeof getI18nSync === "function" && getI18nSync("toasts.micSlow")) || "Mic slow \u2014 try again");
     }
   }, 2000);
@@ -2078,13 +1996,18 @@ async function reportRecordingDuration(actualDuration) {
     const data = await res.json();
     console.debug("[Limits] report response:", JSON.stringify(data));
     if (data.allowed) {
-      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
-    } else if (data.reason === "too_many" || data.reason === "cumulative_exceeded") {
-      // Server says we're capped. Do a silent verify so the UI reflects
-      // the true authoritative count (in case the report succeeded but
-      // returned a different reason than expected).
-      console.debug("[Limits] report returned cap, verifying:", data.reason);
-      _refreshLimitsFromServer();
+      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax, sessionId);
+    }
+    // Safety net: always re-fetch the authoritative count from the server
+    // after any report, so the UI mirrors the server's Redis state even if
+    // the initial response was stale or the increment race produced a stale
+    // value. checkOnly: true does not increment, so this is idempotent.
+    // This auto-corrects the known "Counter stuck at 5/5" symptom in case
+    // the root cause is a client-side caching issue.
+    console.debug("[Limits] report post-verify (allowed=" + data.allowed + ")");
+    await _refreshLimitsFromServer();
+    if (!data.allowed && (data.reason === "too_many" || data.reason === "cumulative_exceeded")) {
+      console.debug("[Limits] report returned cap:", data.reason);
     }
   } catch (e) {
     console.warn("[Limits] Report failed:", e.message);
@@ -2109,16 +2032,37 @@ async function _refreshLimitsFromServer() {
     const data = await res.json();
     console.debug("[Limits] refresh response:", JSON.stringify(data));
     if (data && data.recordingsMax) {
-      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax);
+      updateRecCounter(data.recordingsUsed, data.recordingsMax, data.cumulativeUsed, data.cumulativeMax, sessionId);
     }
   } catch (e) {
     console.warn("[Limits] Refresh failed:", e.message);
   }
 }
 
-function updateRecCounter(used, max, cumulativeUsed, cumulativeMax) {
+function updateRecCounter(used, max, cumulativeUsed, cumulativeMax, sessionId) {
   const el = document.getElementById("recCounter");
   if (!el) return;
+  // Monotonically non-decreasing guard: ignore stale responses (e.g. a
+  // safety-net refresh from a prior recording that arrives after a newer
+  // report, or a response from a previous session that was in flight when
+  // the user cleared localStorage). Used can only grow within a UTC day
+  // for a given session, so any value < the last-known is by definition
+  // older and must not overwrite the UI. Also auto-reset on a new UTC
+  // day or a session change so the count can start over.
+  var today = new Date().toISOString().slice(0, 10);
+  if (sessionId && _lastKnownRecordingsSessionId && sessionId !== _lastKnownRecordingsSessionId) {
+    _lastKnownRecordingsUsed = -1;
+  }
+  if (_lastKnownRecordingsDate && _lastKnownRecordingsDate !== today) {
+    _lastKnownRecordingsUsed = -1;
+  }
+  if (used < _lastKnownRecordingsUsed) {
+    console.debug("[Limits] updateRecCounter: ignoring stale used=" + used + " (last known=" + _lastKnownRecordingsUsed + ")");
+    return;
+  }
+  _lastKnownRecordingsUsed = used;
+  _lastKnownRecordingsDate = today;
+  _lastKnownRecordingsSessionId = sessionId || _lastKnownRecordingsSessionId;
   console.debug("[Limits] updateRecCounter:", JSON.stringify({ used, max, cumulativeUsed, cumulativeMax }));
   const remaining = max - used;
   const cumRemaining = Math.max(0, cumulativeMax - cumulativeUsed);
@@ -2621,7 +2565,6 @@ document.getElementById("resetBtn").addEventListener("click", () => {
     document.getElementById("recSub").textContent =
       (typeof getI18nSync === "function" && getI18nSync("record.sub")) || "Words appear when you stop";
     document.getElementById("recSub").classList.remove("live");
-    document.getElementById("liveBox").classList.remove("show");
   }
   document.getElementById("sta").value = "";
   document.getElementById("nin").value = "";
@@ -2732,6 +2675,9 @@ if (!restored) {
 // whatever content is now in the form (Smart Show), and auto-heal the
 // recording counter from the server so the UI matches the source of truth.
 if (typeof _updateResetBtnVisibility === "function") _updateResetBtnVisibility();
+// Reset monotonic counter guard on page load so a new session can start
+// from 0. The auto-heal fetch below will set the real value.
+_lastKnownRecordingsUsed = -1;
 if (typeof _refreshLimitsFromServer === "function") _refreshLimitsFromServer();
 updateSupporterBadge();
 // Sync per-tone rewrite counts from the server on page load. Without this,

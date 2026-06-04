@@ -6,6 +6,10 @@
     { "source": "/card", "destination": "/api/card" },
     { "source": "/c/:id", "destination": "/api/c/[id]" }
   ],
+  "redirects": [
+    { "source": "/about.html", "destination": "/about", "statusCode": 301 },
+    { "source": "/language-stats.html", "destination": "/language-stats", "statusCode": 301 }
+  ],
   "crons": [
     { "path": "/api/cleanup", "schedule": "0 3 * * *" }
   ],

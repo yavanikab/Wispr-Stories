@@ -7,10 +7,10 @@
   "hero": {
     "title": "Say it once, share it forever",
     "subtitle": "Record with the mic or dictate with <a href=\"https://wisprflow.ai/r?BEST76\" target=\"_blank\" rel=\"noopener\" class=\"wispr-flow-link\"><strong><em>Wispr Flow</em></strong></a>. Style and share with love.",
+    "seo": "Wispr Stories is a free voice-to-card app that turns what you say into a beautiful shareable card. Speak in any of 44 languages, pick a tone and color, then share on WhatsApp, Instagram, or anywhere. No account needed. Wispr Stories is also searched as WisprStories, Wisper Stories, Whisper Stories, Wispr Story, Wisper Story, or Whisper Story. The app is the home for the Wispr Flow companion experience — shareable voice cards made from your spoken words.",
     "quote": "\"Hold onto memories; they will hold onto you.\""
   },
   "sharedCta": "✨ <strong>You received a Wispr Story!</strong> Tap <em>Create my card</em> to make your own.",
-  "ffNotice": "🌐 Voice recording is not supported in Firefox. Use Chrome or Safari, or paste your text below.",
   "record": {
     "label": "Your voice",
     "status": "Tap to speak",
@@ -22,6 +22,7 @@
     "listening": "Listening and processing your words",
     "paused": "Paused \u2014 tap the mic to resume",
     "pausedHint": "Tap Done to transcribe",
+    "ended": "Recording ended",
     "done": "Done",
     "softHint": "A few more today \ud83d\udc9b",
     "softHintDone": "More tomorrow \ud83d\udc9b"

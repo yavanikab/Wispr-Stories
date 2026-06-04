@@ -28,3 +28,11 @@ mockup-og-option-c.html
 .vercel
 
 .vercel
+
+# Internal logs folder (source-of-truth for the Acknowledged Logs page).
+# The secret-shortcut.js is un-ignored so the Alt+Shift+W+S handler ships
+# with the public site, while the .md source stays in the team-only folder.
+# Note: must use `*` not `/` here — a directory-level ignore prevents
+# the `!` re-include rule from working (per Git docs).
+internal-logs/*
+!internal-logs/secret-shortcut.js

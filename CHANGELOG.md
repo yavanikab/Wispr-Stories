@@ -1,5 +1,59 @@
 # Changelog
 
+## [v0.11.0.0] — Acknowledged Logs + Internal Source-of-Truth (2026-06-04)
+
+Major release: the "Acknowledged Logs" transparency system. A Notion page lists 5 known issues and 7 product-decision limitations in plain language for the Wispr Flow team. Reachable via direct URL or via a 4-key chord (Alt+Shift+W+S) on every public page.
+
+### Added
+- **Internal logs folder** — new `internal-logs/` directory. Git-ignored by default; contains the source-of-truth markdown and the keyboard-chord handler.
+- **`internal-logs/ilogs-ws.md`** — source of truth for the public Notion page. 5 known issues + 7 product-decision limitations, in Q&A format. Leads with an Apple-platform disclaimer ("we do not currently own any Apple device in our test environment"). Marked with `<!-- MIRROR TO NOTION -->` / `<!-- INTERNAL ONLY -->` HTML comments so the public block can be copy-pasted cleanly and the internal block stays in the team-only folder.
+- **`internal-logs/secret-shortcut.js`** — IIFE keyboard handler. Listens for the 4-key chord Alt+Shift+W+S (Windows: Alt+Shift; Mac: Option+Shift; physical keyboard only; capture phase). Opens the Notion URL in a new tab with `noopener,noreferrer`; falls back to `location.href` if popups are blocked. Clears state on `window.blur` and on the post-fire tick. Ignores key-repeat events. Notion URL is a single editable constant at the top of the file.
+- **Script tag in 3 pages** — `<script src="internal-logs/secret-shortcut.js" defer></script>` added to `wisprstories.html`, `about.html`, and `language-stats.html`, after the page's primary scripts. Loads deferred so it never blocks the initial render.
+
+### Removed
+- **Dead `ffNotice` i18n key** — Removed from all 11 locale files (`en.json` + 10 others). The only caller, `showNotice("firefox")`, was already a no-op in the codebase. Aligns the locale files with the user-facing Firefox behavior (modern code works; the notice was never shown).
+
+### Changed
+- **Build banner** (`wisprstories.js:1`) — v0.10.4.7 → v0.11.0.0 (2026-06-04).
+- **`.gitignore`** — added `internal-logs/` (git-ignored) with an un-ignore rule for `internal-logs/secret-shortcut.js` so the chord handler ships with the deployed site while the source-of-truth markdown stays in the team-only folder.
+- **Public content policy** — the public Notion page leads with an Apple-disclaimer callout acknowledging that the project is tested on Windows and Android only, and that Apple-platform behavior is based on published browser documentation and user reports rather than first-hand testing.
+
+### Files touched
+`wisprstories.js`, `wisprstories.html`, `about.html`, `language-stats.html`, `internal-logs/ilogs-ws.md` (new), `internal-logs/secret-shortcut.js` (new), `assets/i18n/{en,es,hi,it,ja,kn,ko,ta,te,th,zh}.json` (`ffNotice` removed), `.gitignore`.
+
+### Post-publish checklist
+1. Create the Notion page from the `MIRROR TO NOTION` block in `internal-logs/ilogs-ws.md`.
+2. Replace the `ACKNOWLEDGED_LOGS_URL` placeholder in `internal-logs/secret-shortcut.js` with the real Notion URL.
+3. Redeploy.
+
+## [v0.10.4.7] — liveBox Removal + Counter Safety Net + 3 Bug Fixes (2026-06-04)
+
+liveBox UI element completely removed. Counter safety net added. Three verified bug fixes shipped.
+
+### Removed
+- **liveBox UI element** — `<div class="live-box" id="liveBox">` deleted from `wisprstories.html`. ~110 lines of `.live-box` CSS deleted from `global/styles/inputs.css` (`.live-box`, `.live-box.show`, `.live-box.processing`, `.live-box.processing::before`, `.live-box-cancel` + hover + focus, `.live-box.retry` + hover + `::before`, `.live-box.paused` + `.paused-hint`, `@keyframes live-box-spin`, `@keyframes live-box-breathe`, `.input-hero .live-box`). 64 JS references to `liveBox` removed across `wisprstories.js`.
+- **Cancel button** — The "Cancel" button in the liveBox is gone. The 2s readyTimer handles cleanup if mic setup is slow.
+- **Live transcription text** — The intermediate Web Speech results are no longer shown in a pill. The text appears in the textarea only after the recording finishes.
+- **`--live-glow` CSS variables** — Removed from `global/styles/base.css` (both light and dark themes). Only used by the deleted liveBox glow animation.
+- **Dead `_micStartCancelled` code** — Variable declaration, 5 checks, and the reset line deleted. The only setter was the cancel button click handler.
+
+### Added
+- **Counter safety net** (`wisprstories.js:reportRecordingDuration`) — After every `reportRecordingDuration` call, the client now also calls `_refreshLimitsFromServer()` to re-fetch the authoritative count from `/api/limits`. This auto-corrects any client-server drift that caused the "Counter stuck at 5/5" symptom. Monotonic guard in `updateRecCounter(used, max, cumulativeUsed, cumulativeMax, sessionId)` ignores stale `used < _lastKnownRecordingsUsed` values and resets on session-change or day-rollover, so out-of-order safety-net responses from prior recordings can't make the counter go backwards. The 4× `console.debug` instrumentation from v0.10.4.5 remains for future root-cause diagnosis if the symptom recurs.
+- **`.rec-st.retry` CSS** — Cursor pointer + dotted underline for the retry click target that now lives on the `recSt` label.
+- **`record.ended` i18n key** — Added to all 11 locale files. English fallback for non-English locales (will be re-translated in a later pass).
+
+### Fixed
+- **Deepgram `recSt` text stuck on "Starting..."** (`wisprstories.js:startDeepgramRecording`) — The Deepgram success path now updates `recSt` to the "Listening and processing your words" message and adds the `.live` class to `recSub`. Previously only the Web Speech path did this, leaving Deepgram users staring at "Starting..." for the entire recording.
+- **Pre-flight mic stream leak** (`wisprstories.js:mic click handler`) — After `refreshMicList()` is called with the pre-flight stream, the stream's tracks are now stopped. Previously the stream leaked and `startRec()` opened a second concurrent stream, causing resource conflicts on mobile.
+- **Timer font too small for older users** (`global/styles/inputs.css`) — `.rec-st` (status text) increased from `clamp(14px, 0.3vw + 13px, 15px)` to `clamp(15px, 0.4vw + 14px, 17px)`. `.rec-sub` (the actual timer countdown like "15s", "14s") increased from `clamp(12px, 0.3vw + 11px, 13px)` to `clamp(15px, 0.4vw + 14px, 17px)`. `.rec-counter` increased from `clamp(13px, 0.5vw + 11px, 15px)` to `clamp(14px, 0.5vw + 12px, 17px)`. Mobile media query (480px) increased `.rec-counter` from 15px to 18px with larger padding (12px 16px), and added `.rec-sub: 18px` so the timer countdown stays readable on phones.
+
+### Changed
+- **Retry click target moved to `recSt` label** — Instead of clicking the liveBox, users now tap the `recSt` label (e.g. "Couldn't transcribe. Tap to retry") to retry STT. The label gets a dotted underline and pointer cursor.
+- **Pause state UI** — Removed the "Tap Done to transcribe" hint from the deleted liveBox. The recSt "Paused" text alone is enough.
+- **Resume state UI** — Same simplification. The recSt "Listening" text alone is enough.
+- **Cache buster** (`global/styles/main.css`) — Bumped `base.css` and `inputs.css` from `?v=20260521-*` to `?v=20260604-no-livebox` to force browsers to re-fetch the simplified CSS.
+- **Build banner** (`wisprstories.js:1`) — v0.10.4.6 → v0.10.4.7 (2026-06-04).
+
 ## [v0.10.4.6] — Toast Shortening + Recording Fixes (2026-06-03)
 
 Toast shortening, recording flow bug fixes, and i18n cleanup. Biggest change is the toast pass: 23 toasts kept and shortened, 17 removed.
