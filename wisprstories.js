@@ -1,4 +1,4 @@
-console.log("%c[Build] Wispr Stories v0.11.0.0 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
+console.log("%c[Build] Wispr Stories v0.11.0.2 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",
@@ -907,6 +907,7 @@ function updateCard(preserveText) {
 
   cc.textContent = raw.length + " / 150";
   cc.classList.toggle("warn", raw.length >= 120);
+  cc.classList.toggle("grace", raw.length > 150);
   // No RTL — page layout stays LTR always
 
   cardReady = false;
@@ -1138,7 +1139,8 @@ async function startDeepgramRecording(stream) {
 
     _startRecTimer(recMaxDuration, function() {
       isRec = false;
-      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || "Max " + recMaxDuration + "s");
+      var _maxTimeMsg = (typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || ("Max " + recMaxDuration + "s");
+      showToast(_maxTimeMsg.replace("{max}", recMaxDuration));
       console.debug("[Rec] Timer expired, stopping, chunks=" + audioChunks.length + ", speechLang=" + speechLang);
       if (mediaRec && mediaRec.state !== "inactive") {
         stopDeepgramRecording().then(function(result) {
@@ -1500,7 +1502,8 @@ function startWebSpeechAPI() {
     _showDoneButton(true);
     console.debug("[Speech] Started, lang=" + recog.lang + ", max=" + recMaxDuration + "s");
     _startRecTimer(recMaxDuration, function() {
-      showToast((typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || "Max " + recMaxDuration + "s");
+      var _maxTimeMsgWS = (typeof getI18nSync === "function" && getI18nSync("toasts.maxTime")) || ("Max " + recMaxDuration + "s");
+      showToast(_maxTimeMsgWS.replace("{max}", recMaxDuration));
       isRec = false;
       if (recog) recog.stop();
     });
@@ -1947,7 +1950,8 @@ document.getElementById("recBtn").addEventListener("click", async () => {
       } else if (data.reason === "cumulative_exceeded") {
         showToast((typeof getI18nSync === "function" && getI18nSync("toasts.cumulativeLimit")) || "More tomorrow 💛");
       } else if (data.reason === "too_long") {
-        showToast((typeof getI18nSync === "function" && getI18nSync("toasts.tooLong")) || `Max ${data.maxSeconds}s. Tap Done`);
+        var _tooLongMsg = (typeof getI18nSync === "function" && getI18nSync("toasts.tooLong")) || ("Max " + data.maxSeconds + "s. Tap Done");
+        showToast(_tooLongMsg.replace("{max}", data.maxSeconds));
       }
       return;
     }

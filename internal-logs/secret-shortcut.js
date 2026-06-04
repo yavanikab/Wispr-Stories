@@ -18,7 +18,7 @@
   "use strict";
 
   var ACKNOWLEDGED_LOGS_URL =
-    "https://www.notion.so/REPLACE-BEFORE-PUBLISH-wispr-stories-acknowledged-logs";
+    "https://wisprstories.notion.site/wisprstories-ackologs";
 
   var CHORD_KEYS = ["w", "s"];
   var heldLetters = new Set();

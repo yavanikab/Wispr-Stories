@@ -218,6 +218,14 @@
   }
   initFooterWave();
 
+  /* --- Nav scroll shadow --- */
+  var navEl = document.querySelector('.nav');
+  if (navEl) {
+    window.addEventListener('scroll', function() {
+      navEl.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  }
+
   /* --- Back to top --- */
   var backToTop = document.getElementById('backToTop');
   if (backToTop) {

@@ -1,5 +1,36 @@
 # Version History
 
+## v0.11.0.2 — i18n `{max}` Placeholder Fix (2026-06-04)
+
+Patch release: fixes a bug where three toast messages showed the literal string "Max {max}s" / "Max {max}s. Tap Done" to users instead of the actual recording cap.
+
+### Fixed
+- **Toast showed literal `{max}` placeholder** — Three sites used `getI18nSync("toasts.maxTime")` / `getI18nSync("toasts.tooLong")` and the strings contain a `{max}` placeholder that the code never substituted. Extracted resolved string into a local, then `.replace("{max}", value)` before `showToast`. Sites: `wisprstories.js:1141` (Deepgram timer), `wisprstories.js:1503` (Web Speech timer), `wisprstories.js:1950` (preflight `too_long`).
+- **Build banner** — v0.11.0.1 → v0.11.0.2 (2026-06-04).
+
+## v0.11.0.1 — Invisible 10-Character Textarea Grace (2026-06-04)
+
+Patch release: gives the textarea a small invisible grace so the system does not aggressively cut a message mid-word. The user-visible cap stays at 150.
+
+### Changed
+- **Textarea `maxlength`** (`wisprstories.html:377`) — 150 → 160. The user-visible cap remains 150; the extra 10 chars are an invisible grace so a user typing past 150 can complete their last word.
+- **Counter visual state** (`wisprstories.js:909`) — added a third toggle `cc.classList.toggle("grace", raw.length > 150)` alongside the existing `warn` (red + ⚠️ at 120+). Grace state uses a warm orange color and lighter weight so the user sees a soft cue without an aggressive warning.
+- **Counter format** (`wisprstories.js:908`) — unchanged. Still shows `X / 150`. The numerator reflects the actual char count; the denominator stays at 150. The number 160 is deliberately not shown anywhere in the UI.
+
+### Added
+- **`.char-c.grace` CSS rule** (`global/styles/inputs.css`) — orange color (`#d97706`), font-weight 500, no emoji.
+- **Limitation 8 in `internal-logs/ilogs-ws.md`** — new entry in the MIRROR TO NOTION block. Explains the user-visible cap of 150, the actual cap of 160, and that the 10-char grace is invisible by design.
+- **6th FAQ item in `about.html`** — "Why does the character counter sometimes go past 150?" Plugs the same explanation for curious users.
+
+### Not changed
+- **Server-side caps unchanged** — `api/rewrite.js` (LLM rewrite) and `api/og.js` (card image) both stay at 150. The 10 grace chars are stored in the metadata sidecar and visible on the card's landing page, but they never reach the card image or the LLM.
+- **i18n strings unchanged** — "up to 150 characters" stays accurate because 150 is the user-visible cap.
+- **All 10 `.slice(0, 150)` sites in `wisprstories.js` unchanged** (lines 330, 376, 922, 1145, 1322, 1622, 1821, 2547, 2659, 2982, 3797). These are display/output paths.
+- **The ⚠️ warning at 120 chars unchanged.**
+
+### Files touched
+`wisprstories.html`, `wisprstories.js`, `global/styles/inputs.css`, `internal-logs/ilogs-ws.md`, `about.html`.
+
 ## v0.11.0.0 — Acknowledged Logs + Internal Source-of-Truth (2026-06-04)
 
 Major release: the "Acknowledged Logs" transparency system for the Wispr Flow team. A Notion page lists 5 known issues and 7 product-decision limitations in plain language. Reachable via direct URL or via a 4-key chord (Alt+Shift+W+S) on every public page.

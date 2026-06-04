@@ -248,6 +248,10 @@
   display: inline-block;
   font-size: clamp(11px, 0.3vw + 10px, 12px);
 }
+.char-c.grace {
+  color: #d97706;
+  font-weight: 500;
+}
 .reset-btn {
   /* Pushed to the right edge of .rec-row (the row with the mic + Tap to
      speak), aligned with the top of that section so the user can hit

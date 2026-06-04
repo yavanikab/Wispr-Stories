@@ -1,5 +1,43 @@
 # Changelog
 
+## [v0.11.0.2] — i18n `{max}` Placeholder Fix (2026-06-04)
+
+Patch release: fixes a bug where three toast messages showed the literal string "Max {max}s" / "Max {max}s. Tap Done" to users instead of the actual recording cap (15s for free, 60s for Pro).
+
+### Fixed
+- **Toast showed literal `{max}` placeholder** (`wisprstories.js`) — Three toast call sites used `getI18nSync("toasts.maxTime")` and `getI18nSync("toasts.tooLong")` directly, but the i18n strings contain a `{max}` placeholder. `getI18nSync()` returns the raw template; the `||` fallback never fires because the key exists. Result: users saw the placeholder text instead of the actual seconds value. Fixed by extracting the resolved string into a local variable, then calling `.replace("{max}", value)` before passing to `showToast`. Sites fixed:
+  - `wisprstories.js:1141` — Deepgram timer expiration (uses `recMaxDuration`)
+  - `wisprstories.js:1503` — Web Speech timer expiration (uses `recMaxDuration`)
+  - `wisprstories.js:1950` — preflight `too_long` server rejection (uses `data.maxSeconds`)
+- **Build banner** (`wisprstories.js:1`) — v0.11.0.1 → v0.11.0.2 (2026-06-04).
+
+## [v0.11.0.1] — Invisible 10-Character Textarea Grace (2026-06-04)
+
+Patch release: gives the textarea a small invisible grace so the system does not aggressively cut a message mid-word. The user-visible cap stays at 150 characters.
+
+### Changed
+- **Textarea `maxlength`** (`wisprstories.html:377`) — 150 → 160. The user-visible cap remains 150; the extra 10 chars are an invisible grace so a user typing past 150 can complete their last word.
+- **Counter visual state** (`wisprstories.js:909`) — added a third toggle `cc.classList.toggle("grace", raw.length > 150)` alongside the existing `warn` (red + ⚠️ at 120+). The grace state uses a warm orange color (`#d97706`) and lighter weight so the user sees a soft cue without an aggressive warning.
+- **Counter format** (`wisprstories.js:908`) — unchanged. Still shows `X / 150`. The numerator reflects the actual char count; the denominator stays at 150. We deliberately do NOT show `160` anywhere in the UI.
+
+### Added
+- **`.char-c.grace` CSS rule** (`global/styles/inputs.css`) — orange color (`#d97706`), font-weight 500, no emoji (compared to `.char-c.warn` which is red `#dc2626` with a ⚠️ prefix). Sits next to the existing `.char-c.warn` rule.
+- **Limitation 8 in `internal-logs/ilogs-ws.md`** — new entry in the MIRROR TO NOTION block. Explains that the user-visible cap is 150, the actual cap is 160, and the 10-char grace is invisible by design.
+- **6th FAQ item in `about.html`** — "Why does the character counter sometimes go past 150?" Plugs the same explanation for curious users. Placed at the end of the FAQ list.
+
+### Not changed (and why)
+- **Server-side caps unchanged.** `api/rewrite.js` still caps LLM tone-rewrites at 150 chars; `api/og.js` still caps the card image at 150. The 10 grace chars are stored in the metadata sidecar (`meta/<shortId>.json`) and visible on the card's landing page, but they never reach the card image, the LLM, or the transcription.
+- **i18n strings unchanged.** "up to 150 characters" stays accurate because 150 is the user-visible cap. No new translation work.
+- **All 10 `.slice(0, 150)` sites in `wisprstories.js` unchanged** (lines 330, 376, 922, 1145, 1322, 1622, 1821, 2547, 2659, 2982, 3797). These are display/output paths; the 10 grace chars flow into metadata only.
+- **The ⚠️ warning at 120 chars unchanged.** Still fires as the "approaching limit" hint.
+
+### Tradeoffs
+- **Pros:** User can finish their last word (the original concern). Visible cap stays at 150. No aggressive cut. Card design and LLM cost unchanged. No i18n churn.
+- **Cons:** The grace is invisible; users may not know about it until they hit 150 and discover they can still type. The FAQ surfaces it for the curious.
+
+### Files touched
+`wisprstories.html`, `wisprstories.js`, `global/styles/inputs.css`, `internal-logs/ilogs-ws.md`, `about.html`.
+
 ## [v0.11.0.0] — Acknowledged Logs + Internal Source-of-Truth (2026-06-04)
 
 Major release: the "Acknowledged Logs" transparency system. A Notion page lists 5 known issues and 7 product-decision limitations in plain language for the Wispr Flow team. Reachable via direct URL or via a 4-key chord (Alt+Shift+W+S) on every public page.

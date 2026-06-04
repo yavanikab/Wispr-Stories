@@ -146,27 +146,27 @@
     >[ <i class="fa-solid fa-question"></i> ]</a>
 
     <div class="fmenu-panel hidden" id="fmenu-panel">
-      <a href="/about" class="fmenu-link" data-i18n="footer.about">
-        <i class="fa-solid fa-book-open"></i> About
+      <a href="/about" class="fmenu-link">
+        <i class="fa-solid fa-book-open" aria-hidden="true"></i><span data-i18n="footer.about">About</span>
       </a>
-      <a href="/language-stats" class="fmenu-link" data-i18n="footer.langStats">
-        <i class="fa-solid fa-chart-simple"></i> Lang Stats
+      <a href="/language-stats" class="fmenu-link">
+        <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span data-i18n="footer.langStats">Lang Stats</span>
       </a>
       <div class="fmenu-divider"></div>
-      <a href="https://buymeacoffee.com/yg_labs/membership" class="fmenu-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.support">
-        <i class="fa-solid fa-hand-holding-heart"></i> Support Here
+      <a href="https://buymeacoffee.com/yg_labs/membership" class="fmenu-link" target="_blank" rel="noopener noreferrer">
+        <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i><span data-i18n="footer.support">Support Here</span>
       </a>
-      <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank" data-i18n="footer.articles">
-        <i class="fa-brands fa-medium"></i> Read Articles
+      <a href="https://medium.com/" class="fmenu-link" rel="noopener noreferrer" target="_blank">
+        <i class="fa-brands fa-medium" aria-hidden="true"></i><span data-i18n="footer.articles">Read Articles</span>
       </a>
-      <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link" data-i18n="footer.issues">
-        <i class="fa-solid fa-pen-clip"></i> Submit Issues
+      <a href="mailto:yellowgreenlabs@proton.me?subject=Wispr%20Stories%20Feedback" class="fmenu-link">
+        <i class="fa-solid fa-pen-clip" aria-hidden="true"></i><span data-i18n="footer.issues">Submit Issues</span>
       </a>
-      <a href="#" class="fmenu-link" id="fmenu-help" data-i18n="footer.help">
-        <i class="fa-solid fa-circle-question"></i> How to Use
+      <a href="#" class="fmenu-link" id="fmenu-help">
+        <i class="fa-solid fa-circle-question" aria-hidden="true"></i><span data-i18n="footer.help">How to Use</span>
       </a>
-      <a href="#" class="fmenu-link" data-i18n="footer.license">
-        <i class="fa-solid fa-file-shield"></i> License & Terms
+      <a href="#" class="fmenu-link">
+        <i class="fa-solid fa-file-shield" aria-hidden="true"></i><span data-i18n="footer.license">License &amp; Terms</span>
       </a>
       <div class="fmenu-version" id="fmenu-version">
         <span class="fmenu-version-number" id="fmenu-version-number"></span>
