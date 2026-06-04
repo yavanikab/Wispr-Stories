@@ -1,4 +1,4 @@
-console.log("%c[Build] Wispr Stories v0.11.0.2 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
+console.log("%c[Build] Wispr Stories v0.11.0.3 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",

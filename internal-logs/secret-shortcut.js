@@ -17,6 +17,8 @@
 (function () {
   "use strict";
 
+  console.debug("[secret-shortcut] handler loaded; chord = Alt+Shift+W+S");
+
   var ACKNOWLEDGED_LOGS_URL =
     "https://wisprstories.notion.site/wisprstories-ackologs";
 
@@ -30,11 +32,14 @@
   function fire() {
     heldLetters.clear();
     try {
+      console.debug("[secret-shortcut] chord fired, opening", ACKNOWLEDGED_LOGS_URL);
       var win = window.open(ACKNOWLEDGED_LOGS_URL, "_blank", "noopener,noreferrer");
       if (!win) {
+        console.debug("[secret-shortcut] window.open returned null, falling back to location.href");
         window.location.href = ACKNOWLEDGED_LOGS_URL;
       }
     } catch (err) {
+      console.debug("[secret-shortcut] window.open threw, falling back to location.href", err);
       window.location.href = ACKNOWLEDGED_LOGS_URL;
     }
   }
@@ -50,8 +55,22 @@
 
   function onKeyDown(e) {
     if (e.repeat) return;
-    if (!isPrintableLetter(e.key)) return;
-    heldLetters.add(e.key.toLowerCase());
+    // On Windows, Alt+letter activates menu bar items (Alt+W = Window menu,
+    // Alt+S = Tools menu). Calling preventDefault here stops the browser
+    // from stealing focus to the menu, so the subsequent keydown for the
+    // other chord letter still reaches the page. Scoped to the chord keys
+    // only so other Alt+Shift+letter shortcuts (e.g. Alt+Shift+T to reopen
+    // the last closed tab in Chrome) still work.
+    var k = e.key;
+    if (
+      e.altKey &&
+      e.shiftKey &&
+      (k === "w" || k === "W" || k === "s" || k === "S")
+    ) {
+      e.preventDefault();
+    }
+    if (!isPrintableLetter(k)) return;
+    heldLetters.add(k.toLowerCase());
     checkChord(e);
   }
 

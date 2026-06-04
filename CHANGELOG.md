@@ -1,5 +1,18 @@
 # Changelog
 
+## [v0.11.0.3] — Chord Handler: Windows Menu-Activation Fix (2026-06-04)
+
+Patch release: fixes the "Acknowledged Logs" keyboard chord (Alt+Shift+W+S) on Windows. Previously, the W and S keys in the chord triggered the Windows menu bar (Alt+W = Window, Alt+S = Tools) which stole focus from the page, so the chord handler never received the keydown events and the page never opened.
+
+### Fixed
+- **Chord never fired on Windows** (`internal-logs/secret-shortcut.js`) — On Windows, `Alt+W` and `Alt+S` activate the menu bar (Window, Tools) before the keydown reaches the page. The chord handler still saw `keydown` for Alt and Shift but never got the W or S keydowns, so `heldLetters` never reached the size needed to fire. Fix: added a scoped `e.preventDefault()` in `onKeyDown` that fires only when `e.altKey && e.shiftKey` AND the key is `w`/`s` (case-insensitive). This suppresses the menu-bar activation for the two keys in the chord and lets the keydown reach the page. The `preventDefault` is intentionally narrow (W and S only, Alt+Shift only) so other browser shortcuts like Alt+Shift+T (Chrome reopen tab) still work.
+- **No diagnostics for "chord didn't fire"** (`internal-logs/secret-shortcut.js`) — Two `console.debug` lines added: one on script init (`[secret-shortcut] handler loaded; chord = Alt+Shift+W+S`) and one on chord fire (`[secret-shortcut] chord fired, opening <url>`). If the chord still does not work, open DevTools console and check whether the "handler loaded" line appears (script blocked or missing) and whether the "chord fired" line appears (chord logic works but popup blocked → location.href fallback kicks in).
+- **Build banner** (`wisprstories.js:1`) — v0.11.0.2 → v0.11.0.3 (2026-06-04).
+
+### Not changed
+- The Acknowledged Logs public content (`internal-logs/ilogs-ws.md` MIRROR block) is unchanged. v0.11.0.3 is a code fix only.
+- The `Alt+Shift+W+S` chord shape, the noopener/noreferrer popup, the `location.href` fallback, and the `window.blur` cleanup are all unchanged.
+
 ## [v0.11.0.2] — i18n `{max}` Placeholder Fix (2026-06-04)
 
 Patch release: fixes a bug where three toast messages showed the literal string "Max {max}s" / "Max {max}s. Tap Done" to users instead of the actual recording cap (15s for free, 60s for Pro).

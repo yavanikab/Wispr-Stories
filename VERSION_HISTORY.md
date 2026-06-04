@@ -1,5 +1,14 @@
 # Version History
 
+## v0.11.0.3 — Chord Handler: Windows Menu-Activation Fix (2026-06-04)
+
+Patch release: fixes the Acknowledged Logs keyboard chord (Alt+Shift+W+S) on Windows. On Windows, Alt+W and Alt+S activate the Window and Tools menus, which steal focus from the page before the keydown reaches the chord handler. Fix: scoped `e.preventDefault()` in the keydown handler for W and S when Alt+Shift is held, so the menu bar does not activate and the keydown reaches the page. Two `console.debug` lines added for diagnosis: script-init "handler loaded" and chord-fire "chord fired, opening <url>".
+
+### Fixed
+- **Chord did not fire on Windows** — Alt+W → Window menu, Alt+S → Tools menu. Page never saw the W or S keydowns, so `heldLetters` stayed partial. Fix: `e.preventDefault()` for W and S only, when `e.altKey && e.shiftKey`. Other Alt-combos and other Alt+Shift+letter shortcuts are unaffected.
+- **No way to diagnose a failed chord** — `console.debug` on script init and on chord fire. Open DevTools console to see which step the browser reaches.
+- **Build banner** — v0.11.0.2 → v0.11.0.3 (2026-06-04).
+
 ## v0.11.0.2 — i18n `{max}` Placeholder Fix (2026-06-04)
 
 Patch release: fixes a bug where three toast messages showed the literal string "Max {max}s" / "Max {max}s. Tap Done" to users instead of the actual recording cap.
