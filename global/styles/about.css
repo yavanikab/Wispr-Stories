@@ -237,6 +237,20 @@ h2 {
 .origin-story p:last-child {
   margin-bottom: 0;
 }
+.origin-story .accent-line {
+  font-size: clamp(17px, 1.7vw, 22px);
+  font-weight: 500;
+  color: var(--ws-lavender);
+  line-height: 1.5;
+  margin: 20px 0;
+}
+.origin-story .stories-bridge {
+  font-size: clamp(13px, 1vw, 14px);
+  font-style: italic;
+  color: var(--ws-lavender);
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
 .mission-statement {
   text-align: center;
   margin: 32px auto 40px;
@@ -245,13 +259,9 @@ h2 {
 .mission-statement p {
   font-size: clamp(17px, 1.8vw, 22px);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--ws-lavender);
   line-height: 1.5;
   font-style: italic;
-}
-:root.dark .mission-statement p {
-  color: var(--ws-cream-text);
-  opacity: 0.9;
 }
 .social-proof {
   text-align: center;
@@ -372,94 +382,6 @@ p.section-intro {
 }
 .section-eyebrow + .features {
   margin-top: 8px;
-}
-
-/* === Three Ways to Create === */
-.modes-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 24px 0 8px;
-}
-.mode-card {
-  border-radius: 12px;
-  border: 1px solid var(--rule);
-  padding: 20px 16px;
-  background: var(--cream2);
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-.mode-card:hover {
-  border-color: var(--mode-color, var(--ws-lavender));
-  background: var(--ws-card-hover);
-}
-.mode-icon {
-  font-size: 24px;
-  margin-bottom: 10px;
-  color: var(--mode-color, var(--ws-lavender));
-}
-.mode-title {
-  font-size: clamp(13px, 1.1vw, 14px);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-.mode-desc {
-  font-size: clamp(12px, 1vw, 13px);
-  color: var(--ink2);
-  line-height: 1.5;
-  margin-bottom: 10px;
-}
-.mode-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ink3);
-  letter-spacing: 0.03em;
-}
-p.modes-note {
-  font-size: clamp(12px, 0.9vw, 13px);
-  color: var(--ink3);
-  text-align: center;
-  margin: 4px 0 0;
-}
-
-/* === Tone grid === */
-.tone-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 24px 0 8px;
-}
-.tone-card {
-  flex: 0 1 calc(25% - 8px);
-  min-width: 130px;
-  border-radius: 10px;
-  border: 1px solid var(--rule);
-  padding: 16px 12px;
-  background: var(--cream2);
-  text-align: center;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-}
-.tone-card:hover {
-  border-color: var(--tone-color, var(--ws-lavender));
-  background: var(--ws-card-hover);
-  transform: translateY(-2px);
-}
-.tone-card-icon {
-  font-size: clamp(20px, 2vw, 24px);
-  margin-bottom: 8px;
-  color: var(--tone-color, var(--ws-lavender));
-}
-.tone-card-name {
-  font-size: clamp(13px, 1.1vw, 14px);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 4px;
-}
-.tone-card-desc {
-  font-size: clamp(11px, 0.9vw, 12px);
-  color: var(--ink3);
-  line-height: 1.4;
 }
 
 /* === Body links === */
@@ -714,8 +636,6 @@ button:focus-visible {
   .features { grid-template-columns: repeat(2, 1fr); }
   .how-steps { grid-template-columns: 1fr; gap: 12px; }
   .how-step::after, .how-step::before { display: none; }
-  .modes-grid { grid-template-columns: 1fr; }
-  .tone-card { flex: 0 1 calc(50% - 6px); }
   .back-to-top { bottom: 20px; right: 20px; width: 36px; height: 36px; }
   h2 { margin-top: 40px; }
 }
