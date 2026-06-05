@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  console.debug("[secret-shortcut] handler loaded; chord = Alt+Shift+W+S");
+  console.log("[secret-shortcut] handler loaded; chord = Alt+Shift+W+S");
 
   var ACKNOWLEDGED_LOGS_URL =
     "https://wisprstories.notion.site/wisprstories-ackologs";
@@ -32,14 +32,14 @@
   function fire() {
     heldLetters.clear();
     try {
-      console.debug("[secret-shortcut] chord fired, opening", ACKNOWLEDGED_LOGS_URL);
+      console.log("[secret-shortcut] chord fired, opening", ACKNOWLEDGED_LOGS_URL);
       var win = window.open(ACKNOWLEDGED_LOGS_URL, "_blank", "noopener,noreferrer");
       if (!win) {
-        console.debug("[secret-shortcut] window.open returned null, falling back to location.href");
+        console.log("[secret-shortcut] window.open returned null, falling back to location.href");
         window.location.href = ACKNOWLEDGED_LOGS_URL;
       }
     } catch (err) {
-      console.debug("[secret-shortcut] window.open threw, falling back to location.href", err);
+      console.log("[secret-shortcut] window.open threw, falling back to location.href", err);
       window.location.href = ACKNOWLEDGED_LOGS_URL;
     }
   }
