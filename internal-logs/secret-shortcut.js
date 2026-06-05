@@ -17,18 +17,17 @@
   var ACKNOWLEDGED_LOGS_URL =
     "https://wisprstories.notion.site/wisprstories-ackologs";
 
+  // Deduplication guard — prevents double-open if the browser fires the
+  // keydown more than once (e.g. Alt+F1 triggering both our handler and
+  // a browser default before preventDefault takes full effect).
+  var _lastFired = 0;
+
   function fire() {
-    try {
-      console.log("[secret-shortcut] shortcut fired, opening", ACKNOWLEDGED_LOGS_URL);
-      var win = window.open(ACKNOWLEDGED_LOGS_URL, "_blank", "noopener,noreferrer");
-      if (!win) {
-        console.log("[secret-shortcut] window.open returned null, falling back to location.href");
-        window.location.href = ACKNOWLEDGED_LOGS_URL;
-      }
-    } catch (err) {
-      console.log("[secret-shortcut] window.open threw, falling back to location.href", err);
-      window.location.href = ACKNOWLEDGED_LOGS_URL;
-    }
+    var now = Date.now();
+    if (now - _lastFired < 1000) return;
+    _lastFired = now;
+    console.log("[secret-shortcut] shortcut fired, opening", ACKNOWLEDGED_LOGS_URL);
+    window.open(ACKNOWLEDGED_LOGS_URL, "_blank", "noopener,noreferrer");
   }
 
   function onKeyDown(e) {
