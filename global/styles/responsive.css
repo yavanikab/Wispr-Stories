@@ -432,9 +432,20 @@
     overflow-y: auto;
   }
 
-  .share-modal-content,
-  .upgrade-modal-content {
+  .share-modal-content {
     padding: 24px 20px;
+  }
+  /* Upgrade modal: bottom-sheet on mobile — no side compression */
+  .upgrade-modal {
+    align-items: flex-end;
+  }
+  .upgrade-modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 28px 24px 40px;
+    max-height: 92vh;
+    max-height: 92dvh;
   }
   .share-modal-preview {
     aspect-ratio: auto;

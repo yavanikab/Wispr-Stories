@@ -304,6 +304,11 @@ body.modal-open .rewrite-bar {
   display: flex;
   gap: 8px;
 }
+.upgrade-modal-row .upgrade-modal-btn {
+  width: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .upgrade-modal-input {
   flex: 1;
   background: var(--cream2);
