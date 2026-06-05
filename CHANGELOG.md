@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.11.0.5] — Remove `hero.seo` Visually-Hidden Paragraph (2026-06-04)
+
+Patch release: removes the hidden SEO paragraph below the H1. The paragraph listed brand misspellings ("WisprStories", "Wisper Stories", etc.) for SEO and used the `.visually-hidden` class to be invisible to users. It was added in v0.10.4.8 but turned out to add visual clutter without enough SEO benefit. Brand-misspelling SEO is still covered by the JSON-LD `alternateName` array, `featureList`, and `<meta name="keywords">` — those remain in place.
+
+### Removed
+- **`<p class="visually-hidden" data-i18n="hero.seo">...</p>`** (`wisprstories.html:236-244`) — 9-line paragraph below the H1 listing brand misspellings and a 3-sentence product description.
+- **`hero.seo` i18n key** (`assets/i18n/en.json`) — the source string for the deleted paragraph. 10 other locale files never had this key.
+- **`hero.seo` mention in v0.10.4.8 docs** — kept historical references accurate; this entry supersedes the v0.10.4.8 decision.
+
+### Notes
+- The `.visually-hidden` CSS class in `global/styles/base.css` is preserved (still useful as a utility, e.g., for future SEO content).
+- The JSON-LD `alternateName` array (`wisprstories.html:156-165`) keeps all 10 brand-misspelling variants.
+- The JSON-LD `featureList` (`wisprstories.html:176`) keeps the "Also known as WisprStories, Wisper Stories, or Whisper Stories" suffix.
+- The `<meta name="keywords">` keeps the brand variants.
+
+### Changed
+- **Build banner** (`wisprstories.js:1`) — v0.11.0.4 → v0.11.0.5 (2026-06-04).
+
+## [v0.11.0.4] — Chord Handler: Deployment Path Fix (2026-06-04)
+
+Patch release: fixes the Acknowledged Logs chord script not loading on `/about` and `/language-stats` pages. The script tags used relative paths (`internal-logs/secret-shortcut.js`), which resolved incorrectly on clean URLs (`/about/internal-logs/...`, `/language-stats/internal-logs/...`). Changed all three pages to absolute path `/internal-logs/secret-shortcut.js`.
+
+### Fixed
+- **Chord script 404 on non-home pages** (`wisprstories.html:1113`, `about.html:253`, `language-stats.html:236`) — Relative script src failed on rewritten URLs. Absolute path works everywhere.
+- **Build banner** (`wisprstories.js:1`) — v0.11.0.3 → v0.11.0.4 (2026-06-04).
+
 ## [v0.11.0.3] — Chord Handler: Windows Menu-Activation Fix (2026-06-04)
 
 Patch release: fixes the "Acknowledged Logs" keyboard chord (Alt+Shift+W+S) on Windows. Previously, the W and S keys in the chord triggered the Windows menu bar (Alt+W = Window, Alt+S = Tools) which stole focus from the page, so the chord handler never received the keydown events and the page never opened.

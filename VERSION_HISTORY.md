@@ -1,5 +1,24 @@
 # Version History
 
+## v0.11.0.5 — Remove `hero.seo` Visually-Hidden Paragraph (2026-06-04)
+
+Patch release: removes the hidden SEO paragraph below the H1 that was added in v0.10.4.8. Listed brand misspellings ("WisprStories", "Wisper Stories", etc.) for SEO via the `.visually-hidden` class. Brand-misspelling SEO is still covered by JSON-LD `alternateName`, `featureList`, and `<meta name="keywords">`. The `.visually-hidden` CSS utility is preserved.
+
+### Removed
+- `<p class="visually-hidden" data-i18n="hero.seo">` from `wisprstories.html`.
+- `hero.seo` key from `assets/i18n/en.json`.
+
+### Changed
+- Build banner — v0.11.0.4 → v0.11.0.5 (2026-06-04).
+
+## v0.11.0.4 — Chord Handler: Deployment Path Fix (2026-06-04)
+
+Patch release: fixes the Acknowledged Logs chord script not loading on `/about` and `/language-stats`. The script tags used relative paths (`internal-logs/secret-shortcut.js`), which resolved to `/about/internal-logs/...` and `/language-stats/internal-logs/...` on clean URLs. Changed to absolute path `/internal-logs/secret-shortcut.js` on all three pages.
+
+### Fixed
+- **Script 404 on non-home pages** — Relative path broke on Vercel rewrites. Absolute path works on `/`, `/about`, `/language-stats`.
+- **Build banner** — v0.11.0.3 → v0.11.0.4 (2026-06-04).
+
 ## v0.11.0.3 — Chord Handler: Windows Menu-Activation Fix (2026-06-04)
 
 Patch release: fixes the Acknowledged Logs keyboard chord (Alt+Shift+W+S) on Windows. On Windows, Alt+W and Alt+S activate the Window and Tools menus, which steal focus from the page before the keydown reaches the chord handler. Fix: scoped `e.preventDefault()` in the keydown handler for W and S when Alt+Shift is held, so the menu bar does not activate and the keydown reaches the page. Two `console.debug` lines added for diagnosis: script-init "handler loaded" and chord-fire "chord fired, opening <url>".
