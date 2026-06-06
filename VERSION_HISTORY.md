@@ -1,5 +1,20 @@
 # Version History
 
+## v0.11.0.7 — Grace Zone: Traffic-Light Colors + Clickable FAQ Link (2026-06-05)
+
+Patch release: counter color scheme changed to traffic-light progression (gray 0-119, yellow 120-150, red 151-160). Counter shifts at >150 from `X / 150` to `X (Grace)` where "Grace" links to `/about#faq-grace`. Emoji: ⚠️ for warn, 🛟 for grace (CSS `::before`). New `.grace-link` CSS class. `about.js` gets hash-based FAQ auto-expand. Build banner v0.11.0.6 → v0.11.0.7.
+
+### Changed
+- Counter color scheme: traffic-light progression gray → yellow `#eab308` → red `#dc2626`
+- Counter format shifts at >150 to `X (Grace)` with clickable link to `/about#faq-grace`
+- `.grace-link` CSS class added; `wisprstories.js:998-1000` refactored (safe innerHTML, class toggles)
+- Build banner — v0.11.0.6 → v0.11.0.7
+
+### Added
+- `about.js` hash-based auto-expand for FAQ accordion
+- `en.json` toasts: `"grace": "Grace"` key
+- About page FAQ renamed to "What is the Grace zone?" with `id="faq-grace"`
+
 ## v0.11.0.6 — Delete `audit.md` (2026-06-04)
 
 Patch release: removes the now-redundant `audit.md` design-inconsistency audit. Content fully integrated into CHANGELOG/VERSION_HISTORY across v0.10.4.7 → v0.11.0.5; open items tracked in AGENTS.md "Known bugs". `remotion-demo/` was NOT deleted — it's a marketing demo project (Remotion/React, separate AI agent), not part of the live app. AGENTS.md updated with explicit preservation note.
@@ -94,6 +109,30 @@ Major release: the "Acknowledged Logs" transparency system for the Wispr Flow te
 1. Create the Notion page from the `MIRROR TO NOTION` block in `internal-logs/ilogs-ws.md`.
 2. Replace the `ACKNOWLEDGED_LOGS_URL` placeholder in `internal-logs/secret-shortcut.js` with the real Notion URL.
 3. Redeploy.
+
+## v0.10.4.8 — SEO for Brand Misspellings + Link Hygiene (2026-06-04)
+
+SEO optimization for brand misspellings and link hygiene cleanup.
+
+### Added
+- JSON-LD `alternateName` expanded to 10 brand variants for misspelling SEO
+- Hidden `.visually-hidden` SEO paragraph below H1 listing 6 search variations
+- `inLanguage` (11), `keywords`, `image`, `applicationSubCategory` to JSON-LD
+- 12 `hreflang` tags + `og:locale:alternate` for 11 languages on home
+- `.visually-hidden` CSS utility in `global/styles/base.css`
+- 2 hreflang tags each on About + language-stats pages
+
+### Changed
+- Title tags tightened (88→60 chars on home); meta descriptions ≤160 chars
+- `<meta name="keywords">` expanded with brand variants on all 3 pages
+- Sitemap rewritten with clean URLs and `lastmod` 2026-06-04
+- Vercel 301 redirects `/about.html` → `/about`, `/language-stats.html` → `/language-stats`
+- 39 `wisprflow.ai?ref=wispr-stories` → `wisprflow.ai/r?BEST76` across 20 files
+- 2 Buy Me a Coffee URLs → `/membership`
+- Build banner — v0.10.4.7 → v0.10.4.8
+
+### Removed
+- JSON-LD fake `aggregateRating` (Google penalty risk)
 
 ## v0.10.4.7 — liveBox Removal + Counter Safety Net + 3 Bug Fixes (2026-06-04)
 

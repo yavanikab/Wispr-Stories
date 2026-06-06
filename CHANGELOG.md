@@ -1,5 +1,24 @@
 # Changelog
 
+## [v0.11.0.7] — Grace Zone: Traffic-Light Colors + Clickable FAQ Link (2026-06-05)
+
+Patch release. Counter color scheme changed to traffic-light progression: gray (0-119), yellow `#eab308` (120-150, warn), red `#dc2626` (151-160, grace). Counter format shifts at >150 from `X / 150` to `X (Grace)` where "Grace" is a clickable link to `/about#faq-grace`. Emoji mapping: ⚠️ for warn, 🛟 for grace (both via CSS `::before`). New `.grace-link` CSS class with dotted underline. `about.js` gets hash-based auto-expand for FAQ accordion. Build banner v0.11.0.6 → v0.11.0.7.
+
+### Changed
+- Counter color scheme changed to traffic-light progression: gray (0-119), yellow `#eab308` (120-150, warn), red `#dc2626` (151-160, grace)
+- Counter format shifts at >150 from `X / 150` to `X (Grace)` where "Grace" is a clickable link to `/about#faq-grace`
+- Emoji mapping: ⚠️ for warn, 🛟 for grace (both via CSS `::before`)
+- New `.grace-link` CSS class: dotted underline lighter red, solid on hover, white-on-red active for mobile (`@media (hover: none)`)
+- `wisprstories.js:998-1000` refactored: user text escaped for safe innerHTML, `warn` class only at 120-150, `grace` only at >150
+
+### Added
+- `about.js` hash-based auto-expand: on page load, if `location.hash` matches a `.faq-item` element, auto-click its `.faq-q` to expand the accordion
+- `en.json` toasts section gets `"grace": "Grace"` key (reserved, displayed in English always)
+- About page FAQ renamed to "What is the Grace zone?" with `id="faq-grace"` on the answer div
+
+### Changed
+- Build banner `wisprstories.js:1` v0.11.0.6 → v0.11.0.7
+
 ## [v0.11.0.6] — Delete `audit.md` (2026-06-04)
 
 Patch release: removes the now-redundant `audit.md` design-inconsistency audit. Its content has been fully integrated into `CHANGELOG.md` and `VERSION_HISTORY.md` across v0.10.4.7 → v0.11.0.5, and the still-open items are captured in AGENTS.md's "Known bugs" section. Keeping the file added noise without providing new value.
@@ -117,6 +136,35 @@ Major release: the "Acknowledged Logs" transparency system. A Notion page lists 
 1. Create the Notion page from the `MIRROR TO NOTION` block in `internal-logs/ilogs-ws.md`.
 2. Replace the `ACKNOWLEDGED_LOGS_URL` placeholder in `internal-logs/secret-shortcut.js` with the real Notion URL.
 3. Redeploy.
+
+## [v0.10.4.8] — SEO for Brand Misspellings + Link Hygiene (2026-06-04)
+
+SEO optimization for brand misspellings and link hygiene cleanup.
+
+### Added
+- JSON-LD `alternateName` array expanded to 10 brand variants (WisprStories, Wisper Stories, Whisper Stories, etc.) for misspelling SEO
+- Hidden `.visually-hidden` SEO paragraph below H1 listing all 6 common search variations explicitly
+- Added `inLanguage` (11), `keywords`, `image`, `applicationSubCategory` to JSON-LD
+- Added 12 `hreflang` tags + `og:locale:alternate` for 11 languages on home
+- `.visually-hidden` CSS utility added to `global/styles/base.css`
+- About + language-stats got 2 hreflang tags each
+
+### Changed
+- Title tags tightened (88→60 chars on home)
+- Meta descriptions trimmed to ≤160 chars
+- `<meta name="keywords">` expanded with brand variants on all 3 pages
+- JSON-LD `keywords` and `featureList` also include the brand variants
+- Sitemap rewritten with clean URLs (`/about`, `/language-stats`) and `lastmod` 2026-06-04
+- Vercel `vercel.json` has 301 redirects `/about.html` → `/about` and `/language-stats.html` → `/language-stats`
+- Canonical URLs use trailing slashes consistently
+- **Link hygiene**: 39 `wisprflow.ai?ref=wispr-stories` URLs replaced with `wisprflow.ai/r?BEST76` across 20 files
+- 2 Buy Me a Coffee URLs updated to `/membership` in `wisprstories.html` and `global/footer-menu.js`
+
+### Removed
+- JSON-LD fake `aggregateRating` removed (Google penalty risk)
+
+### Changed
+- Build banner `wisprstories.js:1` v0.10.4.7 → v0.10.4.8
 
 ## [v0.10.4.7] — liveBox Removal + Counter Safety Net + 3 Bug Fixes (2026-06-04)
 
