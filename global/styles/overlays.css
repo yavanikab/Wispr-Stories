@@ -132,6 +132,7 @@
   z-index: 9999;
   white-space: nowrap;
   max-width: 90vw;
+  height: fit-content;
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);

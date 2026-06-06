@@ -99,13 +99,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML and JS — network-first. Always fetch the latest version when online
-  // so users never get stale app code. Fall back to cache only when offline.
-  const isHtmlOrJs = url.pathname === '/'
-    || url.pathname.endsWith('.html')
-    || url.pathname.endsWith('.js');
+  // HTML — network-only. Never cache HTML so users always get fresh version
+  // on every navigation. Fall back to cached shell only when offline.
+  const isHtml = url.pathname === '/' || url.pathname.endsWith('.html');
 
-  if (isHtmlOrJs) {
+  if (isHtml) {
+    event.respondWith(
+      fetch(req)
+        .catch(() =>
+          caches.match(req).then((cached) =>
+            cached || caches.match('/wisprstories.html')
+          )
+        )
+    );
+    return;
+  }
+
+  // JS — network-first. Always fetch latest when online; cache for offline.
+  // Fall back to cache only when offline.
+  if (url.pathname.endsWith('.js')) {
     event.respondWith(
       fetch(req)
         .then((resp) => {
@@ -115,11 +127,7 @@ self.addEventListener('fetch', (event) => {
           }
           return resp;
         })
-        .catch(() =>
-          caches.match(req).then((cached) =>
-            cached || caches.match('/wisprstories.html')
-          )
-        )
+        .catch(() => caches.match(req))
     );
     return;
   }

@@ -63,6 +63,23 @@ body::-webkit-scrollbar { width: 0; }
 }
 </style>
 <script src="global/capacity-check.js" defer></script>
+    <script>
+      /* Service worker — registered on production hosts only. localhost and
+         the Vercel preview branches skip registration so a stale SW doesn't
+         shadow live edits during development. */
+      if (
+        "serviceWorker" in navigator &&
+        location.hostname === "wisprstories.vercel.app"
+      ) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .catch(function () {
+              /* SW registration failed — app still works */
+            });
+        });
+      }
+    </script>
 </head>
 <body>
 

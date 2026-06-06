@@ -240,4 +240,18 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  /* --- Auto-expand FAQ from hash --- */
+  if (location.hash) {
+    var target = document.querySelector(location.hash);
+    if (target) {
+      var btn = target.querySelector('.faq-q');
+      if (btn) {
+        btn.click();
+        requestAnimationFrame(function() {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
+    }
+  }
 })();

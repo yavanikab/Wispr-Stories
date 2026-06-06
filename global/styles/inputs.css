@@ -235,22 +235,54 @@
   font-size: clamp(12px, 0.3vw + 11px, 13px);
   color: var(--ink3);
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 .char-c.warn {
-  color: #dc2626;
+  color: #eab308;
   font-weight: 600;
 }
 .char-c.warn::before {
-  content: "⚠️";
+  content: "\26A0\FE0F";
   display: inline-block;
   font-size: clamp(11px, 0.3vw + 10px, 12px);
 }
 .char-c.grace {
-  color: #d97706;
-  font-weight: 500;
+  --grace-red: #dc2626;
+  color: var(--grace-red);
+  font-weight: 600;
+}
+@media (prefers-color-scheme: dark) {
+  .char-c.grace { --grace-red: #f87171; }
+}
+.char-c.grace::before {
+  content: "\1F6DF";
+  display: inline-block;
+  font-size: clamp(11px, 0.3vw + 10px, 12px);
+}
+.grace-link {
+  color: inherit;
+  font-size: clamp(11px, 0.3vw + 10px, 12px);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: text-decoration-color 0.15s, text-decoration-style 0.15s;
+}
+.grace-link:hover {
+  text-decoration-style: solid;
+  text-decoration-color: inherit;
+}
+@media (prefers-color-scheme: light) {
+  .grace-link { text-decoration-color: rgba(0, 0, 0, 0.3); }
+}
+@media (hover: none) {
+  .grace-link:active {
+    color: #fff;
+    background: var(--grace-red, #dc2626);
+    border-radius: 2px;
+    padding: 0 2px;
+    margin: 0 -2px;
+  }
 }
 .reset-btn {
   /* Pushed to the right edge of .rec-row (the row with the mic + Tap to

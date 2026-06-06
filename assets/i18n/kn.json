@@ -219,7 +219,9 @@
     "exportFailed": "Export failed",
     "playbackFailed": "Can’t play",
     "thankYouEmail": "Sent! 💛",
-    "validEmail": "Enter a valid email"
+    "validEmail": "Enter a valid email",
+    "updateAvailable": "Update ready — tap to refresh",
+    "setSpeechLang": "Choose language"
   },
   "voice": {
     "attach": "Attach voice",

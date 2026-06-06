@@ -227,7 +227,10 @@
     "exportFailed": "Export failed",
     "playbackFailed": "Can\u2019t play",
     "thankYouEmail": "Sent! \ud83d\udc9b",
-    "validEmail": "Enter a valid email"
+    "validEmail": "Enter a valid email",
+    "updateAvailable": "Update ready — tap to refresh",
+    "setSpeechLang": "Choose language",
+    "grace": "Grace"
   },
   "voice": {
     "attach": "Attach voice",

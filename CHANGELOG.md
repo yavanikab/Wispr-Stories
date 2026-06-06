@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.11.0.6] — Delete `audit.md` (2026-06-04)
+
+Patch release: removes the now-redundant `audit.md` design-inconsistency audit. Its content has been fully integrated into `CHANGELOG.md` and `VERSION_HISTORY.md` across v0.10.4.7 → v0.11.0.5, and the still-open items are captured in AGENTS.md's "Known bugs" section. Keeping the file added noise without providing new value.
+
+### Removed
+- **`audit.md`** (3.8KB, committed June 3 2026 in commit `37366b8`) — the 73-line design-inconsistency audit with 9 items (3 DONE, 5 NEEDS DECISION, 3 RETRACTED). All DONE items are integrated into `CHANGELOG.md` and `VERSION_HISTORY.md`. All RETRACTED items are by definition no longer relevant. The 3 still-open NEEDS DECISION items (resetBtn async race, spacebar duplication, tone badge fetch-failure gap) are tracked in AGENTS.md "Known bugs".
+
+### Notes
+- `remotion-demo/` was identified during the audit as a candidate for deletion but is a **marketing demo video project** created by a separate AI agent. **Do NOT delete** — it's a marketing asset, not part of the live app. AGENTS.md updated with explicit preservation note.
+- The historical references to `audit.md` in older `CHANGELOG.md` and `VERSION_HISTORY.md` entries are preserved as historical record (they document what the file was, not that it should still exist).
+
+### Changed
+- **AGENTS.md** — Removed `audit.md` from "Key files" list. Updated `remotion-demo/` entries (lines 94, 143) to make explicit: "Marketing demo video project (Remotion/React). Created by a separate AI agent. Do NOT delete — it's a marketing asset, not part of the live app."
+- **Build banner** (`wisprstories.js:1`) — v0.11.0.5 → v0.11.0.6 (2026-06-04).
+
 ## [v0.11.0.5] — Remove `hero.seo` Visually-Hidden Paragraph (2026-06-04)
 
 Patch release: removes the hidden SEO paragraph below the H1. The paragraph listed brand misspellings ("WisprStories", "Wisper Stories", etc.) for SEO and used the `.visually-hidden` class to be invisible to users. It was added in v0.10.4.8 but turned out to add visual clutter without enough SEO benefit. Brand-misspelling SEO is still covered by the JSON-LD `alternateName` array, `featureList`, and `<meta name="keywords">` — those remain in place.

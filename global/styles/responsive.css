@@ -225,7 +225,7 @@
     padding-bottom: max(80px, env(safe-area-inset-bottom) + 60px);
   }
   body.has-mobile-bar .toast {
-    bottom: 80px;
+    /* toast stays at top */
   }
 
   .ex-grid {
@@ -360,7 +360,7 @@
     padding-bottom: 60px;
   }
   body.has-rewrite-bar .toast {
-    bottom: 70px;
+    /* toast stays at top */
   }
   .rewrite-bar .rewrite-bar-btn {
     background: #f59e0b;

@@ -1,4 +1,4 @@
-console.log("%c[Build] Wispr Stories v0.11.0.5 (2026-06-04)", "color:#ec4899;font-weight:bold;font-size:14px");
+console.log("%c[Build] Wispr Stories v0.11.0.7 (2026-06-05)", "color:#ec4899;font-weight:bold;font-size:14px");
 const PALS = [
   "#7c3aed",
   "#f59e0b",
@@ -137,6 +137,89 @@ let _lastSttLang = "";
 let _lastSttSessionId = "";
 let _lastKnownRecordingsUsed = -1;
 let _lastKnownRecordingsDate = "";
+
+// Service Worker update detection & version polling
+let _swUpdateToastShown = false;
+let _versionPollTimer = null;
+const VERSION_POLL_INTERVAL_MS = 60 * 1000; // 60 seconds
+const CURRENT_VERSION = "v0.11.0.6";
+
+function initSWUpdateDetection() {
+  if (!("serviceWorker" in navigator)) return;
+  if (location.hostname !== "wisprstories.vercel.app") return;
+
+  // controllerchange fires when a new SW takes over the page
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (_swUpdateToastShown) return;
+    _swUpdateToastShown = true;
+const msg = getI18nSync("toasts.updateAvailable") || "Update ready — tap to refresh";
+    showToast(msg);
+    const toastEl = document.getElementById("toast");
+    if (toastEl) {
+      toastEl.style.cursor = "pointer";
+      toastEl.onclick = function () { location.reload(); };
+    }
+  });
+
+  // updatefound fires when a new SW is being installed
+  navigator.serviceWorker.addEventListener("updatefound", function (reg) {
+    const installingWorker = reg.installing;
+    if (!installingWorker) return;
+    installingWorker.addEventListener("statechange", function () {
+      if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+        // New SW installed but not yet controlling — controllerchange will fire on next navigation
+        // We can optionally show a pre-emptive toast here, but controllerchange handles the active case
+      }
+    });
+  });
+}
+
+async function checkVersion() {
+  try {
+    const resp = await fetch("/version.json?v=" + Date.now(), { cache: "no-store" });
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.version && data.version !== CURRENT_VERSION) {
+      if (_swUpdateToastShown) return;
+      _swUpdateToastShown = true;
+const msg = getI18nSync("toasts.updateAvailable") || "Update ready — tap to refresh";
+      showToast(msg);
+      const toastEl = document.getElementById("toast");
+      if (toastEl) {
+        toastEl.style.cursor = "pointer";
+        toastEl.onclick = function () { location.reload(); };
+      }
+    }
+  } catch (_e) {
+    // Silent fail — network issues, offline, etc.
+  }
+}
+
+function startVersionPolling() {
+  if (_versionPollTimer) return;
+  checkVersion(); // Initial check
+  _versionPollTimer = setInterval(checkVersion, VERSION_POLL_INTERVAL_MS);
+}
+
+function stopVersionPolling() {
+  if (_versionPollTimer) {
+    clearInterval(_versionPollTimer);
+    _versionPollTimer = null;
+  }
+}
+
+// Poll on visibility change (tab becomes active)
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "visible") {
+    checkVersion();
+  }
+});
+
+// Initialize on load
+window.addEventListener("load", function () {
+  initSWUpdateDetection();
+  startVersionPolling();
+});
 let _lastKnownRecordingsSessionId = "";
 let _sttRetrying = false;
 const isSafari =
@@ -625,14 +708,21 @@ function handleUpgradeEmail() {
 }
 
 function canCreateCard() {
+  // Speech language is required for all cards (voice + text) — Task A
+  if (!speechLang) {
+    return {
+      ok: false,
+      msg: (typeof getI18nSync === "function" && getI18nSync("toasts.setSpeechLang")) || "Select a speech language first"
+    };
+  }
+  if (speechLang === "__native__") return { ok: true }; // Native mode allowed
   if (curTone === "original") return { ok: true };
   if (isSupporter()) return { ok: true };
   const left = getCardsLeft();
   if (left > 0) return { ok: true };
   return {
     ok: false,
-    msg:
-      "Daily tone card limit reached. Use Original tone for unlimited cards.",
+    msg: "Daily tone card limit reached. Use Original tone for unlimited cards.",
   };
 }
 
@@ -905,8 +995,12 @@ function updateCard(preserveText) {
   const panel = document.getElementById("cardPanel");
   const cc = document.getElementById("charC");
 
-  cc.textContent = raw.length + " / 150";
-  cc.classList.toggle("warn", raw.length >= 120);
+  if (raw.length > 150) {
+    cc.innerHTML = raw.length + ' (<a class="grace-link" href="/about#faq-grace">Grace</a>)';
+  } else {
+    cc.textContent = raw.length + ' / 150';
+  }
+  cc.classList.toggle("warn", raw.length >= 120 && raw.length <= 150);
   cc.classList.toggle("grace", raw.length > 150);
   // No RTL — page layout stays LTR always
 
@@ -928,17 +1022,25 @@ function updateCard(preserveText) {
     tx.style.fontStyle = t.fi;
     tx.style.fontWeight = t.fw;
     tx.style.letterSpacing = t.ls;
-    // Auto-detect language from text content — always wins over speechLang
-    var detected = autoDetectLangFromText(raw);
-    var langName;
-    if (detected) {
-      langName = getLanguageName(detected) || detected;
+    // Label: use ONLY speechLang (Task A + Task B Change 1)
+    var langName = "";
+    if (speechLang && speechLang !== "__native__") {
+      langName = getLanguageName(speechLang) || speechLang;
     } else if (speechLang === "__native__") {
       langName = "Native";
-    } else {
-      langName = getLanguageName(speechLang || curLang);
     }
-    lbl.textContent = name ? name + " \u00b7 " + langName : langName;
+    // Build label with spans for hierarchy (name bold, language muted)
+    if (name || langName) {
+      if (name && langName) {
+        lbl.innerHTML = '<span class="card-label-name">' + name + '</span><span class="card-label-sep"> \u00b7 </span><span class="card-label-lang">' + langName + '</span>';
+      } else if (name) {
+        lbl.innerHTML = '<span class="card-label-name">' + name + '</span>';
+      } else {
+        lbl.innerHTML = '<span class="card-label-lang">' + langName + '</span>';
+      }
+    } else {
+      lbl.textContent = "";
+    }
   } else {
     card.classList.add("card-empty");
     document.querySelector('.shell')?.classList.remove('has-card');
@@ -957,9 +1059,16 @@ function updateCard(preserveText) {
   checkOccasions();
   updateVoiceBar();
 
+  // Disable Create button (btnC) when no valid speech language is set (Task A)
+  const hasValidSpeechLang = speechLang && speechLang !== "__native__";
+  const btnC = document.getElementById("btnC");
+  if (btnC) {
+    btnC.disabled = !hasValidSpeechLang || !raw.trim();
+  }
+
   // Font-size control: only for short, non-empty card text. The length checked
   // is what the card actually shows (capped at 150 + ellipsis). If the text is
-  // empty or has grown past the limit, snap the size back to base and disable.
+  // empty or grown past the limit, snap the size back to base and disable.
   var shownLen = raw.trim() ? (raw.length > 150 ? 153 : raw.length) : 0;
   var fontEligible = shownLen > 0 && shownLen < FONT_SIZE_MAX_CHARS;
   if (!fontEligible && cardFontBump !== 0) cardFontBump = 0;
@@ -2100,12 +2209,14 @@ function updateSlTrigger() {
     t.innerHTML = '<span class="sl-nudge-label">' + ((typeof getI18nSync === 'function' && getI18nSync('speechLang.triggerLabel')) || 'Set language') + '</span> <span class="sl-arr"></span>';
     updateSlNudge();
     updateMicState();
+    updateCard(); // Refresh card label and btnC disabled state
     return;
   }
   t.classList.remove('sl-nudge');
   if (speechLang === "__native__") {
     t.innerHTML = '<i class="fi fi-xx"></i> <span>Native</span> <span class="sl-arr"></span>';
     updateMicState();
+    updateCard(); // Refresh card label and btnC disabled state
     return;
   }
   var lang = allLanguages.find(function(l){ return l.code === speechLang; });
@@ -2113,6 +2224,7 @@ function updateSlTrigger() {
     t.innerHTML = '<i class="fi fi-' + lang.flagCode + '"></i> <span>' + lang.label + '</span> <span class="sl-arr"></span>';
   }
   updateMicState();
+  updateCard(); // Refresh card label and btnC disabled state
 }
 function updateSlNudge() {
   var t = document.getElementById('speechLangTrigger');

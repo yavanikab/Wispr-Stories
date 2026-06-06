@@ -37,6 +37,23 @@
 <link rel="stylesheet" href="assets/fontawesome/css/solid.min.css" />
 <link rel="stylesheet" href="assets/fontawesome/css/brands.min.css" />
 <script src="global/capacity-check.js" defer></script>
+    <script>
+      /* Service worker — registered on production hosts only. localhost and
+         the Vercel preview branches skip registration so a stale SW doesn't
+         shadow live edits during development. */
+      if (
+        "serviceWorker" in navigator &&
+        location.hostname === "wisprstories.vercel.app"
+      ) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .catch(function () {
+              /* SW registration failed — app still works */
+            });
+        });
+      }
+    </script>
 </head>
 <body>
 
@@ -186,40 +203,40 @@
 
   <h2 id="faq" class="reveal">Questions</h2>
   <div class="faq-list" role="list">
-    <div class="faq-item" role="listitem">
+    <div class="faq-item" role="listitem" id="faq-wispr-flow">
       <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> What is Wispr Flow?</button>
       <div class="faq-a" role="region" aria-label="Answer: What is Wispr Flow?">
         <p><a href="https://wisprflow.ai/r?BEST76" target="_blank" rel="noopener noreferrer" class="body-link">Wispr Flow</a> is an AI voice input layer that works across Mac, Windows, iPhone, and Android. It lets you speak naturally and turns messy speech into polished text in any app: emails, documents, messages, code comments, and more. Wispr Stories is an independent project inspired by the same idea: making voice input fast and natural.</p>
       </div>
     </div>
-    <div class="faq-item" role="listitem">
+    <div class="faq-item" role="listitem" id="faq-native">
       <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> What does the &ldquo;Native&rdquo; option mean?</button>
       <div class="faq-a" role="region" aria-label="Answer: What does the Native option mean?">
         <p>&ldquo;Native&rdquo; is for languages that the speech-to-text engines don&rsquo;t specifically name but can still auto-detect. If your language isn&rsquo;t listed individually, select Native and the engine will do its best with automatic detection. The card label will display &ldquo;Native&rdquo; instead of a specific language name.</p>
       </div>
     </div>
-    <div class="faq-item" role="listitem">
+    <div class="faq-item" role="listitem" id="faq-free">
       <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> Is Wispr Stories free?</button>
       <div class="faq-a" role="region" aria-label="Answer: Is Wispr Stories free?">
         <p>Yes, completely free. No account or credit card needed. Free users get 15-second audio recordings (up to 5 per day) and 5 AI rewrites per tone per day.</p>
       </div>
     </div>
-    <div class="faq-item" role="listitem">
+    <div class="faq-item" role="listitem" id="faq-pro">
       <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> What do I get with Pro?</button>
       <div class="faq-a" role="region" aria-label="Answer: What do I get with Pro?">
         <p>Pro unlocks unlimited tone rewrites with no daily caps, 30-second audio recordings (up to 50 per day), and priority support. Upgrade directly from the app.</p>
       </div>
     </div>
-    <div class="faq-item" role="listitem">
+    <div class="faq-item" role="listitem" id="faq-privacy">
       <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> Is my data private?</button>
       <div class="faq-a" role="region" aria-label="Answer: Is my data private?">
         <p>When you create a card, your text is sent to speech-to-text and AI tone rewriting services. We do not store your card text permanently on our servers. Only the metadata needed to display a shared card link (text, name, tone, palette) is stored temporarily alongside the card image. See License &amp; Terms in the footer menu for full details.</p>
       </div>
     </div>
-    <div class="faq-item" role="listitem">
-      <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> Why does the character counter sometimes go past 150?</button>
-      <div class="faq-a" role="region" aria-label="Answer: Why does the character counter sometimes go past 150?">
-        <p>The textarea has an invisible 10-character grace. The user-facing cap is still 150 characters, which is the recommended length for the best-looking cards. But if you are typing and you reach 150 with a word still in progress, the system lets you finish that word (up to 160 characters total) so the system does not aggressively cut your message. The &ldquo;150&rdquo; is the recommended length; the &ldquo;160&rdquo; is a safety margin to make sure you never lose your last word.</p>
+    <div class="faq-item" role="listitem" id="faq-grace">
+      <button class="faq-q" aria-expanded="false"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> What is the Grace zone?</button>
+      <div class="faq-a" role="region" aria-label="Answer: What is the Grace zone?">
+        <p>The textarea accepts up to 150 characters for the best-looking cards. If you reach 150 with a word still in progress, the system lets you finish it &mdash; up to 160 characters. That extra space is the Grace zone. You will see the counter turn red and show &ldquo;(Grace)&rdquo; as a reminder to wrap up.</p>
       </div>
     </div>
   </div>

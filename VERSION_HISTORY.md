@@ -1,5 +1,16 @@
 # Version History
 
+## v0.11.0.6 — Delete `audit.md` (2026-06-04)
+
+Patch release: removes the now-redundant `audit.md` design-inconsistency audit. Content fully integrated into CHANGELOG/VERSION_HISTORY across v0.10.4.7 → v0.11.0.5; open items tracked in AGENTS.md "Known bugs". `remotion-demo/` was NOT deleted — it's a marketing demo project (Remotion/React, separate AI agent), not part of the live app. AGENTS.md updated with explicit preservation note.
+
+### Removed
+- `audit.md` — 73-line design-inconsistency audit (commit `37366b8`).
+
+### Changed
+- `AGENTS.md` — Removed `audit.md` from Key files. Updated `remotion-demo/` entries to make explicit: do NOT delete (marketing project).
+- Build banner — v0.11.0.5 → v0.11.0.6 (2026-06-04).
+
 ## v0.11.0.5 — Remove `hero.seo` Visually-Hidden Paragraph (2026-06-04)
 
 Patch release: removes the hidden SEO paragraph below the H1 that was added in v0.10.4.8. Listed brand misspellings ("WisprStories", "Wisper Stories", etc.) for SEO via the `.visually-hidden` class. Brand-misspelling SEO is still covered by JSON-LD `alternateName`, `featureList`, and `<meta name="keywords">`. The `.visually-hidden` CSS utility is preserved.

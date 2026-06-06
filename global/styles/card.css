@@ -156,10 +156,22 @@
 .card-label {
   font-size: clamp(12px, 0.3vw + 11px, 13px);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffeb;
   min-height: 16px;
   flex-shrink: 0;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.card-label-name {
+  font-weight: 600;
+  color: #ffffeb;
+}
+.card-label-sep {
+  font-weight: 500;
+  color: #ffffeb;
+}
+.card-label-lang {
+  font-weight: 500;
+  color: #ffffeb;
 }
 .card-panel {
   position: relative;
@@ -214,7 +226,8 @@
 .card-voice-label {
   font-size: clamp(10px, 0.3vw + 9px, 11px);
   font-weight: 500;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: rgba(26, 26, 26, 0.45);
   margin-top: 4px;
   text-align: left !important;
@@ -235,7 +248,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #ffffeb;
 }
 .card-logo-img {
   height: 26px;
@@ -250,7 +263,7 @@
 }
 .card-domain {
   font-size: clamp(10px, 0.3vw + 9px, 11px);
-  color: rgba(255, 255, 255, 0.5);
+  color: #ffffeb;
   letter-spacing: 0.01em;
 }
 
